@@ -1,0 +1,6671 @@
+---
+openapi: 3.0.3
+info:
+  title: Redmine API
+  description: Auto-generated OpenAPI specification for Redmine 6.1.3.stable.
+  version: 1.0.0+redmine.6.1.3.stable
+servers:
+- url: "/"
+security:
+- Basic: []
+- ApiKey: []
+- ApiKeyInQuery: []
+- OAuth2: []
+tags:
+- name: Attachments
+- name: Custom Fields
+- name: Enumerations
+- name: Files
+- name: Groups
+- name: Issue Categories
+- name: Issue Relations
+- name: Issue Statuses
+- name: Issues
+- name: Journals
+- name: Members
+- name: My
+- name: News
+- name: Projects
+- name: Queries
+- name: Repositories
+- name: Roles
+- name: Search
+- name: Timelog
+- name: Trackers
+- name: Users
+- name: Versions
+- name: Watchers
+- name: Wiki
+paths:
+  "/issues/changes()":
+    get:
+      tags:
+      - Journals
+      summary: List journal
+      operationId: getJournalses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{id}/quoted()":
+    post:
+      tags:
+      - Journals
+      summary: New journal
+      operationId: newJournal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Journal"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/journals/{id}/diff()":
+    get:
+      tags:
+      - Journals
+      summary: Diff journal
+      operationId: diffJournal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/journals/{id}/edit()":
+    get:
+      tags:
+      - Journals
+      summary: Update journal
+      operationId: updateJournal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/journals/{id}()":
+    patch:
+      tags:
+      - Journals
+      summary: Update journal
+      operationId: updateJournal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Journal"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Journals
+      summary: Update journal
+      operationId: updateJournal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Journal"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/account()":
+    get|put:
+      tags:
+      - My
+      summary: Account my
+      operationId: accountMy
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/account/destroy()":
+    get|post:
+      tags:
+      - My
+      summary: Delete my
+      operationId: deleteMy
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/page()":
+    get:
+      tags:
+      - My
+      summary: Page my
+      operationId: pageMy
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - My
+      summary: Update_page my
+      operationId: update_pageMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my()":
+    get:
+      tags:
+      - My
+      summary: List my
+      operationId: getMies
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/api_key()":
+    get:
+      tags:
+      - My
+      summary: Show_api_key my
+      operationId: show_api_keyMy
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - My
+      summary: Reset_api_key my
+      operationId: reset_api_keyMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/atom_key()":
+    post:
+      tags:
+      - My
+      summary: Reset_atom_key my
+      operationId: reset_atom_keyMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/password()":
+    get|post:
+      tags:
+      - My
+      summary: Password my
+      operationId: passwordMy
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/add_block()":
+    post:
+      tags:
+      - My
+      summary: Add_block my
+      operationId: add_blockMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/remove_block()":
+    post:
+      tags:
+      - My
+      summary: Remove_block my
+      operationId: remove_blockMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/my/order_blocks()":
+    post:
+      tags:
+      - My
+      summary: Order_blocks my
+      operationId: order_blocksMy
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/bulk_destroy()":
+    delete:
+      tags:
+      - Users
+      summary: Bulk_destroy user
+      operationId: bulk_destroyUser
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/bulk_lock()":
+    post:
+      tags:
+      - Users
+      summary: Bulk_lock user
+      operationId: bulk_lockUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/bulk_unlock()":
+    post:
+      tags:
+      - Users
+      summary: Bulk_unlock user
+      operationId: bulk_unlockUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users()":
+    get:
+      tags:
+      - Users
+      summary: List user
+      operationId: getUserses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Users
+      summary: Create user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/new()":
+    get:
+      tags:
+      - Users
+      summary: New user
+      operationId: newUser
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/{id}/edit()":
+    get:
+      tags:
+      - Users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/users/{id}()":
+    get:
+      tags:
+      - Users
+      summary: Get user
+      operationId: getUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Users
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers/watch()":
+    post:
+      tags:
+      - Watchers
+      summary: Watch watcher
+      operationId: watchWatcher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Watcher"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Watchers
+      summary: Unwatch watcher
+      operationId: unwatchWatcher
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers/new()":
+    get:
+      tags:
+      - Watchers
+      summary: New watcher
+      operationId: newWatcher
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers()":
+    post:
+      tags:
+      - Watchers
+      summary: Create watcher
+      operationId: createWatcher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Watcher"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Watchers
+      summary: Delete watcher
+      operationId: deleteWatcher
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers/append()":
+    post:
+      tags:
+      - Watchers
+      summary: Append watcher
+      operationId: appendWatcher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Watcher"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers/autocomplete_for_mention()":
+    get:
+      tags:
+      - Watchers
+      summary: Autocomplete_for_mention watcher
+      operationId: autocomplete_for_mentionWatcher
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/watchers/autocomplete_for_user()":
+    get:
+      tags:
+      - Watchers
+      summary: Autocomplete_for_user watcher
+      operationId: autocomplete_for_userWatcher
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{object_id}/watchers()":
+    post:
+      tags:
+      - Watchers
+      summary: Create watcher
+      operationId: createWatcher
+      parameters:
+      - name: object_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Watcher"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{object_id}/watchers/{user_id}()":
+    delete:
+      tags:
+      - Watchers
+      summary: Delete watcher
+      operationId: deleteWatcher
+      parameters:
+      - name: object_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/autocomplete()":
+    get:
+      tags:
+      - Projects
+      summary: Autocomplete project
+      operationId: autocompleteProject
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/bulk_destroy()":
+    delete:
+      tags:
+      - Projects
+      summary: Bulk_destroy project
+      operationId: bulk_destroyProject
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/settings(/{tab})()":
+    get:
+      tags:
+      - Projects
+      summary: Settings project
+      operationId: settingsProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: tab
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/archive()":
+    post|put:
+      tags:
+      - Projects
+      summary: Archive project
+      operationId: archiveProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/unarchive()":
+    post|put:
+      tags:
+      - Projects
+      summary: Unarchive project
+      operationId: unarchiveProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/close()":
+    post|put:
+      tags:
+      - Projects
+      summary: Close project
+      operationId: closeProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/reopen()":
+    post|put:
+      tags:
+      - Projects
+      summary: Reopen project
+      operationId: reopenProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/copy()":
+    get|post:
+      tags:
+      - Projects
+      summary: Copy project
+      operationId: copyProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/bookmark()":
+    delete|post:
+      tags:
+      - Projects
+      summary: Bookmark project
+      operationId: bookmarkProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/memberships/autocomplete()":
+    get:
+      tags:
+      - Members
+      summary: Autocomplete member
+      operationId: autocompleteMember
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/memberships()":
+    get:
+      tags:
+      - Members
+      summary: List member
+      operationId: getMemberses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Members
+      summary: Create member
+      operationId: createMember
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Member"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/memberships/new()":
+    get:
+      tags:
+      - Members
+      summary: New member
+      operationId: newMember
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/memberships/{id}/edit()":
+    get:
+      tags:
+      - Members
+      summary: Update member
+      operationId: updateMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/memberships/{id}()":
+    get:
+      tags:
+      - Members
+      summary: Get member
+      operationId: getMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Members
+      summary: Update member
+      operationId: updateMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Member"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Members
+      summary: Update member
+      operationId: updateMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Member"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Members
+      summary: Delete member
+      operationId: deleteMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/issues/{copy_from}/copy()":
+    get:
+      tags:
+      - Issues
+      summary: New issue
+      operationId: newIssue
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: copy_from
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/issues()":
+    get:
+      tags:
+      - Issues
+      summary: List issue
+      operationId: getIssueses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: Create issue
+      operationId: createIssue
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/issues/new()":
+    get:
+      tags:
+      - Issues
+      summary: New issue
+      operationId: newIssue
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: New issue
+      operationId: newIssue
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/files()":
+    get:
+      tags:
+      - Files
+      summary: List file
+      operationId: getFileses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Files
+      summary: Create file
+      operationId: createFile
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Attachment"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/files/new()":
+    get:
+      tags:
+      - Files
+      summary: New file
+      operationId: newFile
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/versions/close_completed()":
+    put:
+      tags:
+      - Versions
+      summary: Close_completed version
+      operationId: close_completedVersion
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Version"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/versions()":
+    post:
+      tags:
+      - Versions
+      summary: Create version
+      operationId: createVersion
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Version"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    get:
+      tags:
+      - Versions
+      summary: List version
+      operationId: getVersionses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/versions/new()":
+    get:
+      tags:
+      - Versions
+      summary: New version
+      operationId: newVersion
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/versions":
+    get:
+      tags:
+      - Versions
+      summary: List version
+      operationId: getVersionses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/roadmap":
+    get:
+      tags:
+      - Versions
+      summary: List version
+      operationId: getVersionses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/news()":
+    get:
+      tags:
+      - News
+      summary: List new
+      operationId: getNewses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - News
+      summary: Create new
+      operationId: createNew
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/News"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/news/new()":
+    get:
+      tags:
+      - News
+      summary: New new
+      operationId: newNew
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/time_entries/report()":
+    get:
+      tags:
+      - Timelog
+      summary: Report timelog
+      operationId: reportTimelog
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/time_entries()":
+    get:
+      tags:
+      - Timelog
+      summary: List timelog
+      operationId: getTimelogs
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createTimelog
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/time_entries/new()":
+    get:
+      tags:
+      - Timelog
+      summary: New timelog
+      operationId: newTimelog
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/queries()":
+    post:
+      tags:
+      - Queries
+      summary: Create query
+      operationId: createQuery
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Query"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/queries/new()":
+    get:
+      tags:
+      - Queries
+      summary: New query
+      operationId: newQuery
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/issue_categories()":
+    get:
+      tags:
+      - Issue Categories
+      summary: List issue_category
+      operationId: getIssue_categorieses
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Categories
+      summary: Create issue_category
+      operationId: createIssue_category
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCategory"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/issue_categories/new()":
+    get:
+      tags:
+      - Issue Categories
+      summary: New issue_category
+      operationId: newIssue_category
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_categories/{id}/edit()":
+    get:
+      tags:
+      - Issue Categories
+      summary: Update issue_category
+      operationId: updateIssue_category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_categories/{id}()":
+    get:
+      tags:
+      - Issue Categories
+      summary: Get issue_category
+      operationId: getIssue_category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Issue Categories
+      summary: Update issue_category
+      operationId: updateIssue_category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCategory"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Issue Categories
+      summary: Update issue_category
+      operationId: updateIssue_category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCategory"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Issue Categories
+      summary: Delete issue_category
+      operationId: deleteIssue_category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/repositories/{id}/committers()":
+    get|post:
+      tags:
+      - Repositories
+      summary: Committers repository
+      operationId: committersRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/repositories()":
+    post:
+      tags:
+      - Repositories
+      summary: Create repository
+      operationId: createRepository
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/repositories/new()":
+    get:
+      tags:
+      - Repositories
+      summary: New repository
+      operationId: newRepository
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/repositories/{id}/edit()":
+    get:
+      tags:
+      - Repositories
+      summary: Update repository
+      operationId: updateRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/repositories/{id}()":
+    patch:
+      tags:
+      - Repositories
+      summary: Update repository
+      operationId: updateRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Repositories
+      summary: Update repository
+      operationId: updateRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Repositories
+      summary: Delete repository
+      operationId: deleteRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/index()":
+    get:
+      tags:
+      - Wiki
+      summary: List wiki
+      operationId: getWikis
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/rename()":
+    get:
+      tags:
+      - Wiki
+      summary: Rename wiki
+      operationId: renameWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Wiki
+      summary: Rename wiki
+      operationId: renameWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/history()":
+    get:
+      tags:
+      - Wiki
+      summary: History wiki
+      operationId: historyWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/diff()":
+    get:
+      tags:
+      - Wiki
+      summary: Diff wiki
+      operationId: diffWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/preview()":
+    post|put|patch:
+      tags:
+      - Wiki
+      summary: Preview wiki
+      operationId: previewWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/protect()":
+    post:
+      tags:
+      - Wiki
+      summary: Protect wiki
+      operationId: protectWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/add_attachment()":
+    post:
+      tags:
+      - Wiki
+      summary: Add_attachment wiki
+      operationId: add_attachmentWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/export()":
+    get:
+      tags:
+      - Wiki
+      summary: Export wiki
+      operationId: exportWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/date_index()":
+    get:
+      tags:
+      - Wiki
+      summary: Date_index wiki
+      operationId: date_indexWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/new()":
+    post:
+      tags:
+      - Wiki
+      summary: New wiki
+      operationId: newWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    get:
+      tags:
+      - Wiki
+      summary: New wiki
+      operationId: newWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/edit()":
+    get:
+      tags:
+      - Wiki
+      summary: Update wiki
+      operationId: updateWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}()":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Wiki
+      summary: Update wiki
+      operationId: updateWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Wiki
+      summary: Update wiki
+      operationId: updateWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Wiki
+      summary: Delete wiki
+      operationId: deleteWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki()":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/{version}()":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Wiki
+      summary: Destroy_version wiki
+      operationId: destroy_versionWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/{version}/annotate()":
+    get:
+      tags:
+      - Wiki
+      summary: Annotate wiki
+      operationId: annotateWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}/{version}/diff()":
+    get:
+      tags:
+      - Wiki
+      summary: Diff wiki
+      operationId: diffWiki
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects()":
+    get:
+      tags:
+      - Projects
+      summary: List project
+      operationId: getProjectses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Projects
+      summary: Create project
+      operationId: createProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Project"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/new()":
+    get:
+      tags:
+      - Projects
+      summary: New project
+      operationId: newProject
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/edit()":
+    get:
+      tags:
+      - Projects
+      summary: Update project
+      operationId: updateProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}()":
+    get:
+      tags:
+      - Projects
+      summary: Get project
+      operationId: getProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Projects
+      summary: Update project
+      operationId: updateProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Project"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Projects
+      summary: Update project
+      operationId: updateProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Project"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Projects
+      summary: Delete project
+      operationId: deleteProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{id}/edit()":
+    patch:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    get:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{id}/tab/{name}()":
+    get:
+      tags:
+      - Issues
+      summary: Issue_tab issue
+      operationId: issue_tabIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/bulk_edit()":
+    get|post:
+      tags:
+      - Issues
+      summary: Bulk_edit issue
+      operationId: bulk_editIssue
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/bulk_update()":
+    post|patch:
+      tags:
+      - Issues
+      summary: Bulk_update issue
+      operationId: bulk_updateIssue
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{issue_id}/time_entries()":
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createTimelog
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{issue_id}/time_entries/new()":
+    get:
+      tags:
+      - Timelog
+      summary: New timelog
+      operationId: newTimelog
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{issue_id}/relations()":
+    get:
+      tags:
+      - Issue Relations
+      summary: List issue_relation
+      operationId: getIssue_relationses
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Relations
+      summary: Create issue_relation
+      operationId: createIssue_relation
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueRelation"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/relations/{id}()":
+    get:
+      tags:
+      - Issue Relations
+      summary: Get issue_relation
+      operationId: getIssue_relation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Issue Relations
+      summary: Delete issue_relation
+      operationId: deleteIssue_relation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues()":
+    get:
+      tags:
+      - Issues
+      summary: List issue
+      operationId: getIssueses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: Create issue
+      operationId: createIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Issues
+      summary: Delete issue
+      operationId: deleteIssue
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/new()":
+    get:
+      tags:
+      - Issues
+      summary: New issue
+      operationId: newIssue
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: New issue
+      operationId: newIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issues/{id}()":
+    get:
+      tags:
+      - Issues
+      summary: Get issue
+      operationId: getIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Issue"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Issues
+      summary: Delete issue
+      operationId: deleteIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/queries()":
+    get:
+      tags:
+      - Queries
+      summary: List query
+      operationId: getQuerieses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Queries
+      summary: Create query
+      operationId: createQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Query"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/queries/new()":
+    get:
+      tags:
+      - Queries
+      summary: New query
+      operationId: newQuery
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/queries/{id}/edit()":
+    get:
+      tags:
+      - Queries
+      summary: Update query
+      operationId: updateQuery
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/queries/{id}()":
+    patch:
+      tags:
+      - Queries
+      summary: Update query
+      operationId: updateQuery
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Query"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Queries
+      summary: Update query
+      operationId: updateQuery
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Query"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Queries
+      summary: Delete query
+      operationId: deleteQuery
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/queries/filter()":
+    get:
+      tags:
+      - Queries
+      summary: Filter query
+      operationId: filterQuery
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/news()":
+    get:
+      tags:
+      - News
+      summary: List new
+      operationId: getNewses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - News
+      summary: Create new
+      operationId: createNew
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/News"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/news/new()":
+    get:
+      tags:
+      - News
+      summary: New new
+      operationId: newNew
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/news/{id}/edit()":
+    get:
+      tags:
+      - News
+      summary: Update new
+      operationId: updateNew
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/news/{id}()":
+    get:
+      tags:
+      - News
+      summary: Get new
+      operationId: getNew
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - News
+      summary: Update new
+      operationId: updateNew
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/News"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - News
+      summary: Update new
+      operationId: updateNew
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/News"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - News
+      summary: Delete new
+      operationId: deleteNew
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/versions/{id}/status_by()":
+    post:
+      tags:
+      - Versions
+      summary: Status_by version
+      operationId: status_byVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Version"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/versions/{id}/edit()":
+    get:
+      tags:
+      - Versions
+      summary: Update version
+      operationId: updateVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/versions/{id}()":
+    get:
+      tags:
+      - Versions
+      summary: Get version
+      operationId: getVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Versions
+      summary: Update version
+      operationId: updateVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Version"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Versions
+      summary: Update version
+      operationId: updateVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Version"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Versions
+      summary: Delete version
+      operationId: deleteVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/{id}/edit()":
+    patch:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    get:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/report()":
+    get:
+      tags:
+      - Timelog
+      summary: Report timelog
+      operationId: reportTimelog
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/bulk_edit()":
+    get:
+      tags:
+      - Timelog
+      summary: Bulk_edit timelog
+      operationId: bulk_editTimelog
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: Bulk_edit timelog
+      operationId: bulk_editTimelog
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/bulk_update()":
+    post:
+      tags:
+      - Timelog
+      summary: Bulk_update timelog
+      operationId: bulk_updateTimelog
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries()":
+    get:
+      tags:
+      - Timelog
+      summary: List timelog
+      operationId: getTimelogs
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createTimelog
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/new()":
+    get:
+      tags:
+      - Timelog
+      summary: New timelog
+      operationId: newTimelog
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: New timelog
+      operationId: newTimelog
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/{id}()":
+    get:
+      tags:
+      - Timelog
+      summary: Get timelog
+      operationId: getTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Timelog
+      summary: Delete timelog
+      operationId: deleteTimelog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/time_entries/destroy()":
+    delete:
+      tags:
+      - Timelog
+      summary: Delete timelog
+      operationId: deleteTimelog
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/statistics()":
+    get:
+      tags:
+      - Repositories
+      summary: Stats repository
+      operationId: statsRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/graph()":
+    get:
+      tags:
+      - Repositories
+      summary: Graph repository
+      operationId: graphRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/fetch_changesets()":
+    post:
+      tags:
+      - Repositories
+      summary: Fetch_changesets repository
+      operationId: fetch_changesetsRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}()":
+    get:
+      tags:
+      - Repositories
+      summary: Revision repository
+      operationId: revisionRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revision()":
+    get:
+      tags:
+      - Repositories
+      summary: Revision repository
+      operationId: revisionRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/issues()":
+    post:
+      tags:
+      - Repositories
+      summary: Add_related_issue repository
+      operationId: add_related_issueRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/issues/{issue_id}()":
+    delete:
+      tags:
+      - Repositories
+      summary: Remove_related_issue repository
+      operationId: remove_related_issueRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions()":
+    get:
+      tags:
+      - Repositories
+      summary: Revisions repository
+      operationId: revisionsRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/browse(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Browse repository
+      operationId: browseRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/show(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Get repository
+      operationId: getRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/entry(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Entry repository
+      operationId: entryRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/raw(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Raw repository
+      operationId: rawRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/annotate(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Annotate repository
+      operationId: annotateRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/browse(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Browse repository
+      operationId: browseRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/entry(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Entry repository
+      operationId: entryRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/raw(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Raw repository
+      operationId: rawRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/changes(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Changes repository
+      operationId: changesRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/annotate(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Annotate repository
+      operationId: annotateRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/revisions/{rev}/diff(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Diff repository
+      operationId: diffRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: rev
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/diff(/*path)()":
+    get:
+      tags:
+      - Repositories
+      summary: Diff repository
+      operationId: diffRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}/show/*path()":
+    get:
+      tags:
+      - Repositories
+      summary: Get repository
+      operationId: getRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository/{repository_id}()":
+    get:
+      tags:
+      - Repositories
+      summary: Get repository
+      operationId: getRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: repository_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{id}/repository()":
+    get:
+      tags:
+      - Repositories
+      summary: Get repository
+      operationId: getRepository
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/{id}/{filename}()":
+    get:
+      tags:
+      - Attachments
+      summary: Get attachment
+      operationId: getAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/download/{id}/{filename}()":
+    get:
+      tags:
+      - Attachments
+      summary: Download attachment
+      operationId: downloadAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/download/{id}()":
+    get:
+      tags:
+      - Attachments
+      summary: Download attachment
+      operationId: downloadAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/thumbnail/{id}(/{size})()":
+    get:
+      tags:
+      - Attachments
+      summary: Thumbnail attachment
+      operationId: thumbnailAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: size
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/{id}()":
+    get:
+      tags:
+      - Attachments
+      summary: Get attachment
+      operationId: getAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Attachments
+      summary: Update attachment
+      operationId: updateAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Attachment"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Attachments
+      summary: Update attachment
+      operationId: updateAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Attachment"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Attachments
+      summary: Delete attachment
+      operationId: deleteAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/{object_type}/{object_id}/edit()":
+    get:
+      tags:
+      - Attachments
+      summary: Edit_all attachment
+      operationId: edit_allAttachment
+      parameters:
+      - name: object_type
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: object_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/{object_type}/{object_id}()":
+    patch:
+      tags:
+      - Attachments
+      summary: Update_all attachment
+      operationId: update_allAttachment
+      parameters:
+      - name: object_type
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: object_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Attachment"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/attachments/{object_type}/{object_id}/download()":
+    get:
+      tags:
+      - Attachments
+      summary: Download_all attachment
+      operationId: download_allAttachment
+      parameters:
+      - name: object_type
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: object_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}/autocomplete_for_user()":
+    get:
+      tags:
+      - Groups
+      summary: Autocomplete_for_user group
+      operationId: autocomplete_for_userGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups()":
+    get:
+      tags:
+      - Groups
+      summary: List group
+      operationId: getGroupses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Groups
+      summary: Create group
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Group"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/new()":
+    get:
+      tags:
+      - Groups
+      summary: New group
+      operationId: newGroup
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}/edit()":
+    get:
+      tags:
+      - Groups
+      summary: Update group
+      operationId: updateGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}()":
+    get:
+      tags:
+      - Groups
+      summary: Get group
+      operationId: getGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Groups
+      summary: Update group
+      operationId: updateGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Group"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Groups
+      summary: Update group
+      operationId: updateGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Group"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Groups
+      summary: Delete group
+      operationId: deleteGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}/users/new()":
+    get:
+      tags:
+      - Groups
+      summary: New_users group
+      operationId: new_usersGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}/users()":
+    post:
+      tags:
+      - Groups
+      summary: Add_users group
+      operationId: add_usersGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Group"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/groups/{id}/users/{user_id}()":
+    delete:
+      tags:
+      - Groups
+      summary: Remove_user group
+      operationId: remove_userGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/trackers/fields()":
+    get|post:
+      tags:
+      - Trackers
+      summary: Fields tracker
+      operationId: fieldsTracker
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/trackers()":
+    get:
+      tags:
+      - Trackers
+      summary: List tracker
+      operationId: getTrackerses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Trackers
+      summary: Create tracker
+      operationId: createTracker
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Tracker"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/trackers/new()":
+    get:
+      tags:
+      - Trackers
+      summary: New tracker
+      operationId: newTracker
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/trackers/{id}/edit()":
+    get:
+      tags:
+      - Trackers
+      summary: Update tracker
+      operationId: updateTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/trackers/{id}()":
+    patch:
+      tags:
+      - Trackers
+      summary: Update tracker
+      operationId: updateTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Tracker"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Trackers
+      summary: Update tracker
+      operationId: updateTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Tracker"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Trackers
+      summary: Delete tracker
+      operationId: deleteTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_statuses/update_issue_done_ratio()":
+    post:
+      tags:
+      - Issue Statuses
+      summary: Update_issue_done_ratio issue_statuse
+      operationId: update_issue_done_ratioIssue_statuse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueStatus"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_statuses()":
+    get:
+      tags:
+      - Issue Statuses
+      summary: List issue_statuse
+      operationId: getIssue_statuseses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Statuses
+      summary: Create issue_statuse
+      operationId: createIssue_statuse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueStatus"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_statuses/new()":
+    get:
+      tags:
+      - Issue Statuses
+      summary: New issue_statuse
+      operationId: newIssue_statuse
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_statuses/{id}/edit()":
+    get:
+      tags:
+      - Issue Statuses
+      summary: Update issue_statuse
+      operationId: updateIssue_statuse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/issue_statuses/{id}()":
+    patch:
+      tags:
+      - Issue Statuses
+      summary: Update issue_statuse
+      operationId: updateIssue_statuse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueStatus"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Issue Statuses
+      summary: Update issue_statuse
+      operationId: updateIssue_statuse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueStatus"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Issue Statuses
+      summary: Delete issue_statuse
+      operationId: deleteIssue_statuse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/custom_fields()":
+    get:
+      tags:
+      - Custom Fields
+      summary: List custom_field
+      operationId: getCustom_fieldses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Custom Fields
+      summary: Create custom_field
+      operationId: createCustom_field
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CustomField"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/custom_fields/new()":
+    get:
+      tags:
+      - Custom Fields
+      summary: New custom_field
+      operationId: newCustom_field
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/custom_fields/{id}/edit()":
+    get:
+      tags:
+      - Custom Fields
+      summary: Update custom_field
+      operationId: updateCustom_field
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/custom_fields/{id}()":
+    patch:
+      tags:
+      - Custom Fields
+      summary: Update custom_field
+      operationId: updateCustom_field
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CustomField"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Custom Fields
+      summary: Update custom_field
+      operationId: updateCustom_field
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CustomField"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Custom Fields
+      summary: Delete custom_field
+      operationId: deleteCustom_field
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/roles/permissions()":
+    get:
+      tags:
+      - Roles
+      summary: Permissions role
+      operationId: permissionsRole
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Roles
+      summary: Update_permissions role
+      operationId: update_permissionsRole
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Role"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/roles()":
+    get:
+      tags:
+      - Roles
+      summary: List role
+      operationId: getRoleses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Roles
+      summary: Create role
+      operationId: createRole
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Role"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/roles/new()":
+    get:
+      tags:
+      - Roles
+      summary: New role
+      operationId: newRole
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/roles/{id}/edit()":
+    get:
+      tags:
+      - Roles
+      summary: Update role
+      operationId: updateRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/roles/{id}()":
+    get:
+      tags:
+      - Roles
+      summary: Get role
+      operationId: getRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    patch:
+      tags:
+      - Roles
+      summary: Update role
+      operationId: updateRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Role"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Roles
+      summary: Update role
+      operationId: updateRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Role"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Roles
+      summary: Delete role
+      operationId: deleteRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/enumerations()":
+    get:
+      tags:
+      - Enumerations
+      summary: List enumeration
+      operationId: getEnumerationses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Enumerations
+      summary: Create enumeration
+      operationId: createEnumeration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssuePriority"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/enumerations/new()":
+    get:
+      tags:
+      - Enumerations
+      summary: New enumeration
+      operationId: newEnumeration
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/enumerations/{id}/edit()":
+    get:
+      tags:
+      - Enumerations
+      summary: Update enumeration
+      operationId: updateEnumeration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/enumerations/{id}()":
+    patch:
+      tags:
+      - Enumerations
+      summary: Update enumeration
+      operationId: updateEnumeration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssuePriority"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    put:
+      tags:
+      - Enumerations
+      summary: Update enumeration
+      operationId: updateEnumeration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssuePriority"
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    delete:
+      tags:
+      - Enumerations
+      summary: Delete enumeration
+      operationId: deleteEnumeration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/enumerations/{type}()":
+    get:
+      tags:
+      - Enumerations
+      summary: List enumeration
+      operationId: getEnumerationses
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "(/projects/{id})/search()":
+    get:
+      tags:
+      - Search
+      summary: List search
+      operationId: getSearches
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/uploads()":
+    post:
+      tags:
+      - Attachments
+      summary: Upload attachment
+      operationId: uploadAttachment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Attachment"
+      responses:
+        '201':
+          description: Success
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+components:
+  schemas:
+    Issue:
+      type: object
+      properties:
+        tracker_id:
+          type: integer
+        project_id:
+          type: integer
+        subject:
+          type: string
+        description:
+          type: string
+        due_date:
+          type: string
+        category_id:
+          type: integer
+        status_id:
+          type: integer
+        assigned_to_id:
+          type: integer
+        priority_id:
+          type: integer
+        fixed_version_id:
+          type: integer
+        author_id:
+          type: integer
+        lock_version:
+          type: integer
+          default: '0'
+        start_date:
+          type: string
+        done_ratio:
+          type: integer
+          default: '0'
+        estimated_hours:
+          type: number
+        parent_id:
+          type: integer
+        root_id:
+          type: integer
+        lft:
+          type: integer
+        rgt:
+          type: integer
+        is_private:
+          type: boolean
+          default: '0'
+        closed_on:
+          type: string
+    Project:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        homepage:
+          type: string
+        is_public:
+          type: boolean
+          default: '1'
+        parent_id:
+          type: integer
+        identifier:
+          type: string
+        status:
+          type: integer
+          default: '1'
+        lft:
+          type: integer
+        rgt:
+          type: integer
+        inherit_members:
+          type: boolean
+          default: '0'
+        default_version_id:
+          type: integer
+        default_assigned_to_id:
+          type: integer
+        default_issue_query_id:
+          type: integer
+    User:
+      type: object
+      properties:
+        login:
+          type: string
+        hashed_password:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        admin:
+          type: boolean
+          default: '0'
+        status:
+          type: integer
+          default: '1'
+        last_login_on:
+          type: string
+        language:
+          type: string
+        auth_source_id:
+          type: integer
+        mail_notification:
+          type: string
+        salt:
+          type: string
+        must_change_passwd:
+          type: boolean
+          default: '0'
+        passwd_changed_on:
+          type: string
+        twofa_scheme:
+          type: string
+        twofa_totp_key:
+          type: string
+        twofa_totp_last_used_at:
+          type: integer
+        twofa_required:
+          type: boolean
+          default: '0'
+    Member:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          default: '0'
+        project_id:
+          type: integer
+          default: '0'
+        mail_notification:
+          type: boolean
+          default: '0'
+    Version:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          default: '0'
+        name:
+          type: string
+        description:
+          type: string
+        effective_date:
+          type: string
+        wiki_page_title:
+          type: string
+        status:
+          type: string
+          default: open
+        sharing:
+          type: string
+          default: none
+    News:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        author_id:
+          type: integer
+          default: '0'
+        comments_count:
+          type: integer
+          default: '0'
+    IssueRelation:
+      type: object
+      properties:
+        issue_from_id:
+          type: integer
+        issue_to_id:
+          type: integer
+        relation_type:
+          type: string
+        delay:
+          type: integer
+    IssueStatus:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        is_closed:
+          type: boolean
+          default: '0'
+        position:
+          type: integer
+        default_done_ratio:
+          type: integer
+    Tracker:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        position:
+          type: integer
+        is_in_roadmap:
+          type: boolean
+          default: '1'
+        fields_bits:
+          type: integer
+          default: '0'
+        default_status_id:
+          type: integer
+    IssueCategory:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          default: '0'
+        name:
+          type: string
+        assigned_to_id:
+          type: integer
+    IssuePriority:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: integer
+        is_default:
+          type: boolean
+          default: '0'
+        active:
+          type: boolean
+          default: '1'
+        project_id:
+          type: integer
+        parent_id:
+          type: integer
+        position_name:
+          type: string
+    Role:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: integer
+        assignable:
+          type: boolean
+          default: '1'
+        builtin:
+          type: integer
+          default: '0'
+        permissions:
+          type: string
+        issues_visibility:
+          type: string
+          default: default
+        users_visibility:
+          type: string
+          default: members_of_visible_projects
+        time_entries_visibility:
+          type: string
+          default: all
+        all_roles_managed:
+          type: boolean
+          default: '1'
+        settings:
+          type: string
+        default_time_entry_activity_id:
+          type: integer
+    Group:
+      type: object
+      properties:
+        login:
+          type: string
+        hashed_password:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        admin:
+          type: boolean
+          default: '0'
+        status:
+          type: integer
+          default: '1'
+        last_login_on:
+          type: string
+        language:
+          type: string
+        auth_source_id:
+          type: integer
+        mail_notification:
+          type: string
+        salt:
+          type: string
+        must_change_passwd:
+          type: boolean
+          default: '0'
+        passwd_changed_on:
+          type: string
+        twofa_scheme:
+          type: string
+        twofa_totp_key:
+          type: string
+        twofa_totp_last_used_at:
+          type: integer
+        twofa_required:
+          type: boolean
+          default: '0'
+    CustomField:
+      type: object
+      properties:
+        name:
+          type: string
+        field_format:
+          type: string
+        possible_values:
+          type: string
+        regexp:
+          type: string
+        min_length:
+          type: integer
+        max_length:
+          type: integer
+        is_required:
+          type: boolean
+          default: '0'
+        is_for_all:
+          type: boolean
+          default: '0'
+        is_filter:
+          type: boolean
+          default: '0'
+        position:
+          type: integer
+        searchable:
+          type: boolean
+          default: '0'
+        default_value:
+          type: string
+        editable:
+          type: boolean
+          default: '1'
+        visible:
+          type: boolean
+          default: '1'
+        multiple:
+          type: boolean
+          default: '0'
+        format_store:
+          type: string
+        description:
+          type: string
+    Query:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        name:
+          type: string
+        filters:
+          type: string
+        user_id:
+          type: integer
+          default: '0'
+        column_names:
+          type: string
+        sort_criteria:
+          type: string
+        group_by:
+          type: string
+        visibility:
+          type: integer
+          default: '0'
+        options:
+          type: string
+        description:
+          type: string
+    Attachment:
+      type: object
+      properties:
+        container_id:
+          type: integer
+        container_type:
+          type: string
+        filename:
+          type: string
+        disk_filename:
+          type: string
+        filesize:
+          type: integer
+          default: '0'
+        content_type:
+          type: string
+        digest:
+          type: string
+        downloads:
+          type: integer
+          default: '0'
+        author_id:
+          type: integer
+          default: '0'
+        description:
+          type: string
+        disk_directory:
+          type: string
+    TimeEntry:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        author_id:
+          type: integer
+        user_id:
+          type: integer
+        issue_id:
+          type: integer
+        hours:
+          type: number
+        comments:
+          type: string
+        activity_id:
+          type: integer
+        spent_on:
+          type: string
+        tyear:
+          type: integer
+        tmonth:
+          type: integer
+        tweek:
+          type: integer
+    Board:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        position:
+          type: integer
+        topics_count:
+          type: integer
+          default: '0'
+        messages_count:
+          type: integer
+          default: '0'
+        last_message_id:
+          type: integer
+        parent_id:
+          type: integer
+    Document:
+      type: object
+      properties:
+        project_id:
+          type: integer
+          default: '0'
+        category_id:
+          type: integer
+          default: '0'
+        title:
+          type: string
+        description:
+          type: string
+    Journal:
+      type: object
+      properties:
+        journalized_id:
+          type: integer
+          default: '0'
+        journalized_type:
+          type: string
+        user_id:
+          type: integer
+          default: '0'
+        notes:
+          type: string
+        updated_by_id:
+          type: integer
+        private_notes:
+          type: boolean
+          default: '0'
+    Watcher:
+      type: object
+      properties:
+        watchable_type:
+          type: string
+        watchable_id:
+          type: integer
+          default: '0'
+        user_id:
+          type: integer
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+    PreconditionFailed:
+      description: Precondition Failed
+      content:
+        application/json:
+          schema:
+            type: object
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: HTTP Basic Authentication
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Redmine-API-Key
+      description: API key passed as a header
+    ApiKeyInQuery:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as a query parameter
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "/oauth/authorize"
+          tokenUrl: "/oauth/token"
+          scopes:
+            api: Redmine API access
