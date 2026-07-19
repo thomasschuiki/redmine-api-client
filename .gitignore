@@ -1,0 +1,26 @@
+# Binaries
+/redmine
+/redmine-spec
+
+# Go
+*.exe
+*.test
+*.out
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ruby
+*.gem
+.bundle/
+vendor/bundle/
+tmp/
