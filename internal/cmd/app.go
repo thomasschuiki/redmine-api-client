@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tom-redmine/go-redmine-cli/internal/coverage"
 	"github.com/tom-redmine/go-redmine-cli/internal/spec"
 	"github.com/urfave/cli/v3"
 )
@@ -17,7 +16,6 @@ func Run() *cli.Command {
 		Usage: "OpenAPI spec tooling for the Redmine API",
 		Commands: []*cli.Command{
 			specCommand(),
-			coverageCommand(),
 			generateModelsCommand(),
 		},
 	}
@@ -61,46 +59,6 @@ func specCommand() *cli.Command {
 					}
 
 					fmt.Println("\nOK: spec is valid.")
-					return nil
-				},
-			},
-		},
-	}
-}
-
-func coverageCommand() *cli.Command {
-	return &cli.Command{
-		Name:  "coverage",
-		Usage: "Check spec coverage against Redmine routes",
-		Commands: []*cli.Command{
-			{
-				Name:  "check",
-				Usage: "Compare a Redmine route snapshot against the OpenAPI spec",
-				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "snapshot", Usage: "Path to the route snapshot file (YAML or JSON)"},
-					&cli.StringFlag{Name: "spec", Usage: "Path to the OpenAPI spec", Value: "docs/openapi/openapi.yaml"},
-				},
-				Action: func(ctx context.Context, c *cli.Command) error {
-					snapshotPath := c.String("snapshot")
-					specPath := c.String("spec")
-
-					snap, err := coverage.LoadSnapshot(snapshotPath)
-					if err != nil {
-						return err
-					}
-
-					fmt.Printf("Loaded snapshot: %s (%d routes)\n", snap.RedmineVersion, len(snap.APIRoutes))
-
-					report, err := coverage.Check(snap, specPath)
-					if err != nil {
-						return err
-					}
-
-					fmt.Print(coverage.FormatReport(report))
-
-					if len(report.MissingInSpec) > 0 {
-						return fmt.Errorf("%d route(s) missing from spec", len(report.MissingInSpec))
-					}
 					return nil
 				},
 			},

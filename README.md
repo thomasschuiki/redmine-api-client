@@ -6,7 +6,7 @@ OpenAPI spec tooling and CLI client for the [Redmine](https://www.redmine.org/) 
 
 | Binary | Purpose |
 |--------|---------|
-| `redmine-spec` | Build, validate, and check coverage of the OpenAPI spec |
+| `redmine-spec` | Validate and generate from the OpenAPI spec |
 | `redmine` | CLI client for interacting with a Redmine instance |
 
 ## Install
@@ -43,21 +43,6 @@ redmine-spec spec validate --spec docs/openapi/openapi.yaml
 |---------|--------------------------------|-------------|
 | `--spec` | `docs/openapi/openapi.yaml`   | Spec file   |
 
-### `coverage check`
-
-Compare a Redmine route snapshot against the OpenAPI spec. Reports routes that
-are in Redmine but missing from the spec, and routes in the spec that don't
-exist in Redmine.
-
-```bash
-redmine-spec coverage check --snapshot testdata/routes-7.0.yaml
-```
-
-| Flag        | Default                        | Description              |
-|-------------|--------------------------------|--------------------------|
-| `--snapshot` | *(required)*                  | Route snapshot file      |
-| `--spec`     | `docs/openapi/openapi.yaml`  | OpenAPI spec file        |
-
 ### `generate-models`
 
 Generate Go model types from the bundled OpenAPI spec.
@@ -72,20 +57,6 @@ redmine-spec generate-models --spec docs/openapi/openapi.yaml --out internal/mod
 | `--spec`   | `docs/openapi/openapi.yaml`   | Bundled spec file      |
 | `--out`    | `internal/models`             | Output directory       |
 | `--package` | `models`                      | Go package name        |
-
-### Generating Snapshots
-
-The coverage checker requires a route snapshot. Generate one using Docker:
-
-```bash
-./scripts/gen-routes-snapshot.sh [redmine_version] [output_path]
-```
-
-Example:
-
-```bash
-./scripts/gen-routes-snapshot.sh 7.0 testdata/routes-7.0.yaml
-```
 
 ### Regenerating the Spec from Redmine
 
@@ -197,17 +168,12 @@ go-redmine-cli/
     spec/
       validate.go                 Validation via libopenapi
       generate.go                 Model generation via libopenapi
-    coverage/
-      snapshot.go                 Snapshot types and loader
-      check.go                    Coverage comparison logic
   plugin/
     redmine_openapi_generator/    Redmine plugin (auto-generates the spec)
   scripts/
     gen-openapi-spec.sh           Docker-based spec generation
-    gen-routes-snapshot.sh        Docker-based snapshot generator
   docs/openapi/
     openapi.yaml                  Auto-generated spec
-  testdata/                       Route snapshots
 ```
 
 ## Dependencies
