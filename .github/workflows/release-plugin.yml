@@ -43,18 +43,11 @@ jobs:
           docker run --rm --network redmine-test --name test-redmine \
             -v "${PWD}/plugin/redmine_openapi_generator:/usr/src/redmine/plugins/redmine_openapi_generator:ro" \
             -v "${TMPOUT}:/output" \
-            "redmine:${{ matrix.redmine }}" /bin/bash -euxc '
-              echo "=== Configuring database.yml ==="
+            "redmine:${{ matrix.redmine }}" /bin/bash -exc '
               cp /usr/src/redmine/plugins/redmine_openapi_generator/config/database_ci.yml /usr/src/redmine/config/database.yml
-              cat /usr/src/redmine/config/database.yml
-              echo "=== Plugin directory ==="
-              ls -la /usr/src/redmine/plugins/
-              echo "=== Running migrations ==="
               cd /usr/src/redmine
               RAILS_ENV=test bundle exec rake db:migrate 2>&1
-              echo "=== Running generate_spec.rb ==="
-              RAILS_ENV=test OUTPUT_PATH=/output/openapi.yaml bundle exec ruby plugins/redmine_openapi_generator/generate_spec.rb 2>&1
-              echo "=== Done ==="
+              RAILS_ENV=test OUTPUT_PATH=/output/openapi.yaml bundle exec ruby plugins/redmine_openapi_generator/generate_spec.rb
             '
           EXITCODE=$?
           set -e
