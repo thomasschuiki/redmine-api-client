@@ -1,0 +1,8 @@
+test:
+  adapter: mysql2
+  host: test-mysql
+  port: 3306
+  database: redmine_test
+  username: root
+  password: root
+  encoding: utf8mb4

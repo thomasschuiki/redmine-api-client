@@ -47,7 +47,7 @@ docker run --rm --name "${CONTAINER_NAME}" \
   -v "${PLUGIN_DIR}:/usr/src/redmine/plugins/redmine_openapi_generator:ro" \
   -v "${TMPOUT}:/output" \
   "redmine:${REDMINE_VERSION}" sh -c '
-cp /usr/src/redmine/plugins/redmine_openapi_generator/config/database.yml.test /usr/src/redmine/config/database.yml
+cp /usr/src/redmine/plugins/redmine_openapi_generator/config/database_ci.yml /usr/src/redmine/config/database.yml
 
 cd /usr/src/redmine
 RAILS_ENV=test bundle exec rake db:migrate 2>&1 | tail -1
