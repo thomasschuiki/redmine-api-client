@@ -45,16 +45,7 @@ jobs:
             -v "${TMPOUT}:/output" \
             "redmine:${{ matrix.redmine }}" /bin/bash -euxc '
               echo "=== Configuring database.yml ==="
-              cat > /usr/src/redmine/config/database.yml <<EOF
-test:
-  adapter: mysql2
-  host: test-mysql
-  port: 3306
-  database: redmine_test
-  username: root
-  password: root
-  encoding: utf8mb4
-EOF
+              printf "test:\n  adapter: mysql2\n  host: test-mysql\n  port: 3306\n  database: redmine_test\n  username: root\n  password: root\n  encoding: utf8mb4\n" > /usr/src/redmine/config/database.yml
               cat /usr/src/redmine/config/database.yml
               echo "=== Plugin directory ==="
               ls -la /usr/src/redmine/plugins/
