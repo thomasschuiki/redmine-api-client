@@ -22,30 +22,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create Docker network
+        run: docker network create redmine-test
+
       - name: Start MySQL
         run: |
-          docker run --rm -d --name test-mysql \
+          docker run --rm -d --network redmine-test --name test-mysql \
             -e MYSQL_ROOT_PASSWORD=root \
             -e MYSQL_DATABASE=redmine_test \
             mysql:8.0
-          docker exec test-mysql sh -c \
-            'until mysqladmin ping -h localhost -uroot -proot 2>/dev/null; do sleep 2; done'
-          echo "MySQL ready"
+          for i in $(seq 1 15); do
+            docker exec test-mysql mysql -h localhost -uroot -proot -e "SELECT 1" 2>/dev/null && break
+            sleep 2
+          done
 
       - name: Test plugin on Redmine ${{ matrix.redmine }}
-        continue-on-error: true
         run: |
           TMPOUT=$(mktemp -d)
-          docker run --rm --name test-redmine \
-            --link test-mysql:mysql \
+          docker run --rm --network redmine-test --name test-redmine \
             -v "${PWD}/plugin/redmine_openapi_generator:/usr/src/redmine/plugins/redmine_openapi_generator:ro" \
             -v "${TMPOUT}:/output" \
-            "redmine:${{ matrix.redmine }}" sh -c '
-              cat /usr/src/redmine/config/database.yml 2>/dev/null || true
+            "redmine:${{ matrix.redmine }}" sh -exc '
               cat > /usr/src/redmine/config/database.yml <<EOF
               test:
                 adapter: mysql2
-                host: mysql
+                host: test-mysql
                 port: 3306
                 database: redmine_test
                 username: root
@@ -53,28 +54,23 @@ jobs:
                 encoding: utf8mb4
               EOF
               cd /usr/src/redmine
-              RAILS_ENV=test bundle exec rake db:migrate 2>&1 | tail -5
-              RAILS_ENV=test OUTPUT_PATH=/output/openapi.yaml bundle exec ruby plugins/redmine_openapi_generator/generate_spec.rb 2>&1
-              echo "DONE"
-            ' || true
-          ls -la "${TMPOUT}/" 2>/dev/null || echo "TMPOUT empty"
-          cp "${TMPOUT}/openapi.yaml" openapi.yaml 2>/dev/null || echo "openapi.yaml not found"
+              RAILS_ENV=test bundle exec rake db:migrate 2>&1
+              RAILS_ENV=test OUTPUT_PATH=/output/openapi.yaml bundle exec ruby plugins/redmine_openapi_generator/generate_spec.rb
+            '
+          cp "${TMPOUT}/openapi.yaml" openapi.yaml
 
       - name: Validate spec output
         run: |
-          if [ ! -f openapi.yaml ]; then
-            echo "ERROR: openapi.yaml not generated"
-            exit 1
-          fi
-          grep -q "openapi:" openapi.yaml || { echo "Missing openapi key"; exit 1; }
-          grep -n "paths:" openapi.yaml || { echo "Missing paths key"; exit 1; }
-          routes=$(grep -E '^\s+[a-z]' openapi.yaml | grep -c ':$' || true)
-          echo "Generated spec with $routes path entries for Redmine ${{ matrix.redmine }}"
-          ls -lh openapi.yaml
+          grep -q "openapi:" openapi.yaml
+          grep -q "paths:" openapi.yaml
+          echo "Spec OK for Redmine ${{ matrix.redmine }}"
 
       - name: Cleanup
         if: always()
-        run: docker rm -f test-mysql test-redmine 2>/dev/null; rm -f openapi.yaml
+        run: |
+          docker rm -f test-mysql test-redmine 2>/dev/null || true
+          docker network rm redmine-test 2>/dev/null || true
+          rm -f openapi.yaml
 
   release:
     if: startsWith(github.ref, 'refs/tags/plugin/v')
