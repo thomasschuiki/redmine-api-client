@@ -47,16 +47,7 @@ docker run --rm --name "${CONTAINER_NAME}" \
   -v "${PLUGIN_DIR}:/usr/src/redmine/plugins/redmine_openapi_generator:ro" \
   -v "${TMPOUT}:/output" \
   "redmine:${REDMINE_VERSION}" sh -c '
-cat > /usr/src/redmine/config/database.yml << DEOF
-test:
-  adapter: mysql2
-  host: mysql
-  port: 3306
-  database: redmine_test
-  username: root
-  password: root
-  encoding: utf8mb4
-DEOF
+cp /usr/src/redmine/plugins/redmine_openapi_generator/config/database.yml.test /usr/src/redmine/config/database.yml
 
 cd /usr/src/redmine
 RAILS_ENV=test bundle exec rake db:migrate 2>&1 | tail -1
