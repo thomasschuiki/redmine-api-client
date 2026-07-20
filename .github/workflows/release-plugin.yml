@@ -1,0 +1,36 @@
+name: Release Redmine Plugin
+
+on:
+  push:
+    tags:
+      - plugin/v*.*.*
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: echo "TAG=${GITHUB_REF_NAME#plugin/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create plugin archive
+        run: |
+          cd plugin
+          tar czf "../redmine_openapi_generator-${{ steps.version.outputs.TAG }}.tar.gz" redmine_openapi_generator/
+          cd redmine_openapi_generator
+          zip -r "../../redmine_openapi_generator-${{ steps.version.outputs.TAG }}.zip" .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            redmine_openapi_generator-${{ steps.version.outputs.TAG }}.tar.gz
+            redmine_openapi_generator-${{ steps.version.outputs.TAG }}.zip
+          tag_name: ${{ github.ref_name }}
+          name: redmine_openapi_generator ${{ steps.version.outputs.TAG }}
+          generate_release_notes: true
