@@ -14,9 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
       - name: Get version
         id: version
         run: echo "TAG=${GITHUB_REF_NAME#plugin/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Go binaries
+        run: |
+          for dir in cmd/*/; do
+            name=$(basename "$dir")
+            go build -o "$name" "./$dir"
+            tar czf "$name-${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz" "$name"
+            rm "$name"
+          done
 
       - name: Create plugin archive
         run: |
@@ -31,6 +45,7 @@ jobs:
           files: |
             redmine_openapi_generator-${{ steps.version.outputs.TAG }}.tar.gz
             redmine_openapi_generator-${{ steps.version.outputs.TAG }}.zip
+            *-${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz
           tag_name: ${{ github.ref_name }}
           name: redmine_openapi_generator ${{ steps.version.outputs.TAG }}
           generate_release_notes: true
