@@ -2,13 +2,13 @@ package redminecmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/tom-redmine/go-redmine-cli/internal/client"
 	"github.com/tom-redmine/go-redmine-cli/internal/config"
+	"github.com/tom-redmine/go-redmine-cli/internal/output"
 	"github.com/urfave/cli/v3"
 )
 
@@ -26,12 +26,6 @@ func newClient() *client.Client {
 	return redmineClient
 }
 
-func printJSON(v any) {
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	enc.Encode(v)
-}
-
 // Run creates and runs the CLI application.
 func Run() *cli.Command {
 	return &cli.Command{
@@ -41,6 +35,9 @@ func Run() *cli.Command {
 
 Configure the connection using environment variables or a config file.
 See 'redmine help' for a list of available commands.`,
+		Flags: []cli.Flag{
+			&cli.StringFlag{Name: "output", Usage: "Output format (yaml, json)", Value: "yaml"},
+		},
 		Commands: []*cli.Command{
 			issueCommand(),
 			projectCommand(),
@@ -81,7 +78,7 @@ Filter by project using the --project flag with a project identifier.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
@@ -101,7 +98,7 @@ assignee, and custom fields.`,
 					if err != nil {
 						return err
 					}
-					printJSON(issue)
+					output.Print(issue, c.String("output"))
 					return nil
 				},
 			},
@@ -149,7 +146,7 @@ description, tracker, status, priority, and assignee.`,
 					if err != nil {
 						return err
 					}
-					printJSON(issue)
+					output.Print(issue, c.String("output"))
 					return nil
 				},
 			},
@@ -252,7 +249,7 @@ By default, returns up to 25 results.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
@@ -271,7 +268,7 @@ The identifier is the short name used in URLs, not the numeric ID.`,
 					if err != nil {
 						return err
 					}
-					printJSON(project)
+					output.Print(project, c.String("output"))
 					return nil
 				},
 			},
@@ -298,7 +295,7 @@ and is used as the URL slug for the project.`,
 					if err != nil {
 						return err
 					}
-					printJSON(project)
+					output.Print(project, c.String("output"))
 					return nil
 				},
 			},
@@ -352,7 +349,7 @@ By default, returns up to 25 results.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
@@ -367,7 +364,7 @@ Useful for verifying your API key and checking your user ID.`,
 					if err != nil {
 						return err
 					}
-					printJSON(user)
+					output.Print(user, c.String("output"))
 					return nil
 				},
 			},
@@ -385,7 +382,7 @@ Useful for verifying your API key and checking your user ID.`,
 					if err != nil {
 						return err
 					}
-					printJSON(user)
+					output.Print(user, c.String("output"))
 					return nil
 				},
 			},
@@ -425,7 +422,7 @@ Supports pagination with --limit and --offset flags.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
@@ -462,7 +459,7 @@ project (--project). Optionally specify an activity type and comment.`,
 					if err != nil {
 						return err
 					}
-					printJSON(entry)
+					output.Print(entry, c.String("output"))
 					return nil
 				},
 			},
@@ -511,7 +508,7 @@ The --project flag is required and must be a project identifier.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
@@ -532,7 +529,7 @@ title of the wiki page as it appears in the URL.`,
 					if err != nil {
 						return err
 					}
-					printJSON(page)
+					output.Print(page, c.String("output"))
 					return nil
 				},
 			},
@@ -564,7 +561,7 @@ The --project flag is required and must be a project identifier.`,
 					if err != nil {
 						return err
 					}
-					printJSON(resp)
+					output.Print(resp, c.String("output"))
 					return nil
 				},
 			},
