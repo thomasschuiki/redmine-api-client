@@ -37,6 +37,10 @@ func Run() *cli.Command {
 	return &cli.Command{
 		Name:  "redmine",
 		Usage: "Redmine CLI client",
+		Description: `A command-line interface for interacting with a Redmine instance.
+
+Configure the connection using environment variables or a config file.
+See 'redmine help' for a list of available commands.`,
 		Commands: []*cli.Command{
 			issueCommand(),
 			projectCommand(),
@@ -52,10 +56,18 @@ func issueCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "issue",
 		Usage: "Manage issues",
+		Description: `Create, read, update, and delete issues in Redmine.
+Issues can be filtered by project, assigned to users, and tracked
+across different statuses and priorities.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List issues",
+				Name:      "list",
+				Usage:     "List issues",
+				ArgsUsage: " ",
+				Description: `List issues with optional filtering.
+
+By default, returns up to 25 results. Use --limit and --offset for pagination.
+Filter by project using the --project flag with a project identifier.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
 					&cli.IntFlag{Name: "limit", Usage: "Max results", Value: 25},
@@ -74,9 +86,12 @@ func issueCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "get",
-				Usage: "Get an issue by ID",
+				Name:      "get",
+				Usage:     "Get an issue by ID",
 				ArgsUsage: "<id>",
+				Description: `Retrieve full details for a single issue by its numeric ID.
+Returns the complete issue object including description, status,
+assignee, and custom fields.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
 					if err != nil {
@@ -91,8 +106,13 @@ func issueCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "create",
-				Usage: "Create a new issue",
+				Name:      "create",
+				Usage:     "Create a new issue",
+				ArgsUsage: " ",
+				Description: `Create a new issue in a project.
+
+At minimum, --project and --subject are required. Optional fields include
+description, tracker, status, priority, and assignee.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 					&cli.StringFlag{Name: "subject", Usage: "Issue subject", Required: true},
@@ -104,9 +124,6 @@ func issueCommand() *cli.Command {
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					var req client.IssueCreateRequest
-					// We need the project ID, but the API accepts identifier.
-					// For now, use a lookup or accept numeric ID.
-					// The Redmine API accepts project identifier in the JSON body.
 					req.Issue.ProjectID = 0 // will be set below
 					req.Issue.Subject = c.String("subject")
 					req.Issue.Description = c.String("description")
@@ -137,9 +154,13 @@ func issueCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "update",
-				Usage: "Update an issue",
+				Name:      "update",
+				Usage:     "Update an issue",
 				ArgsUsage: "<id>",
+				Description: `Update fields on an existing issue.
+
+Only the fields you specify will be changed. Use --subject, --description,
+--status, --assignee, or --done-ratio to update the corresponding fields.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "subject", Usage: "New subject"},
 					&cli.StringFlag{Name: "description", Usage: "New description"},
@@ -183,9 +204,11 @@ func issueCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "delete",
-				Usage: "Delete an issue",
+				Name:      "delete",
+				Usage:     "Delete an issue",
 				ArgsUsage: "<id>",
+				Description: `Permanently delete an issue by its numeric ID.
+This action cannot be undone.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
 					if err != nil {
@@ -206,10 +229,18 @@ func projectCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "project",
 		Usage: "Manage projects",
+		Description: `Create, list, view, and delete Redmine projects.
+Projects are the top-level container for issues, wiki pages,
+time entries, and versions.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List projects",
+				Name:      "list",
+				Usage:     "List projects",
+				ArgsUsage: " ",
+				Description: `List all visible projects.
+
+Supports pagination with --limit and --offset flags.
+By default, returns up to 25 results.`,
 				Flags: []cli.Flag{
 					&cli.IntFlag{Name: "limit", Usage: "Max results", Value: 25},
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
@@ -229,6 +260,8 @@ func projectCommand() *cli.Command {
 				Name:      "get",
 				Usage:     "Get a project by identifier",
 				ArgsUsage: "<identifier>",
+				Description: `Retrieve full details for a project by its URL identifier (slug).
+The identifier is the short name used in URLs, not the numeric ID.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					identifier := c.Args().First()
 					if identifier == "" {
@@ -243,8 +276,13 @@ func projectCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "create",
-				Usage: "Create a new project",
+				Name:      "create",
+				Usage:     "Create a new project",
+				ArgsUsage: " ",
+				Description: `Create a new project in Redmine.
+
+Both --name and --identifier are required. The identifier must be unique
+and is used as the URL slug for the project.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "name", Usage: "Project name", Required: true},
 					&cli.StringFlag{Name: "identifier", Usage: "Project identifier (URL slug)", Required: true},
@@ -268,6 +306,10 @@ func projectCommand() *cli.Command {
 				Name:      "delete",
 				Usage:     "Delete a project",
 				ArgsUsage: "<identifier>",
+				Description: `Permanently delete a project by its identifier.
+
+This will remove the project and all associated data (issues, wiki pages,
+time entries, etc.). This action cannot be undone.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					identifier := c.Args().First()
 					if identifier == "" {
@@ -288,10 +330,17 @@ func userCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "user",
 		Usage: "Manage users",
+		Description: `List and retrieve user information from Redmine.
+Use 'current' to view the authenticated user's details.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List users",
+				Name:      "list",
+				Usage:     "List users",
+				ArgsUsage: " ",
+				Description: `List all visible users.
+
+Supports pagination with --limit and --offset flags.
+By default, returns up to 25 results.`,
 				Flags: []cli.Flag{
 					&cli.IntFlag{Name: "limit", Usage: "Max results", Value: 25},
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
@@ -308,8 +357,11 @@ func userCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "current",
-				Usage: "Get the currently authenticated user",
+				Name:        "current",
+				Usage:       "Get the currently authenticated user",
+				ArgsUsage:   " ",
+				Description: `Display the profile of the currently authenticated user.
+Useful for verifying your API key and checking your user ID.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					user, err := newClient().GetCurrentUser()
 					if err != nil {
@@ -323,6 +375,7 @@ func userCommand() *cli.Command {
 				Name:      "get",
 				Usage:     "Get a user by ID",
 				ArgsUsage: "<id>",
+				Description: `Retrieve full details for a single user by their numeric ID.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
 					if err != nil {
@@ -344,10 +397,19 @@ func timeEntryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "time-entry",
 		Usage: "Manage time entries",
+		Description: `Log and manage time entries in Redmine.
+
+Time entries can be associated with issues or projects directly.
+Each entry tracks hours spent and can include a comment and activity type.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List time entries",
+				Name:      "list",
+				Usage:     "List time entries",
+				ArgsUsage: " ",
+				Description: `List time entries with optional filtering.
+
+Filter by project using --project and/or by issue using --issue.
+Supports pagination with --limit and --offset flags.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
 					&cli.IntFlag{Name: "issue", Usage: "Issue ID"},
@@ -368,8 +430,13 @@ func timeEntryCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "create",
-				Usage: "Create a time entry",
+				Name:      "create",
+				Usage:     "Create a time entry",
+				ArgsUsage: " ",
+				Description: `Log a new time entry.
+
+--hours is required. Associate the entry with an issue (--issue) or a
+project (--project). Optionally specify an activity type and comment.`,
 				Flags: []cli.Flag{
 					&cli.IntFlag{Name: "issue", Usage: "Issue ID"},
 					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
@@ -403,6 +470,8 @@ func timeEntryCommand() *cli.Command {
 				Name:      "delete",
 				Usage:     "Delete a time entry",
 				ArgsUsage: "<id>",
+				Description: `Permanently delete a time entry by its numeric ID.
+This action cannot be undone.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
 					if err != nil {
@@ -423,10 +492,17 @@ func wikiCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "wiki",
 		Usage: "Manage wiki pages",
+		Description: `List and retrieve wiki pages for Redmine projects.
+
+Wiki pages are associated with a project and identified by their title.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List wiki pages for a project",
+				Name:      "list",
+				Usage:     "List wiki pages for a project",
+				ArgsUsage: " ",
+				Description: `List all wiki pages for a given project.
+
+The --project flag is required and must be a project identifier.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 				},
@@ -440,8 +516,13 @@ func wikiCommand() *cli.Command {
 				},
 			},
 			{
-				Name:  "get",
-				Usage: "Get a wiki page",
+				Name:      "get",
+				Usage:     "Get a wiki page",
+				ArgsUsage: " ",
+				Description: `Retrieve the content of a wiki page.
+
+Both --project and --page are required. The --page value is the
+title of the wiki page as it appears in the URL.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 					&cli.StringFlag{Name: "page", Usage: "Page title", Required: true},
@@ -463,10 +544,18 @@ func versionCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "version",
 		Usage: "Manage versions",
+		Description: `List and manage project versions (milestones).
+
+Versions are used to group issues into milestones or releases
+within a project.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "list",
-				Usage: "List versions for a project",
+				Name:      "list",
+				Usage:     "List versions for a project",
+				ArgsUsage: " ",
+				Description: `List all versions (milestones) for a given project.
+
+The --project flag is required and must be a project identifier.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 				},

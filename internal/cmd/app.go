@@ -14,6 +14,8 @@ func Run() *cli.Command {
 	return &cli.Command{
 		Name:  "redmine-spec",
 		Usage: "OpenAPI spec tooling for the Redmine API",
+		Description: `Utilities for validating and generating code from the
+Redmine OpenAPI specification.`,
 		Commands: []*cli.Command{
 			specCommand(),
 			generateModelsCommand(),
@@ -27,10 +29,17 @@ func specCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "spec",
 		Usage: "OpenAPI spec operations",
+		Description: `Validate and inspect the Redmine OpenAPI specification.`,
 		Commands: []*cli.Command{
 			{
-				Name:  "validate",
-				Usage: "Validate an OpenAPI spec for structural errors",
+				Name:      "validate",
+				Usage:     "Validate an OpenAPI spec for structural errors",
+				ArgsUsage: " ",
+				Description: `Parse and validate an OpenAPI spec file.
+
+Reports a summary of paths, operations, schemas, parameters,
+responses, security schemes, and tags. Exits with an error
+if any structural issues are found.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "spec", Usage: "Spec file path", Value: defaultOut},
 				},
@@ -70,6 +79,9 @@ func generateModelsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "generate-models",
 		Usage: "Generate Go model types from the OpenAPI spec",
+		Description: `Read an OpenAPI spec file and generate Go struct types
+for all defined schemas. The generated code is written to the
+specified output directory.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "spec", Usage: "Path to the OpenAPI spec", Value: "docs/openapi/openapi.yaml"},
 			&cli.StringFlag{Name: "out", Usage: "Output directory for generated models", Value: "internal/models"},
