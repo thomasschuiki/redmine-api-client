@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/tom-redmine/go-redmine-cli/internal/client"
 	"github.com/tom-redmine/go-redmine-cli/internal/config"
@@ -14,14 +15,24 @@ import (
 
 var redmineClient *client.Client
 
-func newClient() *client.Client {
+func newClient(c *cli.Command) *client.Client {
 	if redmineClient == nil {
 		cfg, err := config.Load()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		redmineClient = client.New(cfg)
+		connectTimeout, err := time.ParseDuration(c.String("connect-timeout"))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid --connect-timeout: %v\n", err)
+			os.Exit(1)
+		}
+		maxTime, err := time.ParseDuration(c.String("max-time"))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid --max-time: %v\n", err)
+			os.Exit(1)
+		}
+		redmineClient = client.New(cfg, connectTimeout, maxTime, c.Int("retries"))
 	}
 	return redmineClient
 }
@@ -37,6 +48,9 @@ Configure the connection using environment variables or a config file.
 See 'redmine help' for a list of available commands.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "output", Usage: "Output format (yaml, json)", Value: "yaml"},
+			&cli.StringFlag{Name: "connect-timeout", Usage: "TCP connection timeout (e.g. 10s)", Value: "10s"},
+			&cli.StringFlag{Name: "max-time", Usage: "Maximum time per request (e.g. 30s)", Value: "30s"},
+			&cli.IntFlag{Name: "retries", Usage: "Number of retries on failure", Value: 3},
 		},
 		Commands: []*cli.Command{
 			issueCommand(),
@@ -110,7 +124,7 @@ Filter flags map to Redmine API query parameters:
 					}
 					opts.Offset = c.Int("offset")
 					opts.Limit = c.Int("limit")
-					resp, err := newClient().ListIssues(c.String("project"), opts)
+					resp, err := newClient(c).ListIssues(c.String("project"), opts)
 					if err != nil {
 						return err
 					}
@@ -140,7 +154,7 @@ Examples:
 					if err != nil {
 						return fmt.Errorf("invalid issue ID: %w", err)
 					}
-					issue, err := newClient().GetIssue(id, c.String("include"))
+					issue, err := newClient(c).GetIssue(id, c.String("include"))
 					if err != nil {
 						return err
 					}
@@ -183,7 +197,7 @@ Examples:
 						TrackerID:    c.Int("tracker-id"),
 						AssignedToID: c.Int("assigned-to-id"),
 					}
-					result, err := newClient().GrepIssues(opts)
+					result, err := newClient(c).GrepIssues(opts)
 					if err != nil {
 						return err
 					}
@@ -239,7 +253,7 @@ description, tracker, status, priority, and assignee.`,
 						req.Issue.AssignedToID = &v
 					}
 
-					issue, err := newClient().CreateIssue(req)
+					issue, err := newClient(c).CreateIssue(req)
 					if err != nil {
 						return err
 					}
@@ -290,7 +304,7 @@ Only the fields you specify will be changed. Use --subject, --description,
 						req.Issue.DoneRatio = &v
 					}
 
-					if err := newClient().UpdateIssue(id, req); err != nil {
+					if err := newClient(c).UpdateIssue(id, req); err != nil {
 						return err
 					}
 					fmt.Fprintf(os.Stdout, "Issue %d updated\n", id)
@@ -308,7 +322,7 @@ This action cannot be undone.`,
 					if err != nil {
 						return fmt.Errorf("invalid issue ID: %w", err)
 					}
-					if err := newClient().DeleteIssue(id); err != nil {
+					if err := newClient(c).DeleteIssue(id); err != nil {
 						return err
 					}
 					fmt.Fprintf(os.Stdout, "Issue %d deleted\n", id)
@@ -340,7 +354,7 @@ By default, returns up to 25 results.`,
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListProjects(
+					resp, err := newClient(c).ListProjects(
 						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
 					)
 					if err != nil {
@@ -361,7 +375,7 @@ The identifier is the short name used in URLs, not the numeric ID.`,
 					if identifier == "" {
 						return fmt.Errorf("project identifier is required")
 					}
-					project, err := newClient().GetProject(identifier)
+					project, err := newClient(c).GetProject(identifier)
 					if err != nil {
 						return err
 					}
@@ -388,7 +402,7 @@ and is used as the URL slug for the project.`,
 					req.Project.Identifier = c.String("identifier")
 					req.Project.Description = c.String("description")
 
-					project, err := newClient().CreateProject(req)
+					project, err := newClient(c).CreateProject(req)
 					if err != nil {
 						return err
 					}
@@ -409,7 +423,7 @@ time entries, etc.). This action cannot be undone.`,
 					if identifier == "" {
 						return fmt.Errorf("project identifier is required")
 					}
-					if err := newClient().DeleteProject(identifier); err != nil {
+					if err := newClient(c).DeleteProject(identifier); err != nil {
 						return err
 					}
 					fmt.Fprintf(os.Stdout, "Project %s deleted\n", identifier)
@@ -440,7 +454,7 @@ By default, returns up to 25 results.`,
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListUsers(
+					resp, err := newClient(c).ListUsers(
 						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
 					)
 					if err != nil {
@@ -457,7 +471,7 @@ By default, returns up to 25 results.`,
 				Description: `Display the profile of the currently authenticated user.
 Useful for verifying your API key and checking your user ID.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
-					user, err := newClient().GetCurrentUser()
+					user, err := newClient(c).GetCurrentUser()
 					if err != nil {
 						return err
 					}
@@ -475,7 +489,7 @@ Useful for verifying your API key and checking your user ID.`,
 					if err != nil {
 						return fmt.Errorf("invalid user ID: %w", err)
 					}
-					user, err := newClient().GetUser(id)
+					user, err := newClient(c).GetUser(id)
 					if err != nil {
 						return err
 					}
@@ -511,7 +525,7 @@ Supports pagination with --limit and --offset flags.`,
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListTimeEntries(
+					resp, err := newClient(c).ListTimeEntries(
 						c.String("project"),
 						c.Int("issue"),
 						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
@@ -552,7 +566,7 @@ project (--project). Optionally specify an activity type and comment.`,
 						req.TimeEntry.ActivityID = &v
 					}
 
-					entry, err := newClient().CreateTimeEntry(req)
+					entry, err := newClient(c).CreateTimeEntry(req)
 					if err != nil {
 						return err
 					}
@@ -571,7 +585,7 @@ This action cannot be undone.`,
 					if err != nil {
 						return fmt.Errorf("invalid time entry ID: %w", err)
 					}
-					if err := newClient().DeleteTimeEntry(id); err != nil {
+					if err := newClient(c).DeleteTimeEntry(id); err != nil {
 						return err
 					}
 					fmt.Fprintf(os.Stdout, "Time entry %d deleted\n", id)
@@ -601,7 +615,7 @@ The --project flag is required and must be a project identifier.`,
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListWikiPages(c.String("project"))
+					resp, err := newClient(c).ListWikiPages(c.String("project"))
 					if err != nil {
 						return err
 					}
@@ -622,7 +636,7 @@ title of the wiki page as it appears in the URL.`,
 					&cli.StringFlag{Name: "page", Usage: "Page title", Required: true},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					page, err := newClient().GetWikiPage(c.String("project"), c.String("page"))
+					page, err := newClient(c).GetWikiPage(c.String("project"), c.String("page"))
 					if err != nil {
 						return err
 					}
@@ -654,7 +668,7 @@ The --project flag is required and must be a project identifier.`,
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListVersions(c.String("project"))
+					resp, err := newClient(c).ListVersions(c.String("project"))
 					if err != nil {
 						return err
 					}
