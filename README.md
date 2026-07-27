@@ -184,3 +184,36 @@ go-redmine-cli/
 
 No Ruby, Node.js, or Python required on the host. Docker is only needed for spec
 regeneration, not for using the CLI tools.
+
+---
+
+## Releasing
+
+This monorepo has two independent release tracks with separate tag prefixes:
+
+| Component | Tag pattern | Workflow |
+|-----------|-------------|----------|
+| Redmine plugin | `plugin/v*.*.*` | `.github/workflows/release-plugin.yml` |
+| CLI binaries | `cli/v*.*.*` | `.github/workflows/release-cli.yml` |
+
+### Plugin release
+
+```bash
+git tag plugin/v0.3.0
+git push origin plugin/v0.3.0
+```
+
+Archives: `.tar.gz` and `.zip` of `plugin/redmine_openapi_generator/`.
+
+### CLI release
+
+```bash
+git tag cli/v1.0.0
+git push origin cli/v1.0.0
+```
+
+Archives: `.tar.gz` per binary in `cmd/` (linux-amd64).
+
+Both workflows run tests before creating the release. Pushing to `main` only
+triggers CI for the files that changed (plugin paths for the plugin workflow, CLI
+paths for the CLI workflow).

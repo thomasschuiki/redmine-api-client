@@ -6,9 +6,17 @@ on:
       - main
     tags:
       - plugin/v*.*.*
+    paths:
+      - plugin/**
   pull_request:
     branches:
       - main
+    paths:
+      - plugin/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -30,7 +38,7 @@ jobs:
           docker run --rm -d --network redmine-test --name test-mysql \
             -e MYSQL_ROOT_PASSWORD=root \
             -e MYSQL_DATABASE=redmine_test \
-            mysql:8.0
+            mysql:8.0.37
           for i in $(seq 1 15); do
             docker exec test-mysql mysql -h localhost -uroot -proot -e "SELECT 1" 2>/dev/null && break
             sleep 2
@@ -74,23 +82,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-
       - name: Get version
         id: version
         run: echo "TAG=${GITHUB_REF_NAME#plugin/v}" >> "$GITHUB_OUTPUT"
-
-      - name: Build CLI binaries (redmine & redmine-spec)
-        run: |
-          for dir in cmd/*/; do
-            name=$(basename "$dir")
-            go build -o "$name" "./$dir"
-            tar czf "go-redmine-cli-$name-${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz" "$name"
-            rm "$name"
-          done
 
       - name: Create plugin archive
         run: |
@@ -105,7 +99,6 @@ jobs:
           files: |
             redmine-openapi-generator-${{ steps.version.outputs.TAG }}.tar.gz
             redmine-openapi-generator-${{ steps.version.outputs.TAG }}.zip
-            go-redmine-cli-*${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz
           tag_name: ${{ github.ref_name }}
-          name: go-redmine-cli ${{ steps.version.outputs.TAG }}
+          name: Redmine OpenAPI Generator ${{ steps.version.outputs.TAG }}
           generate_release_notes: true

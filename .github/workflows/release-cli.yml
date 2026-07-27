@@ -1,0 +1,75 @@
+name: Release CLI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - cli/v*.*.*
+    paths:
+      - cmd/**
+      - internal/**
+      - go.mod
+      - go.sum
+  pull_request:
+    branches:
+      - main
+    paths:
+      - cmd/**
+      - internal/**
+      - go.mod
+      - go.sum
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Test
+        run: go test ./...
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/cli/v')
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Get version
+        id: version
+        run: echo "TAG=${GITHUB_REF_NAME#cli/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build CLI binaries
+        run: |
+          for dir in cmd/*/; do
+            name=$(basename "$dir")
+            go build -o "$name" "./$dir"
+            tar czf "go-redmine-cli-$name-${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz" "$name"
+            rm "$name"
+          done
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: go-redmine-cli-*${{ steps.version.outputs.TAG }}-linux-amd64.tar.gz
+          tag_name: ${{ github.ref_name }}
+          name: go-redmine-cli ${{ steps.version.outputs.TAG }}
+          generate_release_notes: true
