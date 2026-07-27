@@ -7,23 +7,48 @@ import (
 
 // Issue represents a Redmine issue.
 type Issue struct {
-	ID          int            `json:"id"`
-	Project     *IDName        `json:"project,omitempty"`
-	Tracker     *IDName        `json:"tracker,omitempty"`
-	Status      *IDName        `json:"status,omitempty"`
-	Priority    *IDName        `json:"priority,omitempty"`
-	Author      *IDName        `json:"author,omitempty"`
-	AssignedTo  *IDName        `json:"assigned_to,omitempty"`
-	Subject     string         `json:"subject"`
-	Description string         `json:"description,omitempty"`
-	StartDate   string         `json:"start_date,omitempty"`
-	DueDate     string         `json:"due_date,omitempty"`
-	DoneRatio   int            `json:"done_ratio"`
-	IsPrivate   bool           `json:"is_private"`
-	CreatedOn   string         `json:"created_on,omitempty"`
-	UpdatedOn   string         `json:"updated_on,omitempty"`
-	ClosedOn    string         `json:"closed_on,omitempty"`
-	CustomFields []CustomField `json:"custom_fields,omitempty"`
+	ID           int            `json:"id"`
+	Project      *IDName        `json:"project,omitempty"`
+	Tracker      *IDName        `json:"tracker,omitempty"`
+	Status       *IDName        `json:"status,omitempty"`
+	Priority     *IDName        `json:"priority,omitempty"`
+	Author       *IDName        `json:"author,omitempty"`
+	AssignedTo   *IDName        `json:"assigned_to,omitempty"`
+	Parent       *IssueRef      `json:"parent,omitempty"`
+	Subject      string         `json:"subject"`
+	Description  string         `json:"description,omitempty"`
+	StartDate    string         `json:"start_date,omitempty"`
+	DueDate      string         `json:"due_date,omitempty"`
+	DoneRatio    int            `json:"done_ratio"`
+	IsPrivate    bool           `json:"is_private"`
+	CreatedOn    string         `json:"created_on,omitempty"`
+	UpdatedOn    string         `json:"updated_on,omitempty"`
+	ClosedOn     string         `json:"closed_on,omitempty"`
+	CustomFields []CustomField  `json:"custom_fields,omitempty"`
+	Journals     []Journal      `json:"journals,omitempty"`
+}
+
+// IssueRef is a lightweight reference to another issue.
+type IssueRef struct {
+	ID int `json:"id"`
+}
+
+// Journal represents a journal (comment/change history) entry on an issue.
+type Journal struct {
+	ID           int             `json:"id"`
+	User         *IDName         `json:"user,omitempty"`
+	Notes        string          `json:"notes,omitempty"`
+	CreatedOn    string          `json:"created_on,omitempty"`
+	PrivateNotes bool            `json:"private_notes,omitempty"`
+	Details      []JournalDetail `json:"details,omitempty"`
+}
+
+// JournalDetail represents a single field change within a journal entry.
+type JournalDetail struct {
+	Property string `json:"property,omitempty"`
+	Name     string `json:"name,omitempty"`
+	OldValue string `json:"old_value,omitempty"`
+	NewValue string `json:"new_value,omitempty"`
 }
 
 // IDName is a generic reference to a named object.
@@ -155,12 +180,18 @@ func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListRes
 }
 
 // GetIssue returns a single issue by ID.
-func (c *Client) GetIssue(id int) (*Issue, error) {
+// The include parameter is a comma-separated list of associated objects to
+// include (e.g. "journals,watchers"). Pass empty string for no extras.
+func (c *Client) GetIssue(id int, include string) (*Issue, error) {
 	var result struct {
 		Issue Issue `json:"issue"`
 	}
 	path := fmt.Sprintf("/issues/%d.json", id)
-	if err := c.get(path, nil, &result); err != nil {
+	var params url.Values
+	if include != "" {
+		params = url.Values{"include": {include}}
+	}
+	if err := c.get(path, params, &result); err != nil {
 		return nil, err
 	}
 	return &result.Issue, nil

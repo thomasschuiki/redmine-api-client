@@ -124,13 +124,23 @@ Filter flags map to Redmine API query parameters:
 				ArgsUsage: "<id>",
 				Description: `Retrieve full details for a single issue by its numeric ID.
 Returns the complete issue object including description, status,
-assignee, and custom fields.`,
+assignee, and custom fields.
+
+Use --include to add associated objects like journals, watchers, or relations.
+
+Examples:
+  redmine issue get 1234
+  redmine issue get 1234 --include journals --output json
+  redmine issue get 1234 --include "journals,watchers" -o yaml`,
+				Flags: []cli.Flag{
+					&cli.StringFlag{Name: "include", Usage: "Include associated objects (e.g. 'journals,watchers')"},
+				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
 					if err != nil {
 						return fmt.Errorf("invalid issue ID: %w", err)
 					}
-					issue, err := newClient().GetIssue(id)
+					issue, err := newClient().GetIssue(id, c.String("include"))
 					if err != nil {
 						return err
 					}
