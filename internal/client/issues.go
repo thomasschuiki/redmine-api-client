@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // Issue represents a Redmine issue.
@@ -218,4 +219,138 @@ func (c *Client) UpdateIssue(id int, req IssueUpdateRequest) error {
 func (c *Client) DeleteIssue(id int) error {
 	path := fmt.Sprintf("/issues/%d.json", id)
 	return c.delete(path)
+}
+
+// GrepHit represents a single text match within an issue.
+type GrepHit struct {
+	IssueID int    `json:"issue_id"`
+	Subject string `json:"subject"`
+	Where   string `json:"where"`
+	Snippet string `json:"snippet"`
+}
+
+// GrepResult holds all matches from a grep search.
+type GrepResult struct {
+	Matches []GrepHit `json:"matches"`
+	Total   int       `json:"total"`
+}
+
+// GrepOpts holds options for a grep search across issues.
+type GrepOpts struct {
+	Project      string
+	ParentID     int
+	Text         string
+	In           string
+	StatusID     string
+	TrackerID    int
+	AssignedToID int
+}
+
+const grepPageSize = 100
+
+// GrepIssues searches for text in issue descriptions and/or journal notes,
+// auto-paginating through all results in the given scope.
+func (c *Client) GrepIssues(opts GrepOpts) (*GrepResult, error) {
+	searchDesc := strings.Contains(opts.In, "description")
+	searchNotes := strings.Contains(opts.In, "notes")
+
+	var allMatches []GrepHit
+	totalScanned := 0
+
+	for offset := 0; ; {
+		listOpts := IssueListOpts{
+			ListOpts: ListOpts{Offset: offset, Limit: grepPageSize},
+			Include:  "journals",
+		}
+		if opts.ParentID > 0 {
+			listOpts.ParentID = opts.ParentID
+		}
+		if opts.StatusID != "" {
+			listOpts.StatusID = opts.StatusID
+		}
+		if opts.TrackerID > 0 {
+			listOpts.TrackerID = opts.TrackerID
+		}
+		if opts.AssignedToID > 0 {
+			listOpts.AssignedToID = opts.AssignedToID
+		}
+
+		resp, err := c.ListIssues(opts.Project, listOpts)
+		if err != nil {
+			return nil, err
+		}
+
+		for i := range resp.Issues {
+			issue := &resp.Issues[i]
+			totalScanned++
+
+			if searchDesc {
+				if hits := searchField(issue.Description, "description", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
+					allMatches = append(allMatches, hits...)
+				}
+			}
+			if searchNotes {
+				for _, j := range issue.Journals {
+					if j.Notes != "" {
+						if hits := searchField(j.Notes, "note", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
+							allMatches = append(allMatches, hits...)
+						}
+					}
+				}
+			}
+		}
+
+		if len(resp.Issues) < grepPageSize || offset+grepPageSize >= resp.TotalCount {
+			break
+		}
+		offset += grepPageSize
+		_ = resp
+	}
+
+	return &GrepResult{Matches: allMatches, Total: totalScanned}, nil
+}
+
+func searchField(text, where string, issueID int, subject, keyword string) []GrepHit {
+	lowerText := strings.ToLower(text)
+	lowerKeyword := strings.ToLower(keyword)
+	idx := 0
+	var hits []GrepHit
+	for {
+		pos := strings.Index(lowerText[idx:], lowerKeyword)
+		if pos < 0 {
+			break
+		}
+		absPos := idx + pos
+		snippet := extractSnippet(text, absPos, len(keyword))
+		hits = append(hits, GrepHit{
+			IssueID: issueID,
+			Subject: subject,
+			Where:   where,
+			Snippet: snippet,
+		})
+		idx = absPos + len(keyword)
+	}
+	return hits
+}
+
+func extractSnippet(text string, pos, matchLen int) string {
+	const ctx = 40
+	start := pos - ctx
+	if start < 0 {
+		start = 0
+	}
+	end := pos + matchLen + ctx
+	if end > len(text) {
+		end = len(text)
+	}
+	snippet := text[start:end]
+	snippet = strings.ReplaceAll(snippet, "\n", " ")
+	snippet = strings.TrimSpace(snippet)
+	if start > 0 {
+		snippet = "..." + snippet
+	}
+	if end < len(text) {
+		snippet = snippet + "..."
+	}
+	return snippet
 }

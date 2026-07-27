@@ -149,6 +149,57 @@ Examples:
 				},
 			},
 			{
+				Name:      "grep",
+				Usage:     "Search text across issues",
+				ArgsUsage: " ",
+				Description: `Search for text in issue descriptions and/or journal notes.
+
+Auto-paginates through all matching results in the given scope.
+Use --project, --parent-id, and other flags to narrow the search.
+
+The --in flag controls which fields are searched (comma-separated):
+  description  → issue description
+  notes        → journal/comment notes
+
+Examples:
+  redmine issue grep --text contractenddate --in description,notes
+  redmine issue grep --project ework --parent-id 45141 --text contract --in notes`,
+				Flags: []cli.Flag{
+					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
+					&cli.IntFlag{Name: "parent-id", Usage: "Parent issue ID"},
+					&cli.StringFlag{Name: "text", Usage: "Text to search for", Required: true},
+					&cli.StringFlag{Name: "in", Usage: "Fields to search (description, notes)", Value: "description,notes"},
+					&cli.StringFlag{Name: "status-id", Usage: "Status ID ('*' open, '!*' closed, or numeric)"},
+					&cli.IntFlag{Name: "tracker-id", Usage: "Tracker ID"},
+					&cli.IntFlag{Name: "assigned-to-id", Usage: "Assigned to user ID"},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					opts := client.GrepOpts{
+						Project:      c.String("project"),
+						ParentID:     c.Int("parent-id"),
+						Text:         c.String("text"),
+						In:           c.String("in"),
+						StatusID:     c.String("status-id"),
+						TrackerID:    c.Int("tracker-id"),
+						AssignedToID: c.Int("assigned-to-id"),
+					}
+					result, err := newClient().GrepIssues(opts)
+					if err != nil {
+						return err
+					}
+					format := c.String("output")
+					if format == "json" {
+						output.Print(result, "json")
+					} else {
+						for _, m := range result.Matches {
+							fmt.Printf("#%d | %s | %s | %s\n", m.IssueID, m.Subject, m.Where, m.Snippet)
+						}
+						fmt.Fprintf(os.Stderr, "%d matches in %d issues\n", len(result.Matches), result.Total)
+					}
+					return nil
+				},
+			},
+			{
 				Name:      "create",
 				Usage:     "Create a new issue",
 				ArgsUsage: " ",
