@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/tom-redmine/go-redmine-cli/internal/client"
@@ -77,7 +78,8 @@ across different statuses and priorities.`,
 				ArgsUsage: " ",
 				Description: `List issues with optional filtering.
 
-By default, returns up to 25 results. Use --limit and --offset for pagination.
+By default, returns up to 25 results. Use --limit and --offset for pagination,
+or --all to auto-paginate through every matching issue.
 Filter by project using the --project flag with a project identifier.
 
 Filter flags map to Redmine API query parameters:
@@ -91,11 +93,22 @@ Filter flags map to Redmine API query parameters:
   --subject       → subject (substring match)
   --description   → description (substring match)
   --sort          → sort order (e.g. 'created_on:desc')
-  --include       → include associated objects (e.g. 'attachments,relations')`,
+  --include       → include associated objects (e.g. 'attachments,relations')
+
+Client-side filters (applied after fetch):
+  --contains      → substring match across subject, description, status, etc.
+  --regex         → regex match across subject, description, status, etc.
+  --case-insensitive → make --contains/--regex case-insensitive (default: sensitive)
+
+Output options:
+  --fields        → comma-separated list of fields to include in output
+  --top N         → limit results to first N matches`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
 					&cli.IntFlag{Name: "limit", Usage: "Max results", Value: 25},
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
+					&cli.BoolFlag{Name: "all", Usage: "Auto-paginate through all results"},
+					&cli.IntFlag{Name: "top", Usage: "Limit to first N results"},
 					&cli.StringFlag{Name: "status-id", Usage: "Status ID ('*' open, '!*' closed, or numeric)"},
 					&cli.IntFlag{Name: "tracker-id", Usage: "Tracker ID"},
 					&cli.IntFlag{Name: "assigned-to-id", Usage: "Assigned to user ID"},
@@ -107,6 +120,10 @@ Filter flags map to Redmine API query parameters:
 					&cli.StringFlag{Name: "description", Usage: "Filter by description (substring)"},
 					&cli.StringFlag{Name: "sort", Usage: "Sort order (e.g. 'created_on:desc')"},
 					&cli.StringFlag{Name: "include", Usage: "Include associated objects (e.g. 'attachments,relations')"},
+					&cli.StringFlag{Name: "contains", Usage: "Client-side substring filter across fields"},
+					&cli.StringFlag{Name: "regex", Usage: "Client-side regex filter across fields"},
+					&cli.BoolFlag{Name: "case-insensitive", Usage: "Make --contains/--regex case-insensitive"},
+					&cli.StringFlag{Name: "fields", Usage: "Comma-separated fields to include in output"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					opts := client.IssueListOpts{
@@ -124,11 +141,46 @@ Filter flags map to Redmine API query parameters:
 					}
 					opts.Offset = c.Int("offset")
 					opts.Limit = c.Int("limit")
-					resp, err := newClient(c).ListIssues(c.String("project"), opts)
+
+					var resp *client.IssueListResponse
+					var err error
+					if c.Bool("all") {
+						resp, err = newClient(c).ListAllIssues(c.String("project"), opts)
+					} else {
+						resp, err = newClient(c).ListIssues(c.String("project"), opts)
+					}
 					if err != nil {
 						return err
 					}
-					output.Print(resp, c.String("output"))
+
+					issues := resp.Issues
+
+					if v := c.String("contains"); v != "" {
+						issues = client.ContainsFilter(issues, v, c.Bool("case-insensitive"))
+					}
+					if v := c.String("regex"); v != "" {
+						issues, err = client.RegexFilter(issues, v, c.Bool("case-insensitive"))
+						if err != nil {
+							return err
+						}
+					}
+					if v := c.Int("top"); v > 0 && v < len(issues) {
+						issues = issues[:v]
+					}
+
+					result := &client.IssueListResponse{
+						Issues:     issues,
+						TotalCount: resp.TotalCount,
+						Offset:     resp.Offset,
+						Limit:      resp.Limit,
+					}
+
+					if fields := c.String("fields"); fields != "" {
+						fieldList := strings.Split(fields, ",")
+						output.Print(output.FilterFields(result, fieldList), c.String("output"))
+					} else {
+						output.Print(result, c.String("output"))
+					}
 					return nil
 				},
 			},
@@ -148,6 +200,7 @@ Examples:
   redmine issue get 1234 --include "journals,watchers" -o yaml`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "include", Usage: "Include associated objects (e.g. 'journals,watchers')"},
+					&cli.StringFlag{Name: "fields", Usage: "Comma-separated fields to include in output"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
@@ -158,7 +211,12 @@ Examples:
 					if err != nil {
 						return err
 					}
-					output.Print(issue, c.String("output"))
+					if fields := c.String("fields"); fields != "" {
+						fieldList := strings.Split(fields, ",")
+						output.Print(output.FilterFields(issue, fieldList), c.String("output"))
+					} else {
+						output.Print(issue, c.String("output"))
+					}
 					return nil
 				},
 			},
@@ -369,13 +427,15 @@ By default, returns up to 25 results.`,
 				Usage:     "Get a project by identifier",
 				ArgsUsage: "<identifier>",
 				Description: `Retrieve full details for a project by its URL identifier (slug).
-The identifier is the short name used in URLs, not the numeric ID.`,
+The identifier is the short name used in URLs, not the numeric ID.
+
+If the exact identifier is not found, close matches are suggested.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					identifier := c.Args().First()
 					if identifier == "" {
 						return fmt.Errorf("project identifier is required")
 					}
-					project, err := newClient(c).GetProject(identifier)
+					project, err := newClient(c).ResolveProject(identifier)
 					if err != nil {
 						return err
 					}

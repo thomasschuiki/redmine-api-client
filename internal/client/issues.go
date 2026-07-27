@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
 )
 
@@ -178,6 +179,107 @@ func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListRes
 		return nil, err
 	}
 	return &result, nil
+}
+
+const listPageSize = 100
+
+// ListAllIssues auto-paginates through all matching issues.
+func (c *Client) ListAllIssues(projectID string, opts IssueListOpts) (*IssueListResponse, error) {
+	opts.Limit = listPageSize
+	var all []Issue
+	var total int
+
+	for offset := 0; ; {
+		opts.Offset = offset
+		resp, err := c.ListIssues(projectID, opts)
+		if err != nil {
+			return nil, err
+		}
+		total = resp.TotalCount
+		all = append(all, resp.Issues...)
+		if len(resp.Issues) < listPageSize || offset+listPageSize >= resp.TotalCount {
+			break
+		}
+		offset += listPageSize
+	}
+
+	return &IssueListResponse{Issues: all, TotalCount: total}, nil
+}
+
+// ContainsFilter returns issues where any text field contains the given
+// substring (case-insensitive by default).
+func ContainsFilter(issues []Issue, text string, caseInsensitive bool) []Issue {
+	lower := strings.ToLower(text)
+	var out []Issue
+	for _, issue := range issues {
+		if containsIssue(&issue, lower, caseInsensitive) {
+			out = append(out, issue)
+		}
+	}
+	return out
+}
+
+func containsIssue(issue *Issue, lower string, caseInsensitive bool) bool {
+	fields := []string{
+		issue.Subject,
+		issue.Description,
+		issue.Status.Name,
+		issue.Tracker.Name,
+		issue.Author.Name,
+	}
+	if issue.AssignedTo != nil {
+		fields = append(fields, issue.AssignedTo.Name)
+	}
+	for _, f := range fields {
+		if caseInsensitive {
+			if strings.Contains(strings.ToLower(f), lower) {
+				return true
+			}
+		} else {
+			if strings.Contains(f, lower) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// RegexFilter returns issues where any text field matches the given pattern.
+func RegexFilter(issues []Issue, pattern string, caseInsensitive bool) ([]Issue, error) {
+	flags := ""
+	if caseInsensitive {
+		flags = "(?i)"
+	}
+	re, err := regexp.Compile(flags + pattern)
+	if err != nil {
+		return nil, fmt.Errorf("invalid regex: %w", err)
+	}
+	var out []Issue
+	for _, issue := range issues {
+		if regexMatchIssue(&issue, re) {
+			out = append(out, issue)
+		}
+	}
+	return out, nil
+}
+
+func regexMatchIssue(issue *Issue, re *regexp.Regexp) bool {
+	fields := []string{
+		issue.Subject,
+		issue.Description,
+		issue.Status.Name,
+		issue.Tracker.Name,
+		issue.Author.Name,
+	}
+	if issue.AssignedTo != nil {
+		fields = append(fields, issue.AssignedTo.Name)
+	}
+	for _, f := range fields {
+		if re.MatchString(f) {
+			return true
+		}
+	}
+	return false
 }
 
 // GetIssue returns a single issue by ID.
