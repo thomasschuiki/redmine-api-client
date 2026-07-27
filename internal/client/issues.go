@@ -82,8 +82,63 @@ type CustomFieldValue struct {
 	Value string `json:"value"`
 }
 
+// IssueListOpts holds filtering options for listing issues.
+type IssueListOpts struct {
+	ListOpts
+	StatusID       string
+	TrackerID      int
+	AssignedToID   int
+	PriorityID     int
+	CategoryID     int
+	FixedVersionID int
+	ParentID       int
+	Subject        string
+	Description    string
+	Sort           string
+	Include        string
+}
+
+// Params converts IssueListOpts to url.Values.
+func (o IssueListOpts) Params() url.Values {
+	v := o.ListOpts.Params()
+	if o.StatusID != "" {
+		v.Set("status_id", o.StatusID)
+	}
+	if o.TrackerID > 0 {
+		v.Set("tracker_id", fmt.Sprintf("%d", o.TrackerID))
+	}
+	if o.AssignedToID > 0 {
+		v.Set("assigned_to_id", fmt.Sprintf("%d", o.AssignedToID))
+	}
+	if o.PriorityID > 0 {
+		v.Set("priority_id", fmt.Sprintf("%d", o.PriorityID))
+	}
+	if o.CategoryID > 0 {
+		v.Set("category_id", fmt.Sprintf("%d", o.CategoryID))
+	}
+	if o.FixedVersionID > 0 {
+		v.Set("fixed_version_id", fmt.Sprintf("%d", o.FixedVersionID))
+	}
+	if o.ParentID > 0 {
+		v.Set("parent_id", fmt.Sprintf("%d", o.ParentID))
+	}
+	if o.Subject != "" {
+		v.Set("subject", o.Subject)
+	}
+	if o.Description != "" {
+		v.Set("description", o.Description)
+	}
+	if o.Sort != "" {
+		v.Set("sort", o.Sort)
+	}
+	if o.Include != "" {
+		v.Set("include", o.Include)
+	}
+	return v
+}
+
 // ListIssues returns issues, optionally filtered by project.
-func (c *Client) ListIssues(projectID string, opts ListOpts) (*IssueListResponse, error) {
+func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListResponse, error) {
 	var path string
 	if projectID != "" {
 		path = fmt.Sprintf("/projects/%s/issues.json", url.PathEscape(projectID))

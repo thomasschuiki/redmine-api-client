@@ -64,17 +64,53 @@ across different statuses and priorities.`,
 				Description: `List issues with optional filtering.
 
 By default, returns up to 25 results. Use --limit and --offset for pagination.
-Filter by project using the --project flag with a project identifier.`,
+Filter by project using the --project flag with a project identifier.
+
+Filter flags map to Redmine API query parameters:
+  --status-id     → status_id (use '*' for open, '!*' for closed)
+  --tracker-id    → tracker_id
+  --assigned-to-id → assigned_to_id
+  --priority-id   → priority_id
+  --category-id   → category_id
+  --fixed-version-id → fixed_version_id
+  --parent-id     → parent_id (filter children of a parent issue)
+  --subject       → subject (substring match)
+  --description   → description (substring match)
+  --sort          → sort order (e.g. 'created_on:desc')
+  --include       → include associated objects (e.g. 'attachments,relations')`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
 					&cli.IntFlag{Name: "limit", Usage: "Max results", Value: 25},
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
+					&cli.StringFlag{Name: "status-id", Usage: "Status ID ('*' open, '!*' closed, or numeric)"},
+					&cli.IntFlag{Name: "tracker-id", Usage: "Tracker ID"},
+					&cli.IntFlag{Name: "assigned-to-id", Usage: "Assigned to user ID"},
+					&cli.IntFlag{Name: "priority-id", Usage: "Priority ID"},
+					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
+					&cli.IntFlag{Name: "fixed-version-id", Usage: "Fixed version ID"},
+					&cli.IntFlag{Name: "parent-id", Usage: "Parent issue ID"},
+					&cli.StringFlag{Name: "subject", Usage: "Filter by subject (substring)"},
+					&cli.StringFlag{Name: "description", Usage: "Filter by description (substring)"},
+					&cli.StringFlag{Name: "sort", Usage: "Sort order (e.g. 'created_on:desc')"},
+					&cli.StringFlag{Name: "include", Usage: "Include associated objects (e.g. 'attachments,relations')"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					resp, err := newClient().ListIssues(
-						c.String("project"),
-						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
-					)
+					opts := client.IssueListOpts{
+						StatusID:       c.String("status-id"),
+						TrackerID:      c.Int("tracker-id"),
+						AssignedToID:   c.Int("assigned-to-id"),
+						PriorityID:     c.Int("priority-id"),
+						CategoryID:     c.Int("category-id"),
+						FixedVersionID: c.Int("fixed-version-id"),
+						ParentID:       c.Int("parent-id"),
+						Subject:        c.String("subject"),
+						Description:    c.String("description"),
+						Sort:           c.String("sort"),
+						Include:        c.String("include"),
+					}
+					opts.Offset = c.Int("offset")
+					opts.Limit = c.Int("limit")
+					resp, err := newClient().ListIssues(c.String("project"), opts)
 					if err != nil {
 						return err
 					}
