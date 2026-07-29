@@ -569,6 +569,137 @@ This action cannot be undone.`,
 					return nil
 				},
 			},
+			{
+				Name:  "relation",
+				Usage: "Manage issue relations (dependencies)",
+				Description: `Manage relations between issues for dependency tracking.
+
+Relation types:
+  relates       — general relationship
+  duplicates    — this issue duplicates the target
+  duplicated    — this issue is duplicated by the target
+  blocks        — this issue blocks the target
+  blocked       — this issue is blocked by the target
+  precedes      — this issue must be done before the target
+  follows       — this issue must be done after the target
+  copied_to     — this issue was copied to the target
+  copied_from   — this issue was copied from the target
+
+For precedes/follows, use --delay to specify the number of days
+between the two issues.`,
+				Commands: []*cli.Command{
+					{
+						Name:      "add",
+						Usage:     "Add a relation between two issues",
+						ArgsUsage: "<from-id> <to-id>",
+						Description: `Create a relation from one issue to another.
+
+The first argument is the source issue ID, the second is the target
+issue ID. Use --type to specify the relation type.
+
+For precedes/follows relations, use --delay to set the number of
+days of lag between the issues.
+
+Examples:
+  redmine issue relation add 123 456 --type blocks
+  redmine issue relation add 100 200 --type precedes --delay 3`,
+						Flags: []cli.Flag{
+							&cli.StringFlag{Name: "type", Usage: "Relation type", Required: true},
+							&cli.IntFlag{Name: "delay", Usage: "Delay in days (for precedes/follows)"},
+						},
+						Action: func(ctx context.Context, c *cli.Command) error {
+							args := c.Args().Slice()
+							if len(args) < 2 {
+								return fmt.Errorf("requires exactly 2 arguments: <from-id> <to-id>")
+							}
+							fromID, err := strconv.Atoi(args[0])
+							if err != nil {
+								return fmt.Errorf("invalid from-id: %w", err)
+							}
+							toID, err := strconv.Atoi(args[1])
+							if err != nil {
+								return fmt.Errorf("invalid to-id: %w", err)
+							}
+
+							rt, err := client.ParseRelationType(c.String("type"))
+							if err != nil {
+								return err
+							}
+
+							var req client.RelationCreateRequest
+							req.Relation.IssueID = fromID
+							req.Relation.IssueToID = toID
+							req.Relation.RelationType = rt
+							if c.IsSet("delay") {
+								v := c.Int("delay")
+								req.Relation.Delay = &v
+							}
+
+							rel, err := newClient(c).CreateRelation(req)
+							if err != nil {
+								return err
+							}
+							output.Print(rel, c.String("output"))
+							return nil
+						},
+					},
+					{
+						Name:      "list",
+						Usage:     "List relations for an issue",
+						ArgsUsage: "<id>",
+						Description: `List all relations for a given issue.
+
+Shows relation ID, type, target issue, and delay (if applicable).
+
+Examples:
+  redmine issue relation list 123`,
+						Action: func(ctx context.Context, c *cli.Command) error {
+							id, err := strconv.Atoi(c.Args().First())
+							if err != nil {
+								return fmt.Errorf("invalid issue ID: %w", err)
+							}
+							resp, err := newClient(c).ListRelations(id)
+							if err != nil {
+								return err
+							}
+							if c.String("output") == "json" {
+								output.Print(resp, "json")
+							} else {
+								for _, r := range resp.Relations {
+									delay := ""
+									if r.Delay != nil {
+										delay = fmt.Sprintf(" (delay %d days)", *r.Delay)
+									}
+									fmt.Printf("#%d → #%d  %s%s\n", r.IssueID, r.IssueToID, r.RelationType, delay)
+								}
+							}
+							return nil
+						},
+					},
+					{
+						Name:      "remove",
+						Usage:     "Remove a relation",
+						ArgsUsage: "<relation-id>",
+						Description: `Delete a relation by its numeric ID.
+
+Use 'redmine issue relation list <issue-id>' to find the relation ID.
+
+Example:
+  redmine issue relation remove 42`,
+						Action: func(ctx context.Context, c *cli.Command) error {
+							id, err := strconv.Atoi(c.Args().First())
+							if err != nil {
+								return fmt.Errorf("invalid relation ID: %w", err)
+							}
+							if err := newClient(c).DeleteRelation(id); err != nil {
+								return err
+							}
+							fmt.Fprintf(os.Stdout, "Relation %d removed\n", id)
+							return nil
+						},
+					},
+				},
+			},
 		},
 	}
 }

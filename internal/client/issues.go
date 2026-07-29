@@ -29,6 +29,7 @@ type Issue struct {
 	ClosedOn     string         `json:"closed_on,omitempty"`
 	CustomFields []CustomField  `json:"custom_fields,omitempty"`
 	Journals     []Journal      `json:"journals,omitempty"`
+	Relations    []Relation     `json:"relations,omitempty"`
 }
 
 // IssueRef is a lightweight reference to another issue.
