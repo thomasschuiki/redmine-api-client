@@ -48,7 +48,7 @@ func Validate(specPath string) (*ValidationResult, error) {
 
 // ValidationResult holds the outcome of spec validation.
 type ValidationResult struct {
-	Valid               bool
+	ParseErrors         []error
 	PathCount           int
 	OperationCount      int
 	SchemaCount         int
@@ -56,7 +56,7 @@ type ValidationResult struct {
 	ResponseCount       int
 	SecuritySchemeCount int
 	TagCount            int
-	ParseErrors         []error
+	Valid               bool
 }
 
 func countOperations(model *v3high.Document) int {
