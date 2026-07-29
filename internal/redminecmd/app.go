@@ -60,6 +60,10 @@ See 'redmine help' for a list of available commands.`,
 			timeEntryCommand(),
 			wikiCommand(),
 			versionCommand(),
+			trackerCommand(),
+			statusCommand(),
+			priorityCommand(),
+			categoryCommand(),
 		},
 	}
 }
@@ -701,6 +705,160 @@ title of the wiki page as it appears in the URL.`,
 						return err
 					}
 					output.Print(page, c.String("output"))
+					return nil
+				},
+			},
+		},
+	}
+}
+
+func trackerCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "tracker",
+		Usage: "List issue trackers",
+		Description: `Display all available issue trackers with their numeric IDs.
+
+Use the ID with --tracker-id or --tracker when creating or updating issues.`,
+		Commands: []*cli.Command{
+			{
+				Name:      "list",
+				Usage:     "List trackers",
+				ArgsUsage: " ",
+				Description: `List all trackers configured in Redmine.
+
+Output shows ID and name. Use --output json for machine-parseable output.`,
+				Action: func(ctx context.Context, c *cli.Command) error {
+					resp, err := newClient(c).ListTrackers()
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						output.Print(resp, "json")
+					} else {
+						for _, t := range resp.Trackers {
+							fmt.Printf("% 4d  %s\n", t.ID, t.Name)
+						}
+					}
+					return nil
+				},
+			},
+		},
+	}
+}
+
+func statusCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "status",
+		Usage: "List issue statuses",
+		Description: `Display all available issue statuses with their numeric IDs.
+
+Use the ID with --status-id when listing or filtering issues.`,
+		Commands: []*cli.Command{
+			{
+				Name:      "list",
+				Usage:     "List issue statuses",
+				ArgsUsage: " ",
+				Description: `List all issue statuses configured in Redmine.
+
+Output shows ID, name, and whether the status is a closed state.
+Use --output json for machine-parseable output.`,
+				Action: func(ctx context.Context, c *cli.Command) error {
+					resp, err := newClient(c).ListIssueStatuses()
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						output.Print(resp, "json")
+					} else {
+						for _, s := range resp.IssueStatuses {
+							closed := ""
+							if s.IsClosed {
+								closed = " (closed)"
+							}
+							fmt.Printf("% 4d  %s%s\n", s.ID, s.Name, closed)
+						}
+					}
+					return nil
+				},
+			},
+		},
+	}
+}
+
+func priorityCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "priority",
+		Usage: "List issue priorities",
+		Description: `Display all available issue priorities with their numeric IDs.
+
+Use the ID with --priority-id when creating or filtering issues.`,
+		Commands: []*cli.Command{
+			{
+				Name:      "list",
+				Usage:     "List issue priorities",
+				ArgsUsage: " ",
+				Description: `List all issue priorities configured in Redmine.
+
+Output shows ID and name. Default priority is marked with an asterisk.
+Use --output json for machine-parseable output.`,
+				Action: func(ctx context.Context, c *cli.Command) error {
+					resp, err := newClient(c).ListIssuePriorities()
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						output.Print(resp, "json")
+					} else {
+						for _, p := range resp.IssuePriorities {
+							def := ""
+							if p.IsDefault {
+								def = " *"
+							}
+							fmt.Printf("% 4d  %s%s\n", p.ID, p.Name, def)
+						}
+					}
+					return nil
+				},
+			},
+		},
+	}
+}
+
+func categoryCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "category",
+		Usage: "List issue categories",
+		Description: `Display issue categories for a project with their numeric IDs.
+
+Use the ID with --category-id when listing or filtering issues.`,
+		Commands: []*cli.Command{
+			{
+				Name:      "list",
+				Usage:     "List categories for a project",
+				ArgsUsage: " ",
+				Description: `List all issue categories for a given project.
+
+The --project flag is required. Output shows ID, name, and assignee.
+Use --output json for machine-parseable output.`,
+				Flags: []cli.Flag{
+					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					resp, err := newClient(c).ListIssueCategories(c.String("project"))
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						output.Print(resp, "json")
+					} else {
+						for _, cat := range resp.IssueCategories {
+							assigned := ""
+							if cat.AssignedTo != nil {
+								assigned = " → " + cat.AssignedTo.Name
+							}
+							fmt.Printf("% 4d  %s%s\n", cat.ID, cat.Name, assigned)
+						}
+					}
 					return nil
 				},
 			},
