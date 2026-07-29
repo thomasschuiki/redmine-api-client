@@ -240,7 +240,7 @@ This monorepo has two independent release tracks with separate tag prefixes:
 | Component | Tag pattern | Workflow |
 |-----------|-------------|----------|
 | Redmine plugin | `plugin/v*.*.*` | `.github/workflows/release-plugin.yml` |
-| CLI binaries | `cli/v*.*.*` or `v*.*.*` | `.github/workflows/release-cli.yml` |
+| CLI binaries | `cli/v*.*.*` | `.github/workflows/release-cli.yml` |
 
 ### Plugin release
 
@@ -254,11 +254,12 @@ Archives: `.tar.gz` and `.zip` of `plugin/redmine_openapi_generator/`.
 ### CLI release
 
 ```bash
-git tag v0.4.0
-git push origin v0.4.0
+git tag cli/v0.5.0
+git push origin cli/v0.5.0
 ```
 
-Archives: `.tar.gz` per binary in `cmd/` (linux-amd64).
+Archives: `.tar.gz` per binary in `cmd/` (linux-amd64). Pushing a bare `v*.*.*`
+tag will not trigger the release workflow; it must start with `cli/v`.
 
 Both workflows run tests before creating the release. Pushing to `main` only
 triggers CI for the files that changed (plugin paths for the plugin workflow, CLI
