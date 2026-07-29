@@ -81,6 +81,7 @@ type IssueCreateRequest struct {
 		ProjectID    int                `json:"project_id"`
 		Subject      string             `json:"subject"`
 		Description  string             `json:"description,omitempty"`
+		ParentID     *int               `json:"parent_id,omitempty"`
 		TrackerID    *int               `json:"tracker_id,omitempty"`
 		StatusID     *int               `json:"status_id,omitempty"`
 		PriorityID   *int               `json:"priority_id,omitempty"`

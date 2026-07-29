@@ -283,11 +283,18 @@ Examples:
 				Description: `Create a new issue in a project.
 
 At minimum, --project and --subject are required. Optional fields include
-description, tracker, status, priority, and assignee.`,
+description, parent-id, tracker, status, priority, and assignee.
+
+Use --parent-id to create a child issue under a parent (epic/feature).
+The parent must exist and be in the same project.
+
+Examples:
+  redmine issue create --project myproject --subject "Fix bug" --parent-id 123`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 					&cli.StringFlag{Name: "subject", Usage: "Issue subject", Required: true},
 					&cli.StringFlag{Name: "description", Usage: "Issue description"},
+					&cli.IntFlag{Name: "parent-id", Usage: "Parent issue ID"},
 					&cli.IntFlag{Name: "tracker", Usage: "Tracker ID"},
 					&cli.IntFlag{Name: "status", Usage: "Status ID"},
 					&cli.IntFlag{Name: "priority", Usage: "Priority ID"},
@@ -299,6 +306,10 @@ description, tracker, status, priority, and assignee.`,
 					req.Issue.Subject = c.String("subject")
 					req.Issue.Description = c.String("description")
 
+					if c.IsSet("parent-id") {
+						v := c.Int("parent-id")
+						req.Issue.ParentID = &v
+					}
 					if c.IsSet("tracker") {
 						v := c.Int("tracker")
 						req.Issue.TrackerID = &v
