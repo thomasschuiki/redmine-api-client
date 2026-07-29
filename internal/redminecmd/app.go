@@ -283,13 +283,21 @@ Examples:
 				Description: `Create a new issue in a project.
 
 At minimum, --project and --subject are required. Optional fields include
-description, parent-id, tracker, status, priority, and assignee.
+description, parent-id, tracker, status, priority, assignee,
+and custom-field.
 
 Use --parent-id to create a child issue under a parent (epic/feature).
 The parent must exist and be in the same project.
 
+Custom fields:
+  --custom-field <id>=<value> (repeatable)
+  For multi-value fields, repeat the same id:
+    --custom-field 1=opt1 --custom-field 1=opt2
+
 Examples:
-  redmine issue create --project myproject --subject "Fix bug" --parent-id 123`,
+  redmine issue create --project myproject --subject "Fix bug" --parent-id 123
+  redmine issue create --project myproject --subject "Task" \
+    --custom-field 1="value" --custom-field 2="opt1" --custom-field 2="opt2"`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 					&cli.StringFlag{Name: "subject", Usage: "Issue subject", Required: true},
@@ -299,6 +307,7 @@ Examples:
 					&cli.IntFlag{Name: "status", Usage: "Status ID"},
 					&cli.IntFlag{Name: "priority", Usage: "Priority ID"},
 					&cli.IntFlag{Name: "assignee", Usage: "Assignee user ID"},
+					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					var req client.IssueCreateRequest
@@ -326,6 +335,13 @@ Examples:
 						v := c.Int("assignee")
 						req.Issue.AssignedToID = &v
 					}
+					if c.IsSet("custom-field") {
+						fields, err := parseCustomFields(c.StringSlice("custom-field"))
+						if err != nil {
+							return err
+						}
+						req.Issue.CustomFields = client.MergeCustomFields(fields)
+					}
 
 					issue, err := newClient(c).CreateIssue(req)
 					if err != nil {
@@ -342,13 +358,24 @@ Examples:
 				Description: `Update fields on an existing issue.
 
 Only the fields you specify will be changed. Use --subject, --description,
---status, --assignee, or --done-ratio to update the corresponding fields.`,
+--status, --assignee, --done-ratio, or --custom-field to update
+the corresponding fields.
+
+Custom fields:
+  --custom-field <id>=<value> (repeatable)
+  For multi-value fields, repeat the same id:
+    --custom-field 1=opt1 --custom-field 1=opt2
+
+Examples:
+  redmine issue update 123 --status 5
+  redmine issue update 123 --custom-field 1="new value"`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "subject", Usage: "New subject"},
 					&cli.StringFlag{Name: "description", Usage: "New description"},
 					&cli.IntFlag{Name: "status", Usage: "New status ID"},
 					&cli.IntFlag{Name: "assignee", Usage: "New assignee user ID"},
 					&cli.IntFlag{Name: "done-ratio", Usage: "Completion percentage (0-100)"},
+					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					id, err := strconv.Atoi(c.Args().First())
@@ -376,6 +403,13 @@ Only the fields you specify will be changed. Use --subject, --description,
 					if c.IsSet("done-ratio") {
 						v := c.Int("done-ratio")
 						req.Issue.DoneRatio = &v
+					}
+					if c.IsSet("custom-field") {
+						fields, err := parseCustomFields(c.StringSlice("custom-field"))
+						if err != nil {
+							return err
+						}
+						req.Issue.CustomFields = client.MergeCustomFields(fields)
 					}
 
 					if err := newClient(c).UpdateIssue(id, req); err != nil {
@@ -908,4 +942,16 @@ The --project flag is required and must be a project identifier.`,
 			},
 		},
 	}
+}
+
+func parseCustomFields(raw []string) ([]client.CustomFieldValue, error) {
+	fields := make([]client.CustomFieldValue, 0, len(raw))
+	for _, s := range raw {
+		f, err := client.ParseCustomField(s)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, f)
+	}
+	return fields, nil
 }

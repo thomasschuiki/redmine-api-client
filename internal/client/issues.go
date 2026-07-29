@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -105,9 +106,49 @@ type IssueUpdateRequest struct {
 }
 
 // CustomFieldValue is a custom field to set.
+// For single-value fields, use Value.
+// For multi-value fields, use Values (the API receives both; Redmine ignores
+// the one that doesn't match the field configuration).
 type CustomFieldValue struct {
-	ID    int    `json:"id"`
-	Value string `json:"value"`
+	ID     int      `json:"id"`
+	Value  string   `json:"value,omitempty"`
+	Values []string `json:"values,omitempty"`
+}
+
+// ParseCustomField parses a "id=value" string into a CustomFieldValue.
+func ParseCustomField(s string) (CustomFieldValue, error) {
+	idStr, val, ok := strings.Cut(s, "=")
+	if !ok {
+		return CustomFieldValue{}, fmt.Errorf("invalid custom field format %q — expected <id>=<value>", s)
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return CustomFieldValue{}, fmt.Errorf("invalid custom field id %q: %w", idStr, err)
+	}
+	return CustomFieldValue{ID: id, Value: val, Values: []string{val}}, nil
+}
+
+// MergeCustomFields combines a slice of CustomFieldValue into the final form:
+// IDs that appear once use Value only; IDs that appear multiple times use Values.
+func MergeCustomFields(fields []CustomFieldValue) []CustomFieldValue {
+	groups := make(map[int][]string)
+	order := make([]int, 0)
+	for _, f := range fields {
+		if _, ok := groups[f.ID]; !ok {
+			order = append(order, f.ID)
+		}
+		groups[f.ID] = append(groups[f.ID], f.Value)
+	}
+	result := make([]CustomFieldValue, 0, len(order))
+	for _, id := range order {
+		vals := groups[id]
+		if len(vals) == 1 {
+			result = append(result, CustomFieldValue{ID: id, Value: vals[0]})
+		} else {
+			result = append(result, CustomFieldValue{ID: id, Values: vals})
+		}
+	}
+	return result
 }
 
 // IssueListOpts holds filtering options for listing issues.
