@@ -3,13 +3,12 @@ package output
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
-func Print(v any, format string) {
+func Print(v any, format string) error {
 	var data []byte
 	var err error
 
@@ -22,11 +21,11 @@ func Print(v any, format string) {
 	}
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error marshalling output as %s: %v\n", format, err)
-		os.Exit(1)
+		return fmt.Errorf("marshalling output as %s: %w", format, err)
 	}
 
 	fmt.Println(string(data))
+	return nil
 }
 
 // FilterFields returns v with only the listed top-level keys kept.
