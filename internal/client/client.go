@@ -48,7 +48,7 @@ func New(cfg *config.Config, connectTimeout, maxTime time.Duration, retries int)
 // doWithRetry executes a request factory with retries and per-request timeout.
 // Retries on network errors and 5xx responses with exponential backoff.
 // Retry attempts are logged to stderr.
-func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Response, error) {
+func (c *Client) doWithRetry(ctx context.Context, createReq func() (*http.Request, error)) (*http.Response, error) {
 	maxAttempts := c.Retries + 1
 	var lastErr error
 
@@ -65,7 +65,7 @@ func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Res
 			return nil, err
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), c.MaxTime)
+		ctx, cancel := context.WithTimeout(ctx, c.MaxTime)
 		req = req.WithContext(ctx)
 		c.authenticate(req)
 
@@ -126,13 +126,13 @@ func (c *Client) authenticate(req *http.Request) {
 }
 
 // get performs a GET request and decodes the JSON response into target.
-func (c *Client) get(path string, params url.Values, target any) error {
+func (c *Client) get(ctx context.Context, path string, params url.Values, target any) error {
 	u := c.BaseURL + path
 	if params != nil && len(params) > 0 {
 		u += "?" + params.Encode()
 	}
 
-	resp, err := c.doWithRetry(func() (*http.Request, error) {
+	resp, err := c.doWithRetry(ctx, func() (*http.Request, error) {
 		req, err := http.NewRequest("GET", u, nil)
 		if err != nil {
 			return nil, err
@@ -146,14 +146,14 @@ func (c *Client) get(path string, params url.Values, target any) error {
 	defer resp.Body.Close()
 
 	if target != nil {
-		raw, err := io.ReadAll(io.LimitReader(resp.Body, bodyLimit))
+		raw, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return &DecodeError{
-				Method:     "GET",
-				URL:        u,
-				StatusCode: resp.StatusCode,
+				Method:      "GET",
+				URL:         u,
+				StatusCode:  resp.StatusCode,
 				BodySnippet: "",
-				Err:        fmt.Errorf("reading response body: %w", err),
+				Err:         fmt.Errorf("reading response body: %w", err),
 			}
 		}
 		if err := json.Unmarshal(raw, target); err != nil {
@@ -169,22 +169,20 @@ func (c *Client) get(path string, params url.Values, target any) error {
 	return nil
 }
 
-const bodyLimit = 64 * 1024
-
 // post performs a POST request with a JSON body and decodes the response.
-func (c *Client) post(path string, body any, target any) error {
-	return c.doWithBody("POST", path, body, target)
+func (c *Client) post(ctx context.Context, path string, body any, target any) error {
+	return c.doWithBody(ctx, "POST", path, body, target)
 }
 
 // put performs a PUT request with a JSON body.
-func (c *Client) put(path string, body any, target any) error {
-	return c.doWithBody("PUT", path, body, target)
+func (c *Client) put(ctx context.Context, path string, body any, target any) error {
+	return c.doWithBody(ctx, "PUT", path, body, target)
 }
 
 // delete performs a DELETE request.
-func (c *Client) delete(path string) error {
+func (c *Client) delete(ctx context.Context, path string) error {
 	u := c.BaseURL + path
-	resp, err := c.doWithRetry(func() (*http.Request, error) {
+	resp, err := c.doWithRetry(ctx, func() (*http.Request, error) {
 		return http.NewRequest("DELETE", u, nil)
 	})
 	if err != nil {
@@ -194,10 +192,10 @@ func (c *Client) delete(path string) error {
 	return nil
 }
 
-func (c *Client) doWithBody(method, path string, body any, target any) error {
+func (c *Client) doWithBody(ctx context.Context, method, path string, body any, target any) error {
 	u := c.BaseURL + path
 
-	resp, err := c.doWithRetry(func() (*http.Request, error) {
+	resp, err := c.doWithRetry(ctx, func() (*http.Request, error) {
 		var bodyReader io.Reader
 		if body != nil {
 			jsonBytes, err := json.Marshal(body)
@@ -220,7 +218,7 @@ func (c *Client) doWithBody(method, path string, body any, target any) error {
 	defer resp.Body.Close()
 
 	if target != nil {
-		raw, err := io.ReadAll(io.LimitReader(resp.Body, bodyLimit))
+		raw, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return &DecodeError{
 				Method:      method,
@@ -245,9 +243,9 @@ func (c *Client) doWithBody(method, path string, body any, target any) error {
 
 // RequestError represents a network-level failure including timeouts.
 type RequestError struct {
+	Err     error
 	Method  string
 	URL     string
-	Err     error
 	Timeout time.Duration
 	Attempt int
 	Retries int
@@ -285,10 +283,10 @@ func (e *RequestError) Unwrap() error { return e.Err }
 
 // APIError represents a non-2xx response from the Redmine API.
 type APIError struct {
-	StatusCode int
 	Body       string
 	Method     string
 	URL        string
+	StatusCode int
 	Attempt    int
 	Retries    int
 }
@@ -306,11 +304,11 @@ func (e *APIError) Error() string {
 
 // DecodeError represents a failure to decode a successful HTTP response.
 type DecodeError struct {
+	Err         error
 	Method      string
 	URL         string
-	StatusCode  int
 	BodySnippet string
-	Err         error
+	StatusCode  int
 }
 
 func (e *DecodeError) Error() string {

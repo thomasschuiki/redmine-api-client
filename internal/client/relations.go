@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
@@ -20,19 +21,19 @@ const (
 )
 
 type Relation struct {
+	Delay        *int         `json:"delay,omitempty"`
+	RelationType RelationType `json:"relation_type"`
 	ID           int          `json:"id"`
 	IssueID      int          `json:"issue_id"`
 	IssueToID    int          `json:"issue_to_id"`
-	RelationType RelationType `json:"relation_type"`
-	Delay        *int         `json:"delay,omitempty"`
 }
 
 type RelationCreateRequest struct {
 	Relation struct {
+		Delay        *int         `json:"delay,omitempty"`
+		RelationType RelationType `json:"relation_type"`
 		IssueID      int          `json:"issue_id"`
 		IssueToID    int          `json:"issue_to_id"`
-		RelationType RelationType `json:"relation_type"`
-		Delay        *int         `json:"delay,omitempty"`
 	} `json:"relation"`
 }
 
@@ -40,39 +41,28 @@ type RelationListResponse struct {
 	Relations []Relation `json:"relations"`
 }
 
-func (c *Client) CreateRelation(req RelationCreateRequest) (*Relation, error) {
+func (c *Client) CreateRelation(ctx context.Context, req RelationCreateRequest) (*Relation, error) {
 	var result struct {
 		Relation Relation `json:"relation"`
 	}
-	if err := c.post("/relations.json", req, &result); err != nil {
+	if err := c.post(ctx, "/relations.json", req, &result); err != nil {
 		return nil, err
 	}
 	return &result.Relation, nil
 }
 
-func (c *Client) ListRelations(issueID int) (*RelationListResponse, error) {
+func (c *Client) ListRelations(ctx context.Context, issueID int) (*RelationListResponse, error) {
 	var result RelationListResponse
 	path := fmt.Sprintf("/issues/%d/relations.json", issueID)
-	if err := c.get(path, url.Values{}, &result); err != nil {
+	if err := c.get(ctx, path, url.Values{}, &result); err != nil {
 		return nil, err
 	}
 	return &result, nil
 }
 
-func (c *Client) DeleteRelation(id int) error {
+func (c *Client) DeleteRelation(ctx context.Context, id int) error {
 	path := fmt.Sprintf("/relations/%d.json", id)
-	return c.delete(path)
-}
-
-func (c *Client) GetRelation(id int) (*Relation, error) {
-	var result struct {
-		Relation Relation `json:"relation"`
-	}
-	path := fmt.Sprintf("/relations/%d.json", id)
-	if err := c.get(path, url.Values{}, &result); err != nil {
-		return nil, err
-	}
-	return &result.Relation, nil
+	return c.delete(ctx, path)
 }
 
 func ParseRelationType(s string) (RelationType, error) {

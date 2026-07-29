@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -10,26 +11,26 @@ import (
 
 // Issue represents a Redmine issue.
 type Issue struct {
-	ID           int            `json:"id"`
-	Project      *IDName        `json:"project,omitempty"`
-	Tracker      *IDName        `json:"tracker,omitempty"`
-	Status       *IDName        `json:"status,omitempty"`
-	Priority     *IDName        `json:"priority,omitempty"`
-	Author       *IDName        `json:"author,omitempty"`
-	AssignedTo   *IDName        `json:"assigned_to,omitempty"`
-	Parent       *IssueRef      `json:"parent,omitempty"`
-	Subject      string         `json:"subject"`
-	Description  string         `json:"description,omitempty"`
-	StartDate    string         `json:"start_date,omitempty"`
-	DueDate      string         `json:"due_date,omitempty"`
-	DoneRatio    int            `json:"done_ratio"`
-	IsPrivate    bool           `json:"is_private"`
-	CreatedOn    string         `json:"created_on,omitempty"`
-	UpdatedOn    string         `json:"updated_on,omitempty"`
-	ClosedOn     string         `json:"closed_on,omitempty"`
-	CustomFields []CustomField  `json:"custom_fields,omitempty"`
-	Journals     []Journal      `json:"journals,omitempty"`
-	Relations    []Relation     `json:"relations,omitempty"`
+	Parent       *IssueRef     `json:"parent,omitempty"`
+	Project      *IDName       `json:"project,omitempty"`
+	Tracker      *IDName       `json:"tracker,omitempty"`
+	Status       *IDName       `json:"status,omitempty"`
+	Priority     *IDName       `json:"priority,omitempty"`
+	Author       *IDName       `json:"author,omitempty"`
+	AssignedTo   *IDName       `json:"assigned_to,omitempty"`
+	StartDate    string        `json:"start_date,omitempty"`
+	Subject      string        `json:"subject"`
+	Description  string        `json:"description,omitempty"`
+	DueDate      string        `json:"due_date,omitempty"`
+	CreatedOn    string        `json:"created_on,omitempty"`
+	UpdatedOn    string        `json:"updated_on,omitempty"`
+	ClosedOn     string        `json:"closed_on,omitempty"`
+	CustomFields []CustomField `json:"custom_fields,omitempty"`
+	Journals     []Journal     `json:"journals,omitempty"`
+	Relations    []Relation    `json:"relations,omitempty"`
+	ID           int           `json:"id"`
+	DoneRatio    int           `json:"done_ratio"`
+	IsPrivate    bool          `json:"is_private"`
 }
 
 // IssueRef is a lightweight reference to another issue.
@@ -39,12 +40,12 @@ type IssueRef struct {
 
 // Journal represents a journal (comment/change history) entry on an issue.
 type Journal struct {
-	ID           int             `json:"id"`
 	User         *IDName         `json:"user,omitempty"`
 	Notes        string          `json:"notes,omitempty"`
 	CreatedOn    string          `json:"created_on,omitempty"`
-	PrivateNotes bool            `json:"private_notes,omitempty"`
 	Details      []JournalDetail `json:"details,omitempty"`
+	ID           int             `json:"id"`
+	PrivateNotes bool            `json:"private_notes,omitempty"`
 }
 
 // JournalDetail represents a single field change within a journal entry.
@@ -57,15 +58,15 @@ type JournalDetail struct {
 
 // IDName is a generic reference to a named object.
 type IDName struct {
-	ID   int    `json:"id"`
 	Name string `json:"name"`
+	ID   int    `json:"id"`
 }
 
 // CustomField represents a custom field value.
 type CustomField struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
 	Value    any    `json:"value,omitempty"`
+	Name     string `json:"name"`
+	ID       int    `json:"id"`
 	Multiple bool   `json:"multiple,omitempty"`
 }
 
@@ -80,41 +81,41 @@ type IssueListResponse struct {
 // IssueCreateRequest is the request body for creating an issue.
 type IssueCreateRequest struct {
 	Issue struct {
-		ProjectID      int                `json:"project_id"`
-		Subject        string             `json:"subject"`
-		Description    string             `json:"description,omitempty"`
-		StartDate      string             `json:"start_date,omitempty"`
-		DueDate        string             `json:"due_date,omitempty"`
+		PriorityID     *int               `json:"priority_id,omitempty"`
+		TrackerID      *int               `json:"tracker_id,omitempty"`
+		CategoryID     *int               `json:"category_id,omitempty"`
+		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
+		StatusID       *int               `json:"status_id,omitempty"`
 		EstimatedHours *float64           `json:"estimated_hours,omitempty"`
 		ParentID       *int               `json:"parent_id,omitempty"`
-		TrackerID      *int               `json:"tracker_id,omitempty"`
-		StatusID       *int               `json:"status_id,omitempty"`
-		PriorityID     *int               `json:"priority_id,omitempty"`
 		AssignedToID   *int               `json:"assigned_to_id,omitempty"`
-		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
-		CategoryID     *int               `json:"category_id,omitempty"`
+		Subject        string             `json:"subject"`
+		DueDate        string             `json:"due_date,omitempty"`
+		StartDate      string             `json:"start_date,omitempty"`
+		Description    string             `json:"description,omitempty"`
 		WatcherUserIDs []int              `json:"watcher_user_ids,omitempty"`
 		CustomFields   []CustomFieldValue `json:"custom_fields,omitempty"`
+		ProjectID      int                `json:"project_id"`
 	} `json:"issue"`
 }
 
 // IssueUpdateRequest is the request body for updating an issue.
 type IssueUpdateRequest struct {
 	Issue struct {
-		Subject      *string            `json:"subject,omitempty"`
-		Description  *string            `json:"description,omitempty"`
-		StartDate    *string            `json:"start_date,omitempty"`
-		DueDate      *string            `json:"due_date,omitempty"`
-		EstimatedHours *float64         `json:"estimated_hours,omitempty"`
-		TrackerID    *int               `json:"tracker_id,omitempty"`
-		StatusID     *int               `json:"status_id,omitempty"`
-		PriorityID   *int               `json:"priority_id,omitempty"`
-		AssignedToID *int               `json:"assigned_to_id,omitempty"`
-		DoneRatio    *int               `json:"done_ratio,omitempty"`
-		FixedVersionID *int             `json:"fixed_version_id,omitempty"`
-		CategoryID   *int               `json:"category_id,omitempty"`
-		Notes        string             `json:"notes,omitempty"`
-		CustomFields []CustomFieldValue `json:"custom_fields,omitempty"`
+		Subject        *string            `json:"subject,omitempty"`
+		Description    *string            `json:"description,omitempty"`
+		StartDate      *string            `json:"start_date,omitempty"`
+		DueDate        *string            `json:"due_date,omitempty"`
+		EstimatedHours *float64           `json:"estimated_hours,omitempty"`
+		TrackerID      *int               `json:"tracker_id,omitempty"`
+		StatusID       *int               `json:"status_id,omitempty"`
+		PriorityID     *int               `json:"priority_id,omitempty"`
+		AssignedToID   *int               `json:"assigned_to_id,omitempty"`
+		DoneRatio      *int               `json:"done_ratio,omitempty"`
+		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
+		CategoryID     *int               `json:"category_id,omitempty"`
+		Notes          string             `json:"notes,omitempty"`
+		CustomFields   []CustomFieldValue `json:"custom_fields,omitempty"`
 	} `json:"issue"`
 }
 
@@ -123,9 +124,9 @@ type IssueUpdateRequest struct {
 // For multi-value fields, use Values (the API receives both; Redmine ignores
 // the one that doesn't match the field configuration).
 type CustomFieldValue struct {
-	ID     int      `json:"id"`
 	Value  string   `json:"value,omitempty"`
 	Values []string `json:"values,omitempty"`
+	ID     int      `json:"id"`
 }
 
 // ParseCustomField parses a "id=value" string into a CustomFieldValue.
@@ -166,18 +167,18 @@ func MergeCustomFields(fields []CustomFieldValue) []CustomFieldValue {
 
 // IssueListOpts holds filtering options for listing issues.
 type IssueListOpts struct {
+	StatusID    string
+	Subject     string
+	Description string
+	Sort        string
+	Include     string
 	ListOpts
-	StatusID       string
 	TrackerID      int
 	AssignedToID   int
 	PriorityID     int
 	CategoryID     int
 	FixedVersionID int
 	ParentID       int
-	Subject        string
-	Description    string
-	Sort           string
-	Include        string
 }
 
 // Params converts IssueListOpts to url.Values.
@@ -220,7 +221,7 @@ func (o IssueListOpts) Params() url.Values {
 }
 
 // ListIssues returns issues, optionally filtered by project.
-func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListResponse, error) {
+func (c *Client) ListIssues(ctx context.Context, projectID string, opts IssueListOpts) (*IssueListResponse, error) {
 	var path string
 	if projectID != "" {
 		path = fmt.Sprintf("/projects/%s/issues.json", url.PathEscape(projectID))
@@ -230,7 +231,7 @@ func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListRes
 
 	params := opts.Params()
 	var result IssueListResponse
-	if err := c.get(path, params, &result); err != nil {
+	if err := c.get(ctx, path, params, &result); err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -239,14 +240,14 @@ func (c *Client) ListIssues(projectID string, opts IssueListOpts) (*IssueListRes
 const listPageSize = 100
 
 // ListAllIssues auto-paginates through all matching issues.
-func (c *Client) ListAllIssues(projectID string, opts IssueListOpts) (*IssueListResponse, error) {
+func (c *Client) ListAllIssues(ctx context.Context, projectID string, opts IssueListOpts) (*IssueListResponse, error) {
 	opts.Limit = listPageSize
 	var all []Issue
 	var total int
 
 	for offset := 0; ; {
 		opts.Offset = offset
-		resp, err := c.ListIssues(projectID, opts)
+		resp, err := c.ListIssues(ctx, projectID, opts)
 		if err != nil {
 			return nil, err
 		}
@@ -340,7 +341,7 @@ func regexMatchIssue(issue *Issue, re *regexp.Regexp) bool {
 // GetIssue returns a single issue by ID.
 // The include parameter is a comma-separated list of associated objects to
 // include (e.g. "journals,watchers"). Pass empty string for no extras.
-func (c *Client) GetIssue(id int, include string) (*Issue, error) {
+func (c *Client) GetIssue(ctx context.Context, id int, include string) (*Issue, error) {
 	var result struct {
 		Issue Issue `json:"issue"`
 	}
@@ -349,54 +350,54 @@ func (c *Client) GetIssue(id int, include string) (*Issue, error) {
 	if include != "" {
 		params = url.Values{"include": {include}}
 	}
-	if err := c.get(path, params, &result); err != nil {
+	if err := c.get(ctx, path, params, &result); err != nil {
 		return nil, err
 	}
 	return &result.Issue, nil
 }
 
 // CreateIssue creates a new issue.
-func (c *Client) CreateIssue(req IssueCreateRequest) (*Issue, error) {
+func (c *Client) CreateIssue(ctx context.Context, req IssueCreateRequest) (*Issue, error) {
 	var result struct {
 		Issue Issue `json:"issue"`
 	}
-	if err := c.post("/issues.json", req, &result); err != nil {
+	if err := c.post(ctx, "/issues.json", req, &result); err != nil {
 		return nil, err
 	}
 	return &result.Issue, nil
 }
 
 // UpdateIssue updates an existing issue.
-func (c *Client) UpdateIssue(id int, req IssueUpdateRequest) error {
+func (c *Client) UpdateIssue(ctx context.Context, id int, req IssueUpdateRequest) error {
 	path := fmt.Sprintf("/issues/%d.json", id)
-	return c.put(path, req, nil)
+	return c.put(ctx, path, req, nil)
 }
 
 // DeleteIssue deletes an issue.
-func (c *Client) DeleteIssue(id int) error {
+func (c *Client) DeleteIssue(ctx context.Context, id int) error {
 	path := fmt.Sprintf("/issues/%d.json", id)
-	return c.delete(path)
+	return c.delete(ctx, path)
 }
 
 // AddWatcher adds a watcher to an issue.
-func (c *Client) AddWatcher(issueID, userID int) error {
+func (c *Client) AddWatcher(ctx context.Context, issueID, userID int) error {
 	path := fmt.Sprintf("/issues/%d/watchers.json", issueID)
 	body := map[string]int{"user_id": userID}
-	return c.post(path, body, nil)
+	return c.post(ctx, path, body, nil)
 }
 
 // RemoveWatcher removes a watcher from an issue.
-func (c *Client) RemoveWatcher(issueID, userID int) error {
+func (c *Client) RemoveWatcher(ctx context.Context, issueID, userID int) error {
 	path := fmt.Sprintf("/issues/%d/watchers/%d.json", issueID, userID)
-	return c.delete(path)
+	return c.delete(ctx, path)
 }
 
 // GrepHit represents a single text match within an issue.
 type GrepHit struct {
-	IssueID int    `json:"issue_id"`
 	Subject string `json:"subject"`
 	Where   string `json:"where"`
 	Snippet string `json:"snippet"`
+	IssueID int    `json:"issue_id"`
 }
 
 // GrepResult holds all matches from a grep search.
@@ -408,19 +409,17 @@ type GrepResult struct {
 // GrepOpts holds options for a grep search across issues.
 type GrepOpts struct {
 	Project      string
-	ParentID     int
 	Text         string
 	In           string
 	StatusID     string
+	ParentID     int
 	TrackerID    int
 	AssignedToID int
 }
 
-const grepPageSize = 100
-
 // GrepIssues searches for text in issue descriptions and/or journal notes,
 // auto-paginating through all results in the given scope.
-func (c *Client) GrepIssues(opts GrepOpts) (*GrepResult, error) {
+func (c *Client) GrepIssues(ctx context.Context, opts GrepOpts) (*GrepResult, error) {
 	searchDesc := strings.Contains(opts.In, "description")
 	searchNotes := strings.Contains(opts.In, "notes")
 
@@ -429,7 +428,7 @@ func (c *Client) GrepIssues(opts GrepOpts) (*GrepResult, error) {
 
 	for offset := 0; ; {
 		listOpts := IssueListOpts{
-			ListOpts: ListOpts{Offset: offset, Limit: grepPageSize},
+			ListOpts: ListOpts{Offset: offset, Limit: listPageSize},
 			Include:  "journals",
 		}
 		if opts.ParentID > 0 {
@@ -445,7 +444,7 @@ func (c *Client) GrepIssues(opts GrepOpts) (*GrepResult, error) {
 			listOpts.AssignedToID = opts.AssignedToID
 		}
 
-		resp, err := c.ListIssues(opts.Project, listOpts)
+		resp, err := c.ListIssues(ctx, opts.Project, listOpts)
 		if err != nil {
 			return nil, err
 		}
@@ -470,11 +469,10 @@ func (c *Client) GrepIssues(opts GrepOpts) (*GrepResult, error) {
 			}
 		}
 
-		if len(resp.Issues) < grepPageSize || offset+grepPageSize >= resp.TotalCount {
+		if len(resp.Issues) < listPageSize || offset+listPageSize >= resp.TotalCount {
 			break
 		}
-		offset += grepPageSize
-		_ = resp
+		offset += listPageSize
 	}
 
 	return &GrepResult{Matches: allMatches, Total: totalScanned}, nil

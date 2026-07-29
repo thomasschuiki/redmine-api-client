@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -8,15 +9,15 @@ import (
 
 // Project represents a Redmine project.
 type Project struct {
-	ID          int        `json:"id"`
-	Name        string     `json:"name"`
-	Identifier  string     `json:"identifier"`
-	Description string     `json:"description,omitempty"`
-	Status      int        `json:"status"`
-	IsPublic    bool       `json:"is_public"`
-	CreatedOn   string     `json:"created_on,omitempty"`
-	UpdatedOn   string     `json:"updated_on,omitempty"`
+	Name         string        `json:"name"`
+	Identifier   string        `json:"identifier"`
+	Description  string        `json:"description,omitempty"`
+	CreatedOn    string        `json:"created_on,omitempty"`
+	UpdatedOn    string        `json:"updated_on,omitempty"`
 	CustomFields []CustomField `json:"custom_fields,omitempty"`
+	ID           int           `json:"id"`
+	Status       int           `json:"status"`
+	IsPublic     bool          `json:"is_public"`
 }
 
 // ProjectListResponse is the response from listing projects.
@@ -30,72 +31,57 @@ type ProjectListResponse struct {
 // ProjectCreateRequest is the request body for creating a project.
 type ProjectCreateRequest struct {
 	Project struct {
+		IsPublic    *bool  `json:"is_public,omitempty"`
 		Name        string `json:"name"`
 		Identifier  string `json:"identifier"`
 		Description string `json:"description,omitempty"`
-		IsPublic    *bool  `json:"is_public,omitempty"`
-	} `json:"project"`
-}
-
-// ProjectUpdateRequest is the request body for updating a project.
-type ProjectUpdateRequest struct {
-	Project struct {
-		Name        *string `json:"name,omitempty"`
-		Description *string `json:"description,omitempty"`
-		IsPublic    *bool   `json:"is_public,omitempty"`
 	} `json:"project"`
 }
 
 // ListProjects returns all projects.
-func (c *Client) ListProjects(opts ListOpts) (*ProjectListResponse, error) {
+func (c *Client) ListProjects(ctx context.Context, opts ListOpts) (*ProjectListResponse, error) {
 	params := opts.Params()
 	var result ProjectListResponse
-	if err := c.get("/projects.json", params, &result); err != nil {
+	if err := c.get(ctx, "/projects.json", params, &result); err != nil {
 		return nil, err
 	}
 	return &result, nil
 }
 
 // GetProject returns a single project by identifier.
-func (c *Client) GetProject(identifier string) (*Project, error) {
+func (c *Client) GetProject(ctx context.Context, identifier string) (*Project, error) {
 	var result struct {
 		Project Project `json:"project"`
 	}
 	path := fmt.Sprintf("/projects/%s.json", url.PathEscape(identifier))
-	if err := c.get(path, nil, &result); err != nil {
+	if err := c.get(ctx, path, nil, &result); err != nil {
 		return nil, err
 	}
 	return &result.Project, nil
 }
 
 // CreateProject creates a new project.
-func (c *Client) CreateProject(req ProjectCreateRequest) (*Project, error) {
+func (c *Client) CreateProject(ctx context.Context, req ProjectCreateRequest) (*Project, error) {
 	var result struct {
 		Project Project `json:"project"`
 	}
-	if err := c.post("/projects.json", req, &result); err != nil {
+	if err := c.post(ctx, "/projects.json", req, &result); err != nil {
 		return nil, err
 	}
 	return &result.Project, nil
 }
 
-// UpdateProject updates an existing project.
-func (c *Client) UpdateProject(identifier string, req ProjectUpdateRequest) error {
-	path := fmt.Sprintf("/projects/%s.json", url.PathEscape(identifier))
-	return c.put(path, req, nil)
-}
-
 // DeleteProject deletes a project.
-func (c *Client) DeleteProject(identifier string) error {
+func (c *Client) DeleteProject(ctx context.Context, identifier string) error {
 	path := fmt.Sprintf("/projects/%s.json", url.PathEscape(identifier))
-	return c.delete(path)
+	return c.delete(ctx, path)
 }
 
 // ResolveProject normalizes the identifier and attempts to fetch the project.
 // On 404, it lists all projects and suggests close matches.
-func (c *Client) ResolveProject(identifier string) (*Project, error) {
+func (c *Client) ResolveProject(ctx context.Context, identifier string) (*Project, error) {
 	normalized := NormalizeProjectID(identifier)
-	project, err := c.GetProject(normalized)
+	project, err := c.GetProject(ctx, normalized)
 	if err == nil {
 		return project, nil
 	}
@@ -106,7 +92,7 @@ func (c *Client) ResolveProject(identifier string) (*Project, error) {
 	}
 
 	// 404 — try to suggest close matches
-	suggestions, listErr := c.suggestProjects(normalized)
+	suggestions, listErr := c.suggestProjects(ctx, normalized)
 	if listErr != nil {
 		return nil, fmt.Errorf("project %q not found (and could not list projects for suggestions: %v)", normalized, listErr)
 	}
@@ -124,8 +110,8 @@ func NormalizeProjectID(s string) string {
 	return s
 }
 
-func (c *Client) suggestProjects(input string) ([]string, error) {
-	resp, err := c.ListProjects(ListOpts{Limit: 100})
+func (c *Client) suggestProjects(ctx context.Context, input string) ([]string, error) {
+	resp, err := c.ListProjects(ctx, ListOpts{Limit: 100})
 	if err != nil {
 		return nil, err
 	}
