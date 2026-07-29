@@ -34,6 +34,7 @@ func newClient(c *cli.Command) *client.Client {
 			os.Exit(1)
 		}
 		redmineClient = client.New(cfg, connectTimeout, maxTime, c.Int("retries"))
+		client.SetLogWriter(os.Stderr)
 	}
 	return redmineClient
 }

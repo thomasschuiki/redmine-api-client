@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -46,12 +47,16 @@ func New(cfg *config.Config, connectTimeout, maxTime time.Duration, retries int)
 
 // doWithRetry executes a request factory with retries and per-request timeout.
 // Retries on network errors and 5xx responses with exponential backoff.
+// Retry attempts are logged to stderr.
 func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Response, error) {
 	maxAttempts := c.Retries + 1
 	var lastErr error
 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		if attempt > 0 {
+			if lastErr != nil {
+				fmt.Fprintf(logWriter, "retry %d/%d: %v\n", attempt, maxAttempts-1, lastErr)
+			}
 			time.Sleep(backoff(attempt))
 		}
 
@@ -74,6 +79,7 @@ func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Res
 				Err:     err,
 				Timeout: c.MaxTime,
 				Attempt: attempt + 1,
+				Retries: c.Retries,
 			}
 			continue
 		}
@@ -87,6 +93,7 @@ func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Res
 				Method:     req.Method,
 				URL:        req.URL.String(),
 				Attempt:    attempt + 1,
+				Retries:    c.Retries,
 			}
 			continue
 		}
@@ -96,6 +103,12 @@ func (c *Client) doWithRetry(createReq func() (*http.Request, error)) (*http.Res
 
 	return nil, lastErr
 }
+
+var logWriter io.Writer = io.Discard
+
+// SetLogWriter redirects retry log output to the given writer.
+// By default retry logs are discarded. Pass os.Stderr to enable.
+func SetLogWriter(w io.Writer) { logWriter = w }
 
 func backoff(attempt int) time.Duration {
 	return time.Duration(1<<(attempt-1)) * time.Second
@@ -133,12 +146,30 @@ func (c *Client) get(path string, params url.Values, target any) error {
 	defer resp.Body.Close()
 
 	if target != nil {
-		if err := json.NewDecoder(resp.Body).Decode(target); err != nil {
-			return fmt.Errorf("decoding response: %w", err)
+		raw, err := io.ReadAll(io.LimitReader(resp.Body, bodyLimit))
+		if err != nil {
+			return &DecodeError{
+				Method:     "GET",
+				URL:        u,
+				StatusCode: resp.StatusCode,
+				BodySnippet: "",
+				Err:        fmt.Errorf("reading response body: %w", err),
+			}
+		}
+		if err := json.Unmarshal(raw, target); err != nil {
+			return &DecodeError{
+				Method:      "GET",
+				URL:         u,
+				StatusCode:  resp.StatusCode,
+				BodySnippet: string(raw),
+				Err:         err,
+			}
 		}
 	}
 	return nil
 }
+
+const bodyLimit = 64 * 1024
 
 // post performs a POST request with a JSON body and decodes the response.
 func (c *Client) post(path string, body any, target any) error {
@@ -173,7 +204,7 @@ func (c *Client) doWithBody(method, path string, body any, target any) error {
 			if err != nil {
 				return nil, fmt.Errorf("marshaling request body: %w", err)
 			}
-			bodyReader = strings.NewReader(string(jsonBytes))
+			bodyReader = bytes.NewReader(jsonBytes)
 		}
 		req, err := http.NewRequest(method, u, bodyReader)
 		if err != nil {
@@ -189,8 +220,24 @@ func (c *Client) doWithBody(method, path string, body any, target any) error {
 	defer resp.Body.Close()
 
 	if target != nil {
-		if err := json.NewDecoder(resp.Body).Decode(target); err != nil {
-			return fmt.Errorf("decoding response: %w", err)
+		raw, err := io.ReadAll(io.LimitReader(resp.Body, bodyLimit))
+		if err != nil {
+			return &DecodeError{
+				Method:      method,
+				URL:         u,
+				StatusCode:  resp.StatusCode,
+				BodySnippet: "",
+				Err:         fmt.Errorf("reading response body: %w", err),
+			}
+		}
+		if err := json.Unmarshal(raw, target); err != nil {
+			return &DecodeError{
+				Method:      method,
+				URL:         u,
+				StatusCode:  resp.StatusCode,
+				BodySnippet: string(raw),
+				Err:         err,
+			}
 		}
 	}
 	return nil
@@ -203,11 +250,35 @@ type RequestError struct {
 	Err     error
 	Timeout time.Duration
 	Attempt int
+	Retries int
 }
 
 func (e *RequestError) Error() string {
-	return fmt.Sprintf("%s %s failed (attempt %d/%d, timeout %s): %v",
-		e.Method, e.URL, e.Attempt, e.Attempt, e.Timeout, e.Err)
+	msg := fmt.Sprintf("%s %s", e.Method, e.URL)
+	reason := e.Err.Error()
+	if contextMsg := contextCanceledReason(reason); contextMsg != "" {
+		reason = contextMsg
+	}
+	if e.Retries > 0 {
+		return fmt.Sprintf("%s: %s (after %d retries, %s timeout)", msg, reason, e.Retries, e.Timeout)
+	}
+	return fmt.Sprintf("%s: %s (timeout %s)", msg, reason, e.Timeout)
+}
+
+func contextCanceledReason(s string) string {
+	if strings.Contains(s, "context deadline exceeded") {
+		return "request timed out"
+	}
+	if strings.Contains(s, "connection refused") {
+		return "connection refused"
+	}
+	if strings.Contains(s, "no such host") || strings.Contains(s, "DNS") || strings.Contains(s, "lookup") {
+		return "DNS resolution failed — check your Redmine URL"
+	}
+	if strings.Contains(s, "EOF") {
+		return "unexpected EOF — server closed connection"
+	}
+	return ""
 }
 
 func (e *RequestError) Unwrap() error { return e.Err }
@@ -219,18 +290,38 @@ type APIError struct {
 	Method     string
 	URL        string
 	Attempt    int
+	Retries    int
 }
 
 func (e *APIError) Error() string {
 	msg := fmt.Sprintf("%s %s: HTTP %d", e.Method, e.URL, e.StatusCode)
-	if e.Attempt > 1 {
-		msg += fmt.Sprintf(" (attempt %d)", e.Attempt)
+	if e.Retries > 0 && e.Attempt > 1 {
+		msg += fmt.Sprintf(" (after %d retries)", e.Retries)
 	}
 	if e.Body != "" {
 		msg += ": " + truncate(e.Body, 200)
 	}
 	return msg
 }
+
+// DecodeError represents a failure to decode a successful HTTP response.
+type DecodeError struct {
+	Method      string
+	URL         string
+	StatusCode  int
+	BodySnippet string
+	Err         error
+}
+
+func (e *DecodeError) Error() string {
+	msg := fmt.Sprintf("%s %s: HTTP %d: decoding response: %v", e.Method, e.URL, e.StatusCode, e.Err)
+	if e.BodySnippet != "" {
+		msg += " | body: " + truncate(e.BodySnippet, 100)
+	}
+	return msg
+}
+
+func (e *DecodeError) Unwrap() error { return e.Err }
 
 func truncate(s string, max int) string {
 	if len(s) <= max {
