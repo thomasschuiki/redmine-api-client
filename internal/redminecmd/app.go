@@ -358,8 +358,11 @@ Examples:
 				Description: `Update fields on an existing issue.
 
 Only the fields you specify will be changed. Use --subject, --description,
---status, --assignee, --done-ratio, or --custom-field to update
-the corresponding fields.
+--status, --assignee, --done-ratio, --notes, or --custom-field to
+update the corresponding fields.
+
+Use --notes to add a journal entry alongside field changes, keeping
+an audit trail of why the change was made.
 
 Custom fields:
   --custom-field <id>=<value> (repeatable)
@@ -368,6 +371,7 @@ Custom fields:
 
 Examples:
   redmine issue update 123 --status 5
+  redmine issue update 123 --status 5 --notes "Resolved, waiting on QA"
   redmine issue update 123 --custom-field 1="new value"`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "subject", Usage: "New subject"},
@@ -375,6 +379,7 @@ Examples:
 					&cli.IntFlag{Name: "status", Usage: "New status ID"},
 					&cli.IntFlag{Name: "assignee", Usage: "New assignee user ID"},
 					&cli.IntFlag{Name: "done-ratio", Usage: "Completion percentage (0-100)"},
+					&cli.StringFlag{Name: "notes", Usage: "Journal note (audit trail)"},
 					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
@@ -410,6 +415,11 @@ Examples:
 							return err
 						}
 						req.Issue.CustomFields = client.MergeCustomFields(fields)
+					}
+					if notes := c.String("notes"); notes != "" {
+						req.Issue.Notes = notes
+					} else if c.IsSet("notes") {
+						return fmt.Errorf("--notes requires non-empty text")
 					}
 
 					if err := newClient(c).UpdateIssue(id, req); err != nil {

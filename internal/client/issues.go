@@ -101,6 +101,7 @@ type IssueUpdateRequest struct {
 		PriorityID   *int               `json:"priority_id,omitempty"`
 		AssignedToID *int               `json:"assigned_to_id,omitempty"`
 		DoneRatio    *int               `json:"done_ratio,omitempty"`
+		Notes        string             `json:"notes,omitempty"`
 		CustomFields []CustomFieldValue `json:"custom_fields,omitempty"`
 	} `json:"issue"`
 }
