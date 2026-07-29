@@ -317,6 +317,7 @@ Examples:
 					&cli.FloatFlag{Name: "estimated-hours", Usage: "Estimated hours (non-negative)"},
 					&cli.IntFlag{Name: "fixed-version-id", Usage: "Target version/milestone ID"},
 					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
+					&cli.StringSliceFlag{Name: "watcher", Usage: "Watcher user ID (repeatable)"},
 					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
@@ -374,6 +375,13 @@ Examples:
 						v := c.Int("category-id")
 						req.Issue.CategoryID = &v
 					}
+					if c.IsSet("watcher") {
+						ids, err := parseInts(c.StringSlice("watcher"), "watcher")
+						if err != nil {
+							return err
+						}
+						req.Issue.WatcherUserIDs = ids
+					}
 					if c.IsSet("custom-field") {
 						fields, err := parseCustomFields(c.StringSlice("custom-field"))
 						if err != nil {
@@ -398,11 +406,15 @@ Examples:
 
 Only the fields you specify will be changed. Use --subject, --description,
 --status, --assignee, --done-ratio, --start-date, --due-date,
---estimated-hours, --fixed-version-id, --category-id, --notes, or
---custom-field to update the corresponding fields.
+--estimated-hours, --fixed-version-id, --category-id, --notes,
+--watcher, --unwatcher, or --custom-field to update the corresponding
+fields.
 
 Use --notes to add a journal entry alongside field changes, keeping
 an audit trail of why the change was made.
+
+Use --watcher (repeatable) to add watchers and --unwatcher (repeatable)
+to remove them. Redmine ignores duplicate additions.
 
 Date values must be in YYYY-MM-DD format. Estimated hours must be
 non-negative.
@@ -415,6 +427,8 @@ Custom fields:
 Examples:
   redmine issue update 123 --status 5
   redmine issue update 123 --status 5 --notes "Resolved, waiting on QA"
+  redmine issue update 123 --watcher 42 --watcher 7
+  redmine issue update 123 --unwatcher 99
   redmine issue update 123 --start-date 2026-08-01 --due-date 2026-08-15
   redmine issue update 123 --estimated-hours 12.5
   redmine issue update 123 --custom-field 1="new value"`,
@@ -430,6 +444,8 @@ Examples:
 					&cli.IntFlag{Name: "fixed-version-id", Usage: "Target version/milestone ID"},
 					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
 					&cli.StringFlag{Name: "notes", Usage: "Journal note (audit trail)"},
+					&cli.StringSliceFlag{Name: "watcher", Usage: "Add watcher user ID (repeatable)"},
+					&cli.StringSliceFlag{Name: "unwatcher", Usage: "Remove watcher user ID (repeatable)"},
 					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
@@ -501,9 +517,36 @@ Examples:
 						return fmt.Errorf("--notes requires non-empty text")
 					}
 
-					if err := newClient(c).UpdateIssue(id, req); err != nil {
+					cl := newClient(c)
+
+					if err := cl.UpdateIssue(id, req); err != nil {
 						return err
 					}
+
+					if c.IsSet("watcher") {
+						ids, err := parseInts(c.StringSlice("watcher"), "watcher")
+						if err != nil {
+							return err
+						}
+						for _, uid := range ids {
+							if err := cl.AddWatcher(id, uid); err != nil {
+								return fmt.Errorf("adding watcher %d: %w", uid, err)
+							}
+						}
+					}
+
+					if c.IsSet("unwatcher") {
+						ids, err := parseInts(c.StringSlice("unwatcher"), "unwatcher")
+						if err != nil {
+							return err
+						}
+						for _, uid := range ids {
+							if err := cl.RemoveWatcher(id, uid); err != nil {
+								return fmt.Errorf("removing watcher %d: %w", uid, err)
+							}
+						}
+					}
+
 					fmt.Fprintf(os.Stdout, "Issue %d updated\n", id)
 					return nil
 				},
@@ -1043,4 +1086,16 @@ func parseCustomFields(raw []string) ([]client.CustomFieldValue, error) {
 		fields = append(fields, f)
 	}
 	return fields, nil
+}
+
+func parseInts(raw []string, flagName string) ([]int, error) {
+	ids := make([]int, 0, len(raw))
+	for _, s := range raw {
+		id, err := strconv.Atoi(s)
+		if err != nil {
+			return nil, fmt.Errorf("invalid --%s value %q: %w", flagName, s, err)
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
 }

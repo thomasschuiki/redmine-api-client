@@ -79,20 +79,21 @@ type IssueListResponse struct {
 // IssueCreateRequest is the request body for creating an issue.
 type IssueCreateRequest struct {
 	Issue struct {
-		ProjectID    int                `json:"project_id"`
-		Subject      string             `json:"subject"`
-		Description  string             `json:"description,omitempty"`
-		StartDate    string             `json:"start_date,omitempty"`
-		DueDate      string             `json:"due_date,omitempty"`
-		EstimatedHours *float64         `json:"estimated_hours,omitempty"`
-		ParentID     *int               `json:"parent_id,omitempty"`
-		TrackerID    *int               `json:"tracker_id,omitempty"`
-		StatusID     *int               `json:"status_id,omitempty"`
-		PriorityID   *int               `json:"priority_id,omitempty"`
-		AssignedToID *int               `json:"assigned_to_id,omitempty"`
-		FixedVersionID *int             `json:"fixed_version_id,omitempty"`
-		CategoryID   *int               `json:"category_id,omitempty"`
-		CustomFields []CustomFieldValue `json:"custom_fields,omitempty"`
+		ProjectID      int                `json:"project_id"`
+		Subject        string             `json:"subject"`
+		Description    string             `json:"description,omitempty"`
+		StartDate      string             `json:"start_date,omitempty"`
+		DueDate        string             `json:"due_date,omitempty"`
+		EstimatedHours *float64           `json:"estimated_hours,omitempty"`
+		ParentID       *int               `json:"parent_id,omitempty"`
+		TrackerID      *int               `json:"tracker_id,omitempty"`
+		StatusID       *int               `json:"status_id,omitempty"`
+		PriorityID     *int               `json:"priority_id,omitempty"`
+		AssignedToID   *int               `json:"assigned_to_id,omitempty"`
+		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
+		CategoryID     *int               `json:"category_id,omitempty"`
+		WatcherUserIDs []int              `json:"watcher_user_ids,omitempty"`
+		CustomFields   []CustomFieldValue `json:"custom_fields,omitempty"`
 	} `json:"issue"`
 }
 
@@ -373,6 +374,19 @@ func (c *Client) UpdateIssue(id int, req IssueUpdateRequest) error {
 // DeleteIssue deletes an issue.
 func (c *Client) DeleteIssue(id int) error {
 	path := fmt.Sprintf("/issues/%d.json", id)
+	return c.delete(path)
+}
+
+// AddWatcher adds a watcher to an issue.
+func (c *Client) AddWatcher(issueID, userID int) error {
+	path := fmt.Sprintf("/issues/%d/watchers.json", issueID)
+	body := map[string]int{"user_id": userID}
+	return c.post(path, body, nil)
+}
+
+// RemoveWatcher removes a watcher from an issue.
+func (c *Client) RemoveWatcher(issueID, userID int) error {
+	path := fmt.Sprintf("/issues/%d/watchers/%d.json", issueID, userID)
 	return c.delete(path)
 }
 
