@@ -101,7 +101,17 @@ database schemas. See `plugin/redmine_openapi_generator/README.md` for details.
 ## `redmine` — Redmine CLI Client
 
 A thin CLI wrapper around the Redmine API. Designed for programmatic use
-(e.g., coding agents). All commands output JSON to stdout.
+(e.g., coding agents). Commands output YAML by default; use `--output json`
+for JSON.
+
+### Global Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--output` | `yaml` | Output format (`yaml`, `json`) |
+| `--connect-timeout` | `10s` | TCP connection timeout (e.g. `10s`) |
+| `--max-time` | `30s` | Maximum time per request |
+| `--retries` | `3` | Number of retries on failure |
 
 ### Config
 
@@ -119,28 +129,62 @@ Auth types: `api_key`, `basic`, `oauth2`.
 ### Commands
 
 ```
-redmine issue list [--project PROJECT] [--limit N] [--offset N]
-redmine issue get <ID>
-redmine issue create --project PROJECT --subject SUBJECT [--description DESC]
-redmine issue update <ID> [--subject SUBJECT] [--status STATUS] [--assignee USER]
+# Issues
+redmine issue list [--project PROJECT] [--limit N] [--offset N] [--sort FIELD]
+                   [--all] [--top N] [--fields FIELDS]
+                   [--contains TEXT] [--regex PATTERN] [--case-insensitive]
+                   [--include journals]
+redmine issue get <ID> [--include journals] [--fields FIELDS]
+redmine issue grep --text TEXT [--in description,notes]
+                   [--project PROJECT] [--parent-id ID]
+redmine issue create --project PROJECT --subject SUBJECT
+                   [--description DESC] [--parent-id ID] [--tracker ID]
+                   [--status ID] [--priority ID] [--assignee ID]
+                   [--start-date YYYY-MM-DD] [--due-date YYYY-MM-DD]
+                   [--estimated-hours N] [--fixed-version-id ID]
+                   [--category-id ID] [--watcher USER_ID]
+                   [--custom-field ID=VALUE]
+redmine issue update <ID> [--subject SUBJECT] [--status STATUS]
+                   [--assignee USER] [--done-ratio N] [--notes TEXT]
+                   [--start-date YYYY-MM-DD] [--due-date YYYY-MM-DD]
+                   [--estimated-hours N] [--fixed-version-id ID]
+                   [--category-id ID]
+                   [--watcher USER_ID] [--unwatcher USER_ID]
+                   [--custom-field ID=VALUE]
 redmine issue delete <ID>
 
+# Issue relations
+redmine issue relation add <FROM> <TO> --type TYPE [--delay DAYS]
+redmine issue relation list <ISSUE-ID>
+redmine issue relation remove <RELATION-ID>
+
+# Metadata discovery
+redmine tracker list
+redmine status list
+redmine priority list
+redmine category list --project PROJECT
+
+# Projects
 redmine project list [--limit N]
 redmine project get <IDENTIFIER>
 redmine project create --name NAME --identifier IDENTIFIER [--description DESC]
 redmine project delete <IDENTIFIER>
 
+# Users
 redmine user list [--limit N]
 redmine user get <ID>
 redmine user current
 
+# Time entries
 redmine time-entry list [--project PROJECT] [--issue ISSUE] [--limit N]
 redmine time-entry create --issue ISSUE --hours HOURS [--comment COMMENT]
 redmine time-entry delete <ID>
 
+# Wiki
 redmine wiki list --project PROJECT
 redmine wiki get --project PROJECT --page TITLE
 
+# Versions
 redmine version list --project PROJECT
 ```
 
@@ -157,13 +201,15 @@ go-redmine-cli/
     cmd/app.go                    Spec CLI commands
     redminecmd/app.go             Client CLI commands
     config/config.go              Config file loading
-    client/
-      client.go                   Base HTTP client, auth, helpers
-      issues.go                   Issue CRUD
-      projects.go                 Project CRUD
-      users.go                    User operations
-      time_entries.go             Time entry operations
-      wiki.go                     Wiki & version operations
+      client/
+        client.go                   Base HTTP client, auth, helpers
+        issues.go                   Issue CRUD
+        relations.go                Issue relations
+        metadata.go                 Metadata (trackers, statuses, etc.)
+        projects.go                 Project CRUD
+        users.go                    User operations
+        time_entries.go             Time entry operations
+        wiki.go                     Wiki & version operations
     models/models.go              Generated from OpenAPI spec
     spec/
       validate.go                 Validation via libopenapi
@@ -194,7 +240,7 @@ This monorepo has two independent release tracks with separate tag prefixes:
 | Component | Tag pattern | Workflow |
 |-----------|-------------|----------|
 | Redmine plugin | `plugin/v*.*.*` | `.github/workflows/release-plugin.yml` |
-| CLI binaries | `cli/v*.*.*` | `.github/workflows/release-cli.yml` |
+| CLI binaries | `cli/v*.*.*` or `v*.*.*` | `.github/workflows/release-cli.yml` |
 
 ### Plugin release
 
@@ -208,8 +254,8 @@ Archives: `.tar.gz` and `.zip` of `plugin/redmine_openapi_generator/`.
 ### CLI release
 
 ```bash
-git tag cli/v1.0.0
-git push origin cli/v1.0.0
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 Archives: `.tar.gz` per binary in `cmd/` (linux-amd64).
