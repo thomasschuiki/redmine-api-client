@@ -284,10 +284,14 @@ Examples:
 
 At minimum, --project and --subject are required. Optional fields include
 description, parent-id, tracker, status, priority, assignee,
+start-date, due-date, estimated-hours, fixed-version-id, category-id,
 and custom-field.
 
 Use --parent-id to create a child issue under a parent (epic/feature).
 The parent must exist and be in the same project.
+
+Date values must be in YYYY-MM-DD format. Estimated hours must be
+non-negative.
 
 Custom fields:
   --custom-field <id>=<value> (repeatable)
@@ -297,6 +301,7 @@ Custom fields:
 Examples:
   redmine issue create --project myproject --subject "Fix bug" --parent-id 123
   redmine issue create --project myproject --subject "Task" \
+    --start-date 2026-08-01 --due-date 2026-08-15 --estimated-hours 8 \
     --custom-field 1="value" --custom-field 2="opt1" --custom-field 2="opt2"`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
@@ -307,6 +312,11 @@ Examples:
 					&cli.IntFlag{Name: "status", Usage: "Status ID"},
 					&cli.IntFlag{Name: "priority", Usage: "Priority ID"},
 					&cli.IntFlag{Name: "assignee", Usage: "Assignee user ID"},
+					&cli.StringFlag{Name: "start-date", Usage: "Start date (YYYY-MM-DD)"},
+					&cli.StringFlag{Name: "due-date", Usage: "Due date (YYYY-MM-DD)"},
+					&cli.FloatFlag{Name: "estimated-hours", Usage: "Estimated hours (non-negative)"},
+					&cli.IntFlag{Name: "fixed-version-id", Usage: "Target version/milestone ID"},
+					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
 					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
@@ -335,6 +345,35 @@ Examples:
 						v := c.Int("assignee")
 						req.Issue.AssignedToID = &v
 					}
+					if c.IsSet("start-date") {
+						v := c.String("start-date")
+						if err := client.ValidateDate(v); err != nil {
+							return err
+						}
+						req.Issue.StartDate = v
+					}
+					if c.IsSet("due-date") {
+						v := c.String("due-date")
+						if err := client.ValidateDate(v); err != nil {
+							return err
+						}
+						req.Issue.DueDate = v
+					}
+					if c.IsSet("estimated-hours") {
+						v := c.Float("estimated-hours")
+						if err := client.ValidateEstimatedHours(v); err != nil {
+							return err
+						}
+						req.Issue.EstimatedHours = &v
+					}
+					if c.IsSet("fixed-version-id") {
+						v := c.Int("fixed-version-id")
+						req.Issue.FixedVersionID = &v
+					}
+					if c.IsSet("category-id") {
+						v := c.Int("category-id")
+						req.Issue.CategoryID = &v
+					}
 					if c.IsSet("custom-field") {
 						fields, err := parseCustomFields(c.StringSlice("custom-field"))
 						if err != nil {
@@ -358,11 +397,15 @@ Examples:
 				Description: `Update fields on an existing issue.
 
 Only the fields you specify will be changed. Use --subject, --description,
---status, --assignee, --done-ratio, --notes, or --custom-field to
-update the corresponding fields.
+--status, --assignee, --done-ratio, --start-date, --due-date,
+--estimated-hours, --fixed-version-id, --category-id, --notes, or
+--custom-field to update the corresponding fields.
 
 Use --notes to add a journal entry alongside field changes, keeping
 an audit trail of why the change was made.
+
+Date values must be in YYYY-MM-DD format. Estimated hours must be
+non-negative.
 
 Custom fields:
   --custom-field <id>=<value> (repeatable)
@@ -372,6 +415,8 @@ Custom fields:
 Examples:
   redmine issue update 123 --status 5
   redmine issue update 123 --status 5 --notes "Resolved, waiting on QA"
+  redmine issue update 123 --start-date 2026-08-01 --due-date 2026-08-15
+  redmine issue update 123 --estimated-hours 12.5
   redmine issue update 123 --custom-field 1="new value"`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "subject", Usage: "New subject"},
@@ -379,6 +424,11 @@ Examples:
 					&cli.IntFlag{Name: "status", Usage: "New status ID"},
 					&cli.IntFlag{Name: "assignee", Usage: "New assignee user ID"},
 					&cli.IntFlag{Name: "done-ratio", Usage: "Completion percentage (0-100)"},
+					&cli.StringFlag{Name: "start-date", Usage: "Start date (YYYY-MM-DD)"},
+					&cli.StringFlag{Name: "due-date", Usage: "Due date (YYYY-MM-DD)"},
+					&cli.FloatFlag{Name: "estimated-hours", Usage: "Estimated hours (non-negative)"},
+					&cli.IntFlag{Name: "fixed-version-id", Usage: "Target version/milestone ID"},
+					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
 					&cli.StringFlag{Name: "notes", Usage: "Journal note (audit trail)"},
 					&cli.StringSliceFlag{Name: "custom-field", Usage: "Custom field (<id>=<value>, repeatable)"},
 				},
@@ -408,6 +458,35 @@ Examples:
 					if c.IsSet("done-ratio") {
 						v := c.Int("done-ratio")
 						req.Issue.DoneRatio = &v
+					}
+					if c.IsSet("start-date") {
+						v := c.String("start-date")
+						if err := client.ValidateDate(v); err != nil {
+							return err
+						}
+						req.Issue.StartDate = &v
+					}
+					if c.IsSet("due-date") {
+						v := c.String("due-date")
+						if err := client.ValidateDate(v); err != nil {
+							return err
+						}
+						req.Issue.DueDate = &v
+					}
+					if c.IsSet("estimated-hours") {
+						v := c.Float("estimated-hours")
+						if err := client.ValidateEstimatedHours(v); err != nil {
+							return err
+						}
+						req.Issue.EstimatedHours = &v
+					}
+					if c.IsSet("fixed-version-id") {
+						v := c.Int("fixed-version-id")
+						req.Issue.FixedVersionID = &v
+					}
+					if c.IsSet("category-id") {
+						v := c.Int("category-id")
+						req.Issue.CategoryID = &v
 					}
 					if c.IsSet("custom-field") {
 						fields, err := parseCustomFields(c.StringSlice("custom-field"))

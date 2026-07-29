@@ -82,11 +82,16 @@ type IssueCreateRequest struct {
 		ProjectID    int                `json:"project_id"`
 		Subject      string             `json:"subject"`
 		Description  string             `json:"description,omitempty"`
+		StartDate    string             `json:"start_date,omitempty"`
+		DueDate      string             `json:"due_date,omitempty"`
+		EstimatedHours *float64         `json:"estimated_hours,omitempty"`
 		ParentID     *int               `json:"parent_id,omitempty"`
 		TrackerID    *int               `json:"tracker_id,omitempty"`
 		StatusID     *int               `json:"status_id,omitempty"`
 		PriorityID   *int               `json:"priority_id,omitempty"`
 		AssignedToID *int               `json:"assigned_to_id,omitempty"`
+		FixedVersionID *int             `json:"fixed_version_id,omitempty"`
+		CategoryID   *int               `json:"category_id,omitempty"`
 		CustomFields []CustomFieldValue `json:"custom_fields,omitempty"`
 	} `json:"issue"`
 }
@@ -96,11 +101,16 @@ type IssueUpdateRequest struct {
 	Issue struct {
 		Subject      *string            `json:"subject,omitempty"`
 		Description  *string            `json:"description,omitempty"`
+		StartDate    *string            `json:"start_date,omitempty"`
+		DueDate      *string            `json:"due_date,omitempty"`
+		EstimatedHours *float64         `json:"estimated_hours,omitempty"`
 		TrackerID    *int               `json:"tracker_id,omitempty"`
 		StatusID     *int               `json:"status_id,omitempty"`
 		PriorityID   *int               `json:"priority_id,omitempty"`
 		AssignedToID *int               `json:"assigned_to_id,omitempty"`
 		DoneRatio    *int               `json:"done_ratio,omitempty"`
+		FixedVersionID *int             `json:"fixed_version_id,omitempty"`
+		CategoryID   *int               `json:"category_id,omitempty"`
 		Notes        string             `json:"notes,omitempty"`
 		CustomFields []CustomFieldValue `json:"custom_fields,omitempty"`
 	} `json:"issue"`
@@ -498,4 +508,20 @@ func extractSnippet(text string, pos, matchLen int) string {
 		snippet = snippet + "..."
 	}
 	return snippet
+}
+
+var dateRe = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+
+func ValidateDate(v string) error {
+	if !dateRe.MatchString(v) {
+		return fmt.Errorf("invalid date %q — expected YYYY-MM-DD", v)
+	}
+	return nil
+}
+
+func ValidateEstimatedHours(v float64) error {
+	if v < 0 {
+		return fmt.Errorf("estimated hours must be non-negative, got %f", v)
+	}
+	return nil
 }
