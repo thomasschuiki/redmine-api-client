@@ -28,7 +28,7 @@ jobs:
       matrix:
         redmine: ["5.1.12", "6.0.10", "6.1.3"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Create Docker network
         run: docker network create redmine-test
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test-plugin
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Get version
         id: version
