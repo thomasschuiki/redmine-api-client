@@ -39,14 +39,24 @@ func specCommand() *cli.Command {
 
 Reports a summary of paths, operations, schemas, parameters,
 responses, security schemes, and tags. Exits with an error
-if any structural issues are found.`,
+if any structural issues are found.
+
+Use --strict to also enforce stricter gates such as requiring
+every component schema to be referenced by an operation.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "spec", Usage: "Spec file path", Value: defaultOut},
+					&cli.BoolFlag{
+						Name:  "strict",
+						Usage: "Enable strict gates (e.g. every component schema must be referenced)",
+					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					specPath := c.String("spec")
 					fmt.Printf("Validating %s\n", specPath)
 					result, err := spec.Validate(specPath)
+					if c.Bool("strict") {
+						result, err = spec.ValidateStrict(specPath)
+					}
 					if err != nil {
 						return err
 					}

@@ -41,6 +41,21 @@ jobs:
       - name: Test
         run: go test ./...
 
+      - name: Strict-validate committed contract
+        run: |
+          go run ./cmd/redmine-spec spec validate --strict --spec docs/openapi/openapi.yaml
+
+      - name: Check model drift
+        run: |
+          TMPDIR_GO=$(mktemp -d)
+          go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out "$TMPDIR_GO"
+          if ! diff -q "$TMPDIR_GO/models.go" internal/models/models.go; then
+            echo "internal/models/models.go is out of date."
+            echo "Run: go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out internal/models"
+            exit 1
+          fi
+          echo "Models are in sync with docs/openapi/openapi.yaml"
+
   release:
     if: startsWith(github.ref, 'refs/tags/cli/v')
     runs-on: ubuntu-latest

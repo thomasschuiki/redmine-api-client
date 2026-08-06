@@ -30,6 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
       - name: Create Docker network
         run: docker network create redmine-test
 
@@ -62,11 +67,18 @@ jobs:
           [ $EXITCODE -eq 0 ] || exit $EXITCODE
           cp "${TMPOUT}/openapi.yaml" openapi.yaml
 
-      - name: Validate spec output
+      - name: Strict-validate generated spec
         run: |
-          grep -q "openapi:" openapi.yaml
-          grep -q "paths:" openapi.yaml
-          echo "Spec OK for Redmine ${{ matrix.redmine }}"
+          go run ./cmd/redmine-spec spec validate --strict --spec openapi.yaml
+
+      - name: Check snapshot drift
+        run: |
+          if ! diff -q openapi.yaml "testdata/openapi/redmine-${{ matrix.redmine }}.yaml"; then
+            echo "Generated spec for Redmine ${{ matrix.redmine }} differs from the committed snapshot."
+            echo "Run ./scripts/gen-spec-snapshots.sh and commit the regenerated snapshots."
+            exit 1
+          fi
+          echo "No snapshot drift for Redmine ${{ matrix.redmine }}"
 
       - name: Cleanup
         if: always()
@@ -74,6 +86,38 @@ jobs:
           docker rm -f test-mysql test-redmine 2>/dev/null || true
           docker network rm redmine-test 2>/dev/null || true
           rm -f openapi.yaml
+
+  sync-generated:
+    if: startsWith(github.ref, 'refs/tags/plugin/v')
+    runs-on: ubuntu-latest
+    needs: test-plugin
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: Regenerate versioned snapshots
+        run: ./scripts/gen-spec-snapshots.sh
+
+      - name: Sync CLI contract and generated models
+        run: |
+          cp testdata/openapi/redmine-6.1.3.yaml docs/openapi/openapi.yaml
+          go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out internal/models
+
+      - name: Commit generated artifacts if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/openapi/openapi.yaml testdata/openapi internal/models/models.go
+          if git diff --cached --quiet; then
+            echo "No generated artifacts changed."
+          else
+            git commit -m "chore(plugin): regenerate OpenAPI spec for ${{ github.ref_name }}"
+            git push
+          fi
 
   release:
     if: startsWith(github.ref, 'refs/tags/plugin/v')

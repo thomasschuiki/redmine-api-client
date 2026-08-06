@@ -42,17 +42,6 @@ type CustomFieldValue struct {
 	Values []string `json:"values,omitempty"`
 }
 
-type Attachment struct {
-	ID          int        `json:"id"`
-	Filename    string     `json:"filename"`
-	Filesize    *int       `json:"filesize,omitempty"`
-	ContentType *string    `json:"content_type,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	ContentURL  *string    `json:"content_url,omitempty"`
-	CreatedOn   *time.Time `json:"created_on,omitempty"`
-	Author      *IDName    `json:"author,omitempty"`
-}
-
 type Error struct {
 	Errors []string `json:"errors,omitempty"`
 }

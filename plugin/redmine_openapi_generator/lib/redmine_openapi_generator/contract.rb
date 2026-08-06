@@ -75,20 +75,6 @@ module RedmineOpenapiGenerator
           }
         }
       },
-      'Attachment' => {
-        'type' => 'object',
-        'required' => %w[id filename],
-        'properties' => {
-          'id' => { 'type' => 'integer' },
-          'filename' => { 'type' => 'string' },
-          'filesize' => { 'type' => 'integer' },
-          'content_type' => { 'type' => 'string' },
-          'description' => { 'type' => 'string' },
-          'content_url' => { 'type' => 'string' },
-          'created_on' => { 'type' => 'string', 'format' => 'date-time' },
-          'author' => { '$ref' => 'IDName' }
-        }
-      },
       'Error' => {
         'type' => 'object',
         'properties' => {

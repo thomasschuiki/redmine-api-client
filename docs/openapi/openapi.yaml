@@ -1220,7 +1220,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/IssueCreate"
+              "$ref": "#/components/schemas/IssueUpdateRequest"
       responses:
         '200':
           description: Success
@@ -1254,7 +1254,7 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/IssueCreate"
+              "$ref": "#/components/schemas/IssueUpdateRequest"
       responses:
         '200':
           description: Success
@@ -2070,29 +2070,6 @@ components:
           type: array
           items:
             type: string
-    Attachment:
-      type: object
-      required:
-      - id
-      - filename
-      properties:
-        id:
-          type: integer
-        filename:
-          type: string
-        filesize:
-          type: integer
-        content_type:
-          type: string
-        description:
-          type: string
-        content_url:
-          type: string
-        created_on:
-          type: string
-          format: date-time
-        author:
-          "$ref": "#/components/schemas/IDName"
     Error:
       type: object
       properties:

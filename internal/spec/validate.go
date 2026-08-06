@@ -46,6 +46,16 @@ var requiredSchemas = []string{
 // Validate reads a bundled OpenAPI spec and checks for structural errors:
 // broken $ref pointers, invalid schemas, missing required fields, etc.
 func Validate(specPath string) (*ValidationResult, error) {
+	return validate(specPath, false)
+}
+
+// ValidateStrict runs all Validate checks plus the strict gates (e.g. no
+// unreferenced component schemas).
+func ValidateStrict(specPath string) (*ValidationResult, error) {
+	return validate(specPath, true)
+}
+
+func validate(specPath string, strict bool) (*ValidationResult, error) {
 	data, err := os.ReadFile(specPath)
 	if err != nil {
 		return nil, fmt.Errorf("reading spec: %w", err)
@@ -85,7 +95,7 @@ func Validate(specPath string) (*ValidationResult, error) {
 		return result, nil
 	}
 
-	result.ContentErrors = checkContent(root)
+	result.ContentErrors = checkContent(root, strict)
 	if len(result.ContentErrors) > 0 {
 		result.Valid = false
 	}
@@ -107,7 +117,7 @@ type ValidationResult struct {
 	Valid               bool
 }
 
-func checkContent(root map[string]any) []string {
+func checkContent(root map[string]any, strict bool) []string {
 	var errs []string
 
 	for _, ref := range collectRefs(root) {
@@ -134,7 +144,40 @@ func checkContent(root map[string]any) []string {
 	errs = append(errs, checkDuplicateOperationIDs(root)...)
 	errs = append(errs, checkPayloadsHaveSchemas(root)...)
 
+	if strict {
+		for _, name := range checkDeadComponents(root) {
+			errs = append(errs, fmt.Sprintf("unreferenced schema (dead component): %s", name))
+		}
+	}
+
 	return errs
+}
+
+// checkDeadComponents reports component schemas never referenced by a $ref in
+// the document. A dead schema signals a resource dropped from the contract
+// without its schema being removed.
+func checkDeadComponents(root map[string]any) []string {
+	schemas := componentsSchemas(root)
+	if len(schemas) == 0 {
+		return nil
+	}
+
+	referenced := map[string]bool{}
+	const prefix = "#/components/schemas/"
+	for _, ref := range collectRefs(root) {
+		if strings.HasPrefix(ref, prefix) {
+			referenced[strings.TrimPrefix(ref, prefix)] = true
+		}
+	}
+
+	var dead []string
+	for name := range schemas {
+		if !referenced[name] {
+			dead = append(dead, name)
+		}
+	}
+	sort.Strings(dead)
+	return dead
 }
 
 // checkDuplicateOperationIDs reports operationIds emitted more than once.

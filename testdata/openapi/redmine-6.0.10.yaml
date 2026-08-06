@@ -1,0 +1,2766 @@
+---
+openapi: 3.0.3
+info:
+  title: Redmine API
+  description: Auto-generated OpenAPI specification for Redmine 6.0.10.stable.
+  version: 1.0.0+redmine.6.0.10.stable
+servers:
+- url: "/"
+security:
+- Basic: []
+- ApiKey: []
+- ApiKeyInQuery: []
+- OAuth2: []
+tags:
+- name: Enumerations
+- name: Issue Categories
+- name: Issue Relations
+- name: Issue Statuses
+- name: Issues
+- name: Projects
+- name: Timelog
+- name: Trackers
+- name: Users
+- name: Versions
+- name: Wiki
+paths:
+  "/users":
+    get:
+      tags:
+      - Users
+      summary: List user
+      operationId: getUsers
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Users
+      summary: Create user
+      operationId: createUser
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/users/{id}":
+    get:
+      tags:
+      - Users
+      summary: Get user
+      operationId: getUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Users
+      summary: Update user
+      operationId: updateUser2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Users
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects/{project_id}/issues":
+    get:
+      tags:
+      - Issues
+      summary: List issue
+      operationId: getProjectIssues
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: Create issue
+      operationId: createProjectIssue
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/projects/{project_id}/versions":
+    post:
+      tags:
+      - Versions
+      summary: Create version
+      operationId: createProjectVersion
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    get:
+      tags:
+      - Versions
+      summary: List version
+      operationId: getProjectVersions
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/roadmap":
+    get:
+      tags:
+      - Versions
+      summary: List version
+      operationId: getProjectRoadmap
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/time_entries":
+    get:
+      tags:
+      - Timelog
+      summary: List timelog
+      operationId: getProjectTimeEntries
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntryList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createProjectTimeEntry
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TimeEntryCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/projects/{project_id}/issue_categories":
+    get:
+      tags:
+      - Issue Categories
+      summary: List issue_category
+      operationId: getProjectIssueCategories
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueCategoryList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Categories
+      summary: Create issue_category
+      operationId: createProjectIssueCategory
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueCategorySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/issue_categories/{id}":
+    get:
+      tags:
+      - Issue Categories
+      summary: Get issue_category
+      operationId: getIssueCategory
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueCategorySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Issue Categories
+      summary: Update issue_category
+      operationId: updateIssueCategory
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueCategorySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Issue Categories
+      summary: Update issue_category
+      operationId: updateIssueCategory2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueCategorySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Issue Categories
+      summary: Delete issue_category
+      operationId: deleteIssueCategory
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects/{project_id}/wiki/index":
+    get:
+      tags:
+      - Wiki
+      summary: List wiki
+      operationId: getProjectWikiPages
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/wiki/{id}":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWikiPage
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Wiki
+      summary: Update wiki
+      operationId: updateWikiPage
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Wiki
+      summary: Update wiki
+      operationId: updateWikiPage2
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Wiki
+      summary: Delete wiki
+      operationId: deleteWikiPage
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects/{project_id}/wiki":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWikiPage2
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects/{project_id}/wiki/{id}/{version}":
+    get:
+      tags:
+      - Wiki
+      summary: Get wiki
+      operationId: getWikiPage3
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WikiPageSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects":
+    get:
+      tags:
+      - Projects
+      summary: List project
+      operationId: getProjects
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Projects
+      summary: Create project
+      operationId: createProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProjectCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/projects/{id}":
+    get:
+      tags:
+      - Projects
+      summary: Get project
+      operationId: getProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Projects
+      summary: Update project
+      operationId: updateProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProjectCreate"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Projects
+      summary: Update project
+      operationId: updateProject2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ProjectCreate"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Projects
+      summary: Delete project
+      operationId: deleteProject
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/issues/{issue_id}/time_entries":
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createIssueTimeEntry
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TimeEntryCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/issues/{issue_id}/relations":
+    get:
+      tags:
+      - Issue Relations
+      summary: List issue_relation
+      operationId: getIssueRelations
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RelationList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Relations
+      summary: Create issue_relation
+      operationId: createIssueRelation
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RelationCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RelationSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/relations/{id}":
+    get:
+      tags:
+      - Issue Relations
+      summary: Get issue_relation
+      operationId: getRelation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RelationSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    delete:
+      tags:
+      - Issue Relations
+      summary: Delete issue_relation
+      operationId: deleteRelation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/issues":
+    get:
+      tags:
+      - Issues
+      summary: List issue
+      operationId: getIssues
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issues
+      summary: Create issue
+      operationId: createIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/issues/{id}":
+    get:
+      tags:
+      - Issues
+      summary: Get issue
+      operationId: getIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Issues
+      summary: Update issue
+      operationId: updateIssue2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Issues
+      summary: Delete issue
+      operationId: deleteIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/versions/{id}":
+    get:
+      tags:
+      - Versions
+      summary: Get version
+      operationId: getVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Versions
+      summary: Update version
+      operationId: updateVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Versions
+      summary: Update version
+      operationId: updateVersion2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/VersionSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Versions
+      summary: Delete version
+      operationId: deleteVersion
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/time_entries":
+    get:
+      tags:
+      - Timelog
+      summary: List timelog
+      operationId: getTimeEntries
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntryList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Timelog
+      summary: Create timelog
+      operationId: createTimeEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TimeEntryCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/time_entries/{id}":
+    get:
+      tags:
+      - Timelog
+      summary: Get timelog
+      operationId: getTimeEntry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimeEntry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TimeEntryCreate"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Timelog
+      summary: Update timelog
+      operationId: updateTimeEntry2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/TimeEntryCreate"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TimeEntrySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Timelog
+      summary: Delete timelog
+      operationId: deleteTimeEntry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/trackers":
+    get:
+      tags:
+      - Trackers
+      summary: List tracker
+      operationId: getTrackers
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrackerList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Trackers
+      summary: Create tracker
+      operationId: createTracker
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrackerSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/trackers/{id}":
+    patch:
+      tags:
+      - Trackers
+      summary: Update tracker
+      operationId: updateTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrackerSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Trackers
+      summary: Update tracker
+      operationId: updateTracker2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrackerSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Trackers
+      summary: Delete tracker
+      operationId: deleteTracker
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/issue_statuses":
+    get:
+      tags:
+      - Issue Statuses
+      summary: List issue_statuse
+      operationId: getIssueStatuses
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueStatusList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Issue Statuses
+      summary: Create issue_statuse
+      operationId: createIssueStatus
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueStatusSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/issue_statuses/{id}":
+    patch:
+      tags:
+      - Issue Statuses
+      summary: Update issue_statuse
+      operationId: updateIssueStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueStatusSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Issue Statuses
+      summary: Update issue_statuse
+      operationId: updateIssueStatus2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueStatusSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Issue Statuses
+      summary: Delete issue_statuse
+      operationId: deleteIssueStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/enumerations":
+    get:
+      tags:
+      - Enumerations
+      summary: List enumeration
+      operationId: getIssuePriorities
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssuePriorityList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Enumerations
+      summary: Create enumeration
+      operationId: createIssuePriority
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssuePrioritySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/enumerations/{id}":
+    patch:
+      tags:
+      - Enumerations
+      summary: Update enumeration
+      operationId: updateIssuePriority
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssuePrioritySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Enumerations
+      summary: Update enumeration
+      operationId: updateIssuePriority2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssuePrioritySingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Enumerations
+      summary: Delete enumeration
+      operationId: deleteIssuePriority
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/enumerations/{type}":
+    get:
+      tags:
+      - Enumerations
+      summary: List enumeration
+      operationId: getEnumerationIssuePriorities
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssuePriorityList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+components:
+  schemas:
+    IDName:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    IssueRef:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+    Journal:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+        notes:
+          type: string
+        private_notes:
+          type: boolean
+        created_on:
+          type: string
+          format: date-time
+        user:
+          "$ref": "#/components/schemas/IDName"
+        details:
+          type: array
+          items:
+            "$ref": "#/components/schemas/JournalDetail"
+    JournalDetail:
+      type: object
+      properties:
+        property:
+          type: string
+        name:
+          type: string
+        old_value:
+          type: string
+        new_value:
+          type: string
+    CustomField:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        value: {}
+        multiple:
+          type: boolean
+    CustomFieldValue:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+        value:
+          type: string
+        values:
+          type: array
+          items:
+            type: string
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    Issue:
+      type: object
+      required:
+      - id
+      - subject
+      properties:
+        id:
+          type: integer
+        subject:
+          type: string
+        description:
+          type: string
+        done_ratio:
+          type: integer
+        is_private:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        closed_on:
+          type: string
+          format: date-time
+        parent:
+          "$ref": "#/components/schemas/IssueRef"
+        project:
+          "$ref": "#/components/schemas/IDName"
+        tracker:
+          "$ref": "#/components/schemas/IDName"
+        status:
+          "$ref": "#/components/schemas/IDName"
+        priority:
+          "$ref": "#/components/schemas/IDName"
+        author:
+          "$ref": "#/components/schemas/IDName"
+        assigned_to:
+          "$ref": "#/components/schemas/IDName"
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomField"
+        journals:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Journal"
+        relations:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Relation"
+    IssueSingle:
+      type: object
+      required:
+      - issue
+      properties:
+        issue:
+          "$ref": "#/components/schemas/Issue"
+    IssueList:
+      type: object
+      required:
+      - issues
+      properties:
+        issues:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Issue"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    IssueRequest:
+      type: object
+      required:
+      - subject
+      properties:
+        subject:
+          type: string
+        project_id:
+          type: integer
+        description:
+          type: string
+        tracker_id:
+          type: integer
+        status_id:
+          type: integer
+        priority_id:
+          type: integer
+        category_id:
+          type: integer
+        fixed_version_id:
+          type: integer
+        assigned_to_id:
+          type: integer
+        parent_id:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        estimated_hours:
+          type: number
+        watcher_user_ids:
+          type: array
+          items:
+            type: integer
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomFieldValue"
+    IssueCreate:
+      type: object
+      required:
+      - issue
+      properties:
+        issue:
+          "$ref": "#/components/schemas/IssueRequest"
+    IssueUpdate:
+      type: object
+      properties:
+        subject:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        estimated_hours:
+          type: number
+        tracker_id:
+          type: integer
+        status_id:
+          type: integer
+        priority_id:
+          type: integer
+        assigned_to_id:
+          type: integer
+        done_ratio:
+          type: integer
+        fixed_version_id:
+          type: integer
+        category_id:
+          type: integer
+        notes:
+          type: string
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomFieldValue"
+    IssueUpdateRequest:
+      type: object
+      required:
+      - issue
+      properties:
+        issue:
+          "$ref": "#/components/schemas/IssueUpdate"
+    Project:
+      type: object
+      required:
+      - id
+      - name
+      - identifier
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        identifier:
+          type: string
+        description:
+          type: string
+        homepage:
+          type: string
+        is_public:
+          type: boolean
+        status:
+          type: integer
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        parent:
+          "$ref": "#/components/schemas/IDName"
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomField"
+    ProjectSingle:
+      type: object
+      required:
+      - project
+      properties:
+        project:
+          "$ref": "#/components/schemas/Project"
+    ProjectList:
+      type: object
+      required:
+      - projects
+      properties:
+        projects:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Project"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    ProjectRequest:
+      type: object
+      required:
+      - name
+      - identifier
+      properties:
+        name:
+          type: string
+        identifier:
+          type: string
+        description:
+          type: string
+        homepage:
+          type: string
+        is_public:
+          type: boolean
+        parent_id:
+          type: integer
+        inherit_members:
+          type: boolean
+        default_version_id:
+          type: integer
+        default_assigned_to_id:
+          type: integer
+    ProjectCreate:
+      type: object
+      required:
+      - project
+      properties:
+        project:
+          "$ref": "#/components/schemas/ProjectRequest"
+    User:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        mail:
+          type: string
+        admin:
+          type: boolean
+        status:
+          type: integer
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        last_login_on:
+          type: string
+          format: date-time
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomField"
+    UserSingle:
+      type: object
+      required:
+      - user
+      properties:
+        user:
+          "$ref": "#/components/schemas/User"
+    UserList:
+      type: object
+      required:
+      - users
+      properties:
+        users:
+          type: array
+          items:
+            "$ref": "#/components/schemas/User"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    TimeEntry:
+      type: object
+      required:
+      - id
+      - hours
+      properties:
+        id:
+          type: integer
+        hours:
+          type: number
+        comments:
+          type: string
+        spent_on:
+          type: string
+          format: date
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        project:
+          "$ref": "#/components/schemas/IDName"
+        issue:
+          "$ref": "#/components/schemas/IDName"
+        user:
+          "$ref": "#/components/schemas/IDName"
+        activity:
+          "$ref": "#/components/schemas/IDName"
+    TimeEntrySingle:
+      type: object
+      required:
+      - time_entry
+      properties:
+        time_entry:
+          "$ref": "#/components/schemas/TimeEntry"
+    TimeEntryList:
+      type: object
+      required:
+      - time_entries
+      properties:
+        time_entries:
+          type: array
+          items:
+            "$ref": "#/components/schemas/TimeEntry"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    TimeEntryRequest:
+      type: object
+      required:
+      - hours
+      properties:
+        hours:
+          type: number
+        issue_id:
+          type: integer
+        project_id:
+          type: integer
+        activity_id:
+          type: integer
+        comments:
+          type: string
+        spent_on:
+          type: string
+          format: date
+    TimeEntryCreate:
+      type: object
+      required:
+      - time_entry
+      properties:
+        time_entry:
+          "$ref": "#/components/schemas/TimeEntryRequest"
+    WikiPage:
+      type: object
+      required:
+      - id
+      - title
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        text:
+          type: string
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        author:
+          "$ref": "#/components/schemas/IDName"
+    WikiPageSingle:
+      type: object
+      required:
+      - wiki_page
+      properties:
+        wiki_page:
+          "$ref": "#/components/schemas/WikiPage"
+    WikiPageList:
+      type: object
+      required:
+      - wiki_pages
+      properties:
+        wiki_pages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/WikiPage"
+    Version:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+        sharing:
+          type: string
+        due_date:
+          type: string
+          format: date
+        description:
+          type: string
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        project:
+          "$ref": "#/components/schemas/IDName"
+    VersionSingle:
+      type: object
+      required:
+      - version
+      properties:
+        version:
+          "$ref": "#/components/schemas/Version"
+    VersionList:
+      type: object
+      required:
+      - versions
+      properties:
+        versions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Version"
+    Tracker:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    TrackerSingle:
+      type: object
+      required:
+      - tracker
+      properties:
+        tracker:
+          "$ref": "#/components/schemas/Tracker"
+    TrackerList:
+      type: object
+      required:
+      - trackers
+      properties:
+        trackers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Tracker"
+    IssueStatus:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_closed:
+          type: boolean
+    IssueStatusSingle:
+      type: object
+      required:
+      - issue_status
+      properties:
+        issue_status:
+          "$ref": "#/components/schemas/IssueStatus"
+    IssueStatusList:
+      type: object
+      required:
+      - issue_statuses
+      properties:
+        issue_statuses:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IssueStatus"
+    IssuePriority:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_default:
+          type: boolean
+        active:
+          type: boolean
+    IssuePrioritySingle:
+      type: object
+      required:
+      - issue_priority
+      properties:
+        issue_priority:
+          "$ref": "#/components/schemas/IssuePriority"
+    IssuePriorityList:
+      type: object
+      required:
+      - issue_priorities
+      properties:
+        issue_priorities:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IssuePriority"
+    IssueCategory:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        project:
+          "$ref": "#/components/schemas/IDName"
+        assigned_to:
+          "$ref": "#/components/schemas/IDName"
+    IssueCategorySingle:
+      type: object
+      required:
+      - issue_category
+      properties:
+        issue_category:
+          "$ref": "#/components/schemas/IssueCategory"
+    IssueCategoryList:
+      type: object
+      required:
+      - issue_categories
+      properties:
+        issue_categories:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IssueCategory"
+    Relation:
+      type: object
+      required:
+      - id
+      - issue_id
+      - issue_to_id
+      - relation_type
+      properties:
+        id:
+          type: integer
+        issue_id:
+          type: integer
+        issue_to_id:
+          type: integer
+        relation_type:
+          type: string
+        delay:
+          type: integer
+    RelationSingle:
+      type: object
+      required:
+      - relation
+      properties:
+        relation:
+          "$ref": "#/components/schemas/Relation"
+    RelationList:
+      type: object
+      required:
+      - relations
+      properties:
+        relations:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Relation"
+    RelationRequest:
+      type: object
+      required:
+      - relation_type
+      - issue_to_id
+      properties:
+        relation_type:
+          type: string
+        issue_id:
+          type: integer
+        issue_to_id:
+          type: integer
+        delay:
+          type: integer
+    RelationCreate:
+      type: object
+      required:
+      - relation
+      properties:
+        relation:
+          "$ref": "#/components/schemas/RelationRequest"
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Error"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Error"
+    PreconditionFailed:
+      description: Precondition Failed
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Error"
+    UnprocessableEntity:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Error"
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: HTTP Basic Authentication
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Redmine-API-Key
+      description: API key passed as a header
+    ApiKeyInQuery:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as a query parameter
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "/oauth/authorize"
+          tokenUrl: "/oauth/token"
+          scopes:
+            api: Redmine API access

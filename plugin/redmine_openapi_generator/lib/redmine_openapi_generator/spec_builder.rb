@@ -176,7 +176,12 @@ module RedmineOpenapiGenerator
       op['parameters'] = params unless params.empty?
 
       if %w[POST PUT PATCH].include?(route[:verb].upcase) && model_name
-        op['requestBody'] = build_request_body(model_name) if @components.key?("#{model_name}Create")
+        schema = if %w[PUT PATCH].include?(route[:verb].upcase) && @components.key?("#{model_name}UpdateRequest")
+                   "#{model_name}UpdateRequest"
+                 elsif @components.key?("#{model_name}Create")
+                   "#{model_name}Create"
+                 end
+        op['requestBody'] = build_request_body(schema) if schema
       end
 
       op['responses'] = build_responses(route)
@@ -216,12 +221,12 @@ module RedmineOpenapiGenerator
       'string'
     end
 
-    def build_request_body(model_name)
+    def build_request_body(schema_name)
       {
         'required' => true,
         'content' => {
           'application/json' => {
-            'schema' => { '$ref' => "#/components/schemas/#{model_name}Create" }
+            'schema' => { '$ref' => "#/components/schemas/#{schema_name}" }
           }
         }
       }
