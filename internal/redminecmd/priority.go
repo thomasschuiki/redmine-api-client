@@ -25,22 +25,22 @@ Use the ID with --priority-id when creating or filtering issues.`,
 Output shows ID and name. Default priority is marked with an asterisk.
 Use --output json for machine-parseable output.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				resp, err := cl.ListIssuePriorities(ctx)
-				if err != nil {
-					return err
-				}
-				if c.String("output") == "json" {
-					if err := output.Print(resp, "json"); err != nil {
+					cl, err := newClient(c)
+					if err != nil {
 						return err
 					}
+					resp, err := cl.ListIssuePriorities(ctx)
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						if err := output.Print(resp, "json"); err != nil {
+							return err
+						}
 					} else {
 						for _, p := range resp.IssuePriorities {
 							def := ""
-							if p.IsDefault {
+							if p.IsDefault != nil && *p.IsDefault {
 								def = " *"
 							}
 							fmt.Printf("% 4d  %s%s\n", p.ID, p.Name, def)

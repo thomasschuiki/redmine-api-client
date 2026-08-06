@@ -122,8 +122,8 @@ func TestMergeCustomFields(t *testing.T) {
 
 func TestContainsFilter(t *testing.T) {
 	issues := []Issue{
-		{Subject: "Fix login bug", Description: "Users cannot log in", Status: &IDName{Name: "New"}, Tracker: &IDName{Name: "Bug"}, Author: &IDName{Name: "Alice"}},
-		{Subject: "Add dark mode", Description: "Implement dark theme", Status: &IDName{Name: "In Progress"}, Tracker: &IDName{Name: "Feature"}, Author: &IDName{Name: "Bob"}},
+		{Subject: "Fix login bug", Description: strPtr("Users cannot log in"), Status: &IDName{Name: "New"}, Tracker: &IDName{Name: "Bug"}, Author: &IDName{Name: "Alice"}},
+		{Subject: "Add dark mode", Description: strPtr("Implement dark theme"), Status: &IDName{Name: "In Progress"}, Tracker: &IDName{Name: "Feature"}, Author: &IDName{Name: "Bob"}},
 	}
 
 	tests := []struct {
@@ -152,8 +152,8 @@ func TestContainsFilter(t *testing.T) {
 
 func TestRegexFilter(t *testing.T) {
 	issues := []Issue{
-		{Subject: "Fix login bug #123", Description: "Critical", Status: &IDName{Name: "New"}, Tracker: &IDName{Name: "Bug"}, Author: &IDName{Name: "Alice"}},
-		{Subject: "Release v2.0", Description: "Major release", Status: &IDName{Name: "Done"}, Tracker: &IDName{Name: "Feature"}, Author: &IDName{Name: "Bob"}},
+		{Subject: "Fix login bug #123", Description: strPtr("Critical"), Status: &IDName{Name: "New"}, Tracker: &IDName{Name: "Bug"}, Author: &IDName{Name: "Alice"}},
+		{Subject: "Release v2.0", Description: strPtr("Major release"), Status: &IDName{Name: "Done"}, Tracker: &IDName{Name: "Feature"}, Author: &IDName{Name: "Bob"}},
 	}
 
 	tests := []struct {

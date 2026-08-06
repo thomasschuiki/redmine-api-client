@@ -287,8 +287,6 @@ Examples:
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					var req client.IssueCreateRequest
-					zero := 0
-					req.Issue.ProjectID = &zero // will be set below
 					req.Issue.Subject = c.String("subject")
 					desc := c.String("description")
 					req.Issue.Description = &desc
@@ -361,6 +359,11 @@ Examples:
 					if err != nil {
 						return err
 					}
+					project, err := cl.ResolveProject(ctx, c.String("project"))
+					if err != nil {
+						return err
+					}
+					req.Issue.ProjectID = &project.ID
 					issue, err := cl.CreateIssue(ctx, req)
 					if err != nil {
 						return err

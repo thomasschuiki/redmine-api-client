@@ -4,39 +4,21 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // WikiPage represents a Redmine wiki page.
-type WikiPage struct {
-	Author    *IDName `json:"author,omitempty"`
-	Title     string  `json:"title"`
-	CreatedOn string  `json:"created_on,omitempty"`
-	UpdatedOn string  `json:"updated_on,omitempty"`
-	Text      string  `json:"text,omitempty"`
-	ID        int     `json:"id"`
-}
+type WikiPage = models.WikiPage
 
 // WikiPageListResponse is the response from listing wiki pages.
-type WikiPageListResponse struct {
-	WikiPages []WikiPage `json:"wiki_pages"`
-}
+type WikiPageListResponse = models.WikiPageList
 
 // Version represents a Redmine version.
-type Version struct {
-	Project     *IDName `json:"project,omitempty"`
-	Name        string  `json:"name"`
-	Status      string  `json:"status,omitempty"`
-	DueDate     string  `json:"due_date,omitempty"`
-	Description string  `json:"description,omitempty"`
-	CreatedOn   string  `json:"created_on,omitempty"`
-	UpdatedOn   string  `json:"updated_on,omitempty"`
-	ID          int     `json:"id"`
-}
+type Version = models.Version
 
 // VersionListResponse is the response from listing versions.
-type VersionListResponse struct {
-	Versions []Version `json:"versions"`
-}
+type VersionListResponse = models.VersionList
 
 // ListWikiPages returns wiki pages for a project.
 func (c *Client) ListWikiPages(ctx context.Context, projectID string) (*WikiPageListResponse, error) {

@@ -4,18 +4,15 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // Tracker represents a Redmine issue tracker.
-type Tracker struct {
-	Name string `json:"name"`
-	ID   int    `json:"id"`
-}
+type Tracker = models.Tracker
 
 // TrackerListResponse is the response from listing trackers.
-type TrackerListResponse struct {
-	Trackers []Tracker `json:"trackers"`
-}
+type TrackerListResponse = models.TrackerList
 
 // ListTrackers returns all trackers.
 func (c *Client) ListTrackers(ctx context.Context) (*TrackerListResponse, error) {
@@ -27,16 +24,10 @@ func (c *Client) ListTrackers(ctx context.Context) (*TrackerListResponse, error)
 }
 
 // IssueStatus represents a Redmine issue status.
-type IssueStatus struct {
-	Name     string `json:"name"`
-	ID       int    `json:"id"`
-	IsClosed bool   `json:"is_closed"`
-}
+type IssueStatus = models.IssueStatus
 
 // IssueStatusListResponse is the response from listing issue statuses.
-type IssueStatusListResponse struct {
-	IssueStatuses []IssueStatus `json:"issue_statuses"`
-}
+type IssueStatusListResponse = models.IssueStatusList
 
 // ListIssueStatuses returns all issue statuses.
 func (c *Client) ListIssueStatuses(ctx context.Context) (*IssueStatusListResponse, error) {
@@ -48,17 +39,10 @@ func (c *Client) ListIssueStatuses(ctx context.Context) (*IssueStatusListRespons
 }
 
 // IssuePriority represents a Redmine issue priority.
-type IssuePriority struct {
-	Name      string `json:"name"`
-	ID        int    `json:"id"`
-	IsDefault bool   `json:"is_default"`
-	Active    bool   `json:"active"`
-}
+type IssuePriority = models.IssuePriority
 
 // IssuePriorityListResponse is the response from listing priorities.
-type IssuePriorityListResponse struct {
-	IssuePriorities []IssuePriority `json:"issue_priorities"`
-}
+type IssuePriorityListResponse = models.IssuePriorityList
 
 // ListIssuePriorities returns all issue priorities.
 func (c *Client) ListIssuePriorities(ctx context.Context) (*IssuePriorityListResponse, error) {
@@ -70,17 +54,10 @@ func (c *Client) ListIssuePriorities(ctx context.Context) (*IssuePriorityListRes
 }
 
 // IssueCategory represents a Redmine issue category.
-type IssueCategory struct {
-	Project    *IDName `json:"project,omitempty"`
-	AssignedTo *IDName `json:"assigned_to,omitempty"`
-	Name       string  `json:"name"`
-	ID         int     `json:"id"`
-}
+type IssueCategory = models.IssueCategory
 
 // IssueCategoryListResponse is the response from listing categories.
-type IssueCategoryListResponse struct {
-	IssueCategories []IssueCategory `json:"issue_categories"`
-}
+type IssueCategoryListResponse = models.IssueCategoryList
 
 // ListIssueCategories returns categories for a project.
 func (c *Client) ListIssueCategories(ctx context.Context, projectID string) (*IssueCategoryListResponse, error) {

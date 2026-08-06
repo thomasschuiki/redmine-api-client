@@ -143,30 +143,7 @@ func (c *Client) get(ctx context.Context, path string, params url.Values, target
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	if target != nil {
-		raw, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return &DecodeError{
-				Method:      "GET",
-				URL:         u,
-				StatusCode:  resp.StatusCode,
-				BodySnippet: "",
-				Err:         fmt.Errorf("reading response body: %w", err),
-			}
-		}
-		if err := json.Unmarshal(raw, target); err != nil {
-			return &DecodeError{
-				Method:      "GET",
-				URL:         u,
-				StatusCode:  resp.StatusCode,
-				BodySnippet: string(raw),
-				Err:         err,
-			}
-		}
-	}
-	return nil
+	return c.decodeResponse("GET", u, resp, target)
 }
 
 // post performs a POST request with a JSON body and decodes the response.
@@ -188,8 +165,7 @@ func (c *Client) delete(ctx context.Context, path string) error {
 	if err != nil {
 		return err
 	}
-	resp.Body.Close()
-	return nil
+	return c.decodeResponse("DELETE", u, resp, nil)
 }
 
 func (c *Client) doWithBody(ctx context.Context, method, path string, body any, target any) error {
@@ -215,27 +191,44 @@ func (c *Client) doWithBody(ctx context.Context, method, path string, body any, 
 	if err != nil {
 		return err
 	}
+	return c.decodeResponse(method, u, resp, target)
+}
+
+// decodeResponse reads a response body, returning an APIError for non-2xx
+// responses or decoding the body into target for successful responses.
+func (c *Client) decodeResponse(method, u string, resp *http.Response, target any) error {
 	defer resp.Body.Close()
 
-	if target != nil {
-		raw, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return &DecodeError{
-				Method:      method,
-				URL:         u,
-				StatusCode:  resp.StatusCode,
-				BodySnippet: "",
-				Err:         fmt.Errorf("reading response body: %w", err),
-			}
+	raw, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return &DecodeError{
+			Method:      method,
+			URL:         u,
+			StatusCode:  resp.StatusCode,
+			BodySnippet: "",
+			Err:         fmt.Errorf("reading response body: %w", err),
 		}
-		if err := json.Unmarshal(raw, target); err != nil {
-			return &DecodeError{
-				Method:      method,
-				URL:         u,
-				StatusCode:  resp.StatusCode,
-				BodySnippet: string(raw),
-				Err:         err,
-			}
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return &APIError{
+			Method:     method,
+			URL:        u,
+			StatusCode: resp.StatusCode,
+			Body:       string(raw),
+		}
+	}
+
+	if target == nil {
+		return nil
+	}
+	if err := json.Unmarshal(raw, target); err != nil {
+		return &DecodeError{
+			Method:      method,
+			URL:         u,
+			StatusCode:  resp.StatusCode,
+			BodySnippet: string(raw),
+			Err:         err,
 		}
 	}
 	return nil

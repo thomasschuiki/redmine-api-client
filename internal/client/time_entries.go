@@ -9,25 +9,10 @@ import (
 )
 
 // TimeEntry represents a Redmine time entry.
-type TimeEntry struct {
-	Project   *IDName `json:"project,omitempty"`
-	Issue     *IDName `json:"issue,omitempty"`
-	User      *IDName `json:"user,omitempty"`
-	Activity  *IDName `json:"activity,omitempty"`
-	Comments  string  `json:"comments,omitempty"`
-	CreatedOn string  `json:"created_on,omitempty"`
-	UpdatedOn string  `json:"updated_on,omitempty"`
-	ID        int     `json:"id"`
-	Hours     float64 `json:"hours"`
-}
+type TimeEntry = models.TimeEntry
 
 // TimeEntryListResponse is the response from listing time entries.
-type TimeEntryListResponse struct {
-	TimeEntries []TimeEntry `json:"time_entries"`
-	TotalCount  int         `json:"total_count"`
-	Offset      int         `json:"offset"`
-	Limit       int         `json:"limit"`
-}
+type TimeEntryListResponse = models.TimeEntryList
 
 // TimeEntryCreateRequest is the request body for creating a time entry.
 type TimeEntryCreateRequest = models.TimeEntryCreate

@@ -22,19 +22,13 @@ const (
 	RelationCopiedFrom RelationType = "copied_from"
 )
 
-type Relation struct {
-	Delay        *int         `json:"delay,omitempty"`
-	RelationType RelationType `json:"relation_type"`
-	ID           int          `json:"id"`
-	IssueID      int          `json:"issue_id"`
-	IssueToID    int          `json:"issue_to_id"`
-}
+// Relation represents an issue-to-issue relation.
+type Relation = models.Relation
 
 type RelationCreateRequest = models.RelationCreate
 
-type RelationListResponse struct {
-	Relations []Relation `json:"relations"`
-}
+// RelationListResponse is the response from listing relations.
+type RelationListResponse = models.RelationList
 
 func (c *Client) CreateRelation(ctx context.Context, req RelationCreateRequest) (*Relation, error) {
 	var result struct {

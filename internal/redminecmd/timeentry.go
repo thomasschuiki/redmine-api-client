@@ -87,6 +87,13 @@ project (--project). Optionally specify an activity type and comment.`,
 					if err != nil {
 						return err
 					}
+					if c.String("project") != "" && !c.IsSet("issue") {
+						project, err := cl.ResolveProject(ctx, c.String("project"))
+						if err != nil {
+							return err
+						}
+						req.TimeEntry.ProjectID = &project.ID
+					}
 					entry, err := cl.CreateTimeEntry(ctx, req)
 					if err != nil {
 						return err

@@ -3,29 +3,15 @@ package client
 import (
 	"context"
 	"fmt"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // User represents a Redmine user.
-type User struct {
-	Login        string        `json:"login"`
-	FirstName    string        `json:"firstname"`
-	LastName     string        `json:"lastname"`
-	Email        string        `json:"mail"`
-	CreatedOn    string        `json:"created_on,omitempty"`
-	UpdatedOn    string        `json:"updated_on,omitempty"`
-	LastLoginOn  string        `json:"last_login_on,omitempty"`
-	CustomFields []CustomField `json:"custom_fields,omitempty"`
-	ID           int           `json:"id"`
-	Status       int           `json:"status"`
-}
+type User = models.User
 
 // UserListResponse is the response from listing users.
-type UserListResponse struct {
-	Users      []User `json:"users"`
-	TotalCount int    `json:"total_count"`
-	Offset     int    `json:"offset"`
-	Limit      int    `json:"limit"`
-}
+type UserListResponse = models.UserList
 
 // ListUsers returns all users.
 func (c *Client) ListUsers(ctx context.Context, opts ListOpts) (*UserListResponse, error) {

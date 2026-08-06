@@ -12,73 +12,25 @@ import (
 )
 
 // Issue represents a Redmine issue.
-type Issue struct {
-	Parent       *IssueRef     `json:"parent,omitempty"`
-	Project      *IDName       `json:"project,omitempty"`
-	Tracker      *IDName       `json:"tracker,omitempty"`
-	Status       *IDName       `json:"status,omitempty"`
-	Priority     *IDName       `json:"priority,omitempty"`
-	Author       *IDName       `json:"author,omitempty"`
-	AssignedTo   *IDName       `json:"assigned_to,omitempty"`
-	StartDate    string        `json:"start_date,omitempty"`
-	Subject      string        `json:"subject"`
-	Description  string        `json:"description,omitempty"`
-	DueDate      string        `json:"due_date,omitempty"`
-	CreatedOn    string        `json:"created_on,omitempty"`
-	UpdatedOn    string        `json:"updated_on,omitempty"`
-	ClosedOn     string        `json:"closed_on,omitempty"`
-	CustomFields []CustomField `json:"custom_fields,omitempty"`
-	Journals     []Journal     `json:"journals,omitempty"`
-	Relations    []Relation    `json:"relations,omitempty"`
-	ID           int           `json:"id"`
-	DoneRatio    int           `json:"done_ratio"`
-	IsPrivate    bool          `json:"is_private"`
-}
+type Issue = models.Issue
 
 // IssueRef is a lightweight reference to another issue.
-type IssueRef struct {
-	ID int `json:"id"`
-}
+type IssueRef = models.IssueRef
 
 // Journal represents a journal (comment/change history) entry on an issue.
-type Journal struct {
-	User         *IDName         `json:"user,omitempty"`
-	Notes        string          `json:"notes,omitempty"`
-	CreatedOn    string          `json:"created_on,omitempty"`
-	Details      []JournalDetail `json:"details,omitempty"`
-	ID           int             `json:"id"`
-	PrivateNotes bool            `json:"private_notes,omitempty"`
-}
+type Journal = models.Journal
 
 // JournalDetail represents a single field change within a journal entry.
-type JournalDetail struct {
-	Property string `json:"property,omitempty"`
-	Name     string `json:"name,omitempty"`
-	OldValue string `json:"old_value,omitempty"`
-	NewValue string `json:"new_value,omitempty"`
-}
+type JournalDetail = models.JournalDetail
 
 // IDName is a generic reference to a named object.
-type IDName struct {
-	Name string `json:"name"`
-	ID   int    `json:"id"`
-}
+type IDName = models.IDName
 
 // CustomField represents a custom field value.
-type CustomField struct {
-	Value    any    `json:"value,omitempty"`
-	Name     string `json:"name"`
-	ID       int    `json:"id"`
-	Multiple bool   `json:"multiple,omitempty"`
-}
+type CustomField = models.CustomField
 
 // IssueListResponse is the response from listing issues.
-type IssueListResponse struct {
-	Issues     []Issue `json:"issues"`
-	TotalCount int     `json:"total_count"`
-	Offset     int     `json:"offset"`
-	Limit      int     `json:"limit"`
-}
+type IssueListResponse = models.IssueList
 
 // IssueCreateRequest is the request body for creating an issue.
 type IssueCreateRequest = models.IssueCreate
@@ -219,15 +171,18 @@ func (c *Client) ListAllIssues(ctx context.Context, projectID string, opts Issue
 		if err != nil {
 			return nil, err
 		}
-		total = resp.TotalCount
+		total = 0
+		if resp.TotalCount != nil {
+			total = *resp.TotalCount
+		}
 		all = append(all, resp.Issues...)
-		if len(resp.Issues) < listPageSize || offset+listPageSize >= resp.TotalCount {
+		if len(resp.Issues) < listPageSize || offset+listPageSize >= total {
 			break
 		}
 		offset += listPageSize
 	}
 
-	return &IssueListResponse{Issues: all, TotalCount: total}, nil
+	return &IssueListResponse{Issues: all, TotalCount: &total}, nil
 }
 
 // ContainsFilter returns issues where any text field contains the given
@@ -246,10 +201,12 @@ func ContainsFilter(issues []Issue, text string, caseInsensitive bool) []Issue {
 func containsIssue(issue *Issue, lower string, caseInsensitive bool) bool {
 	fields := []string{
 		issue.Subject,
-		issue.Description,
 		issue.Status.Name,
 		issue.Tracker.Name,
 		issue.Author.Name,
+	}
+	if issue.Description != nil {
+		fields = append(fields, *issue.Description)
 	}
 	if issue.AssignedTo != nil {
 		fields = append(fields, issue.AssignedTo.Name)
@@ -290,10 +247,12 @@ func RegexFilter(issues []Issue, pattern string, caseInsensitive bool) ([]Issue,
 func regexMatchIssue(issue *Issue, re *regexp.Regexp) bool {
 	fields := []string{
 		issue.Subject,
-		issue.Description,
 		issue.Status.Name,
 		issue.Tracker.Name,
 		issue.Author.Name,
+	}
+	if issue.Description != nil {
+		fields = append(fields, *issue.Description)
 	}
 	if issue.AssignedTo != nil {
 		fields = append(fields, issue.AssignedTo.Name)
@@ -421,15 +380,15 @@ func (c *Client) GrepIssues(ctx context.Context, opts GrepOpts) (*GrepResult, er
 			issue := &resp.Issues[i]
 			totalScanned++
 
-			if searchDesc {
-				if hits := searchField(issue.Description, "description", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
+			if searchDesc && issue.Description != nil {
+				if hits := searchField(*issue.Description, "description", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
 					allMatches = append(allMatches, hits...)
 				}
 			}
 			if searchNotes {
 				for _, j := range issue.Journals {
-					if j.Notes != "" {
-						if hits := searchField(j.Notes, "note", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
+					if j.Notes != nil && *j.Notes != "" {
+						if hits := searchField(*j.Notes, "note", issue.ID, issue.Subject, opts.Text); len(hits) > 0 {
 							allMatches = append(allMatches, hits...)
 						}
 					}
@@ -437,7 +396,7 @@ func (c *Client) GrepIssues(ctx context.Context, opts GrepOpts) (*GrepResult, er
 			}
 		}
 
-		if len(resp.Issues) < listPageSize || offset+listPageSize >= resp.TotalCount {
+		if len(resp.Issues) < listPageSize || (resp.TotalCount != nil && offset+listPageSize >= *resp.TotalCount) {
 			break
 		}
 		offset += listPageSize

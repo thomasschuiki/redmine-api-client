@@ -25,22 +25,22 @@ Use the ID with --status-id when listing or filtering issues.`,
 Output shows ID, name, and whether the status is a closed state.
 Use --output json for machine-parseable output.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				resp, err := cl.ListIssueStatuses(ctx)
-				if err != nil {
-					return err
-				}
-				if c.String("output") == "json" {
-					if err := output.Print(resp, "json"); err != nil {
+					cl, err := newClient(c)
+					if err != nil {
 						return err
 					}
+					resp, err := cl.ListIssueStatuses(ctx)
+					if err != nil {
+						return err
+					}
+					if c.String("output") == "json" {
+						if err := output.Print(resp, "json"); err != nil {
+							return err
+						}
 					} else {
 						for _, s := range resp.IssueStatuses {
 							closed := ""
-							if s.IsClosed {
+							if s.IsClosed != nil && *s.IsClosed {
 								closed = " (closed)"
 							}
 							fmt.Printf("% 4d  %s%s\n", s.ID, s.Name, closed)

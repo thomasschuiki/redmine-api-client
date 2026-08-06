@@ -10,25 +10,10 @@ import (
 )
 
 // Project represents a Redmine project.
-type Project struct {
-	Name         string        `json:"name"`
-	Identifier   string        `json:"identifier"`
-	Description  string        `json:"description,omitempty"`
-	CreatedOn    string        `json:"created_on,omitempty"`
-	UpdatedOn    string        `json:"updated_on,omitempty"`
-	CustomFields []CustomField `json:"custom_fields,omitempty"`
-	ID           int           `json:"id"`
-	Status       int           `json:"status"`
-	IsPublic     bool          `json:"is_public"`
-}
+type Project = models.Project
 
 // ProjectListResponse is the response from listing projects.
-type ProjectListResponse struct {
-	Projects   []Project `json:"projects"`
-	TotalCount int       `json:"total_count"`
-	Offset     int       `json:"offset"`
-	Limit      int       `json:"limit"`
-}
+type ProjectListResponse = models.ProjectList
 
 // ProjectCreateRequest is the request body for creating a project.
 type ProjectCreateRequest = models.ProjectCreate
