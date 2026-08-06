@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 type RelationType string
@@ -28,14 +30,7 @@ type Relation struct {
 	IssueToID    int          `json:"issue_to_id"`
 }
 
-type RelationCreateRequest struct {
-	Relation struct {
-		Delay        *int         `json:"delay,omitempty"`
-		RelationType RelationType `json:"relation_type"`
-		IssueID      int          `json:"issue_id"`
-		IssueToID    int          `json:"issue_to_id"`
-	} `json:"relation"`
-}
+type RelationCreateRequest = models.RelationCreate
 
 type RelationListResponse struct {
 	Relations []Relation `json:"relations"`

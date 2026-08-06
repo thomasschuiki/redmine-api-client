@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+func strPtr(s string) *string { return &s }
+
+func valOrEmpty(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
+}
+
 func TestParseCustomField(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -36,8 +45,8 @@ func TestParseCustomField(t *testing.T) {
 			if got.ID != tt.wantID {
 				t.Errorf("ParseCustomField(%q).ID = %d, want %d", tt.input, got.ID, tt.wantID)
 			}
-			if got.Value != tt.wantVal {
-				t.Errorf("ParseCustomField(%q).Value = %q, want %q", tt.input, got.Value, tt.wantVal)
+			if valOrEmpty(got.Value) != tt.wantVal {
+				t.Errorf("ParseCustomField(%q).Value = %q, want %q", tt.input, valOrEmpty(got.Value), tt.wantVal)
 			}
 			if len(got.Values) != 1 || got.Values[0] != tt.wantVal {
 				t.Errorf("ParseCustomField(%q).Values = %v, want [%q]", tt.input, got.Values, tt.wantVal)
@@ -60,33 +69,33 @@ func TestMergeCustomFields(t *testing.T) {
 		{
 			name: "single field",
 			input: []CustomFieldValue{
-				{ID: 1, Value: "a"},
+				{ID: 1, Value: strPtr("a")},
 			},
 			output: []CustomFieldValue{
-				{ID: 1, Value: "a"},
+				{ID: 1, Value: strPtr("a")},
 			},
 		},
 		{
 			name: "multiple distinct fields",
 			input: []CustomFieldValue{
-				{ID: 1, Value: "a"},
-				{ID: 2, Value: "b"},
+				{ID: 1, Value: strPtr("a")},
+				{ID: 2, Value: strPtr("b")},
 			},
 			output: []CustomFieldValue{
-				{ID: 1, Value: "a"},
-				{ID: 2, Value: "b"},
+				{ID: 1, Value: strPtr("a")},
+				{ID: 2, Value: strPtr("b")},
 			},
 		},
 		{
 			name: "duplicate ids become multi-value",
 			input: []CustomFieldValue{
-				{ID: 1, Value: "x"},
-				{ID: 1, Value: "y"},
-				{ID: 2, Value: "z"},
+				{ID: 1, Value: strPtr("x")},
+				{ID: 1, Value: strPtr("y")},
+				{ID: 2, Value: strPtr("z")},
 			},
 			output: []CustomFieldValue{
 				{ID: 1, Values: []string{"x", "y"}},
-				{ID: 2, Value: "z"},
+				{ID: 2, Value: strPtr("z")},
 			},
 		},
 	}
@@ -100,8 +109,8 @@ func TestMergeCustomFields(t *testing.T) {
 				if got[i].ID != tt.output[i].ID {
 					t.Errorf("[%d].ID = %d, want %d", i, got[i].ID, tt.output[i].ID)
 				}
-				if got[i].Value != tt.output[i].Value {
-					t.Errorf("[%d].Value = %q, want %q", i, got[i].Value, tt.output[i].Value)
+				if valOrEmpty(got[i].Value) != valOrEmpty(tt.output[i].Value) {
+					t.Errorf("[%d].Value = %q, want %q", i, valOrEmpty(got[i].Value), valOrEmpty(tt.output[i].Value))
 				}
 				if len(got[i].Values) != len(tt.output[i].Values) {
 					t.Errorf("[%d].Values len = %d, want %d", i, len(got[i].Values), len(tt.output[i].Values))
@@ -118,10 +127,10 @@ func TestContainsFilter(t *testing.T) {
 	}
 
 	tests := []struct {
-		name           string
-		text           string
+		name            string
+		text            string
 		caseInsensitive bool
-		want           int
+		want            int
 	}{
 		{"substring match", "login", true, 1},
 		{"case insensitive", "LOGIN", true, 1},
@@ -148,11 +157,11 @@ func TestRegexFilter(t *testing.T) {
 	}
 
 	tests := []struct {
-		name           string
-		pattern        string
+		name            string
+		pattern         string
 		caseInsensitive bool
-		want           int
-		wantErr        bool
+		want            int
+		wantErr         bool
 	}{
 		{"regex match", `#\d+`, true, 1, false},
 		{"regex no match", `INVALID\d+`, true, 0, false},

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // TimeEntry represents a Redmine time entry.
@@ -28,15 +30,7 @@ type TimeEntryListResponse struct {
 }
 
 // TimeEntryCreateRequest is the request body for creating a time entry.
-type TimeEntryCreateRequest struct {
-	TimeEntry struct {
-		IssueID    *int    `json:"issue_id,omitempty"`
-		ProjectID  *int    `json:"project_id,omitempty"`
-		ActivityID *int    `json:"activity_id,omitempty"`
-		Comments   string  `json:"comments,omitempty"`
-		Hours      float64 `json:"hours"`
-	} `json:"time_entry"`
-}
+type TimeEntryCreateRequest = models.TimeEntryCreate
 
 // ListTimeEntries returns time entries, optionally filtered by project or issue.
 func (c *Client) ListTimeEntries(ctx context.Context, projectID string, issueID int, opts ListOpts) (*TimeEntryListResponse, error) {

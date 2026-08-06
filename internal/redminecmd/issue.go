@@ -90,17 +90,17 @@ Output options:
 					opts.Offset = c.Int("offset")
 					opts.Limit = c.Int("limit")
 
-	var resp *client.IssueListResponse
-	var err error
-	cl, err := newClient(c)
-	if err != nil {
-		return err
-	}
-	if c.Bool("all") {
-		resp, err = cl.ListAllIssues(ctx, c.String("project"), opts)
-	} else {
-		resp, err = cl.ListIssues(ctx, c.String("project"), opts)
-	}
+					var resp *client.IssueListResponse
+					var err error
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					if c.Bool("all") {
+						resp, err = cl.ListAllIssues(ctx, c.String("project"), opts)
+					} else {
+						resp, err = cl.ListIssues(ctx, c.String("project"), opts)
+					}
 					if err != nil {
 						return err
 					}
@@ -129,13 +129,13 @@ Output options:
 
 					if fields := c.String("fields"); fields != "" {
 						fieldList := strings.Split(fields, ",")
-					if err := output.Print(output.FilterFields(result, fieldList), c.String("output")); err != nil {
-						return err
-					}
-				} else {
-					if err := output.Print(result, c.String("output")); err != nil {
-						return err
-					}
+						if err := output.Print(output.FilterFields(result, fieldList), c.String("output")); err != nil {
+							return err
+						}
+					} else {
+						if err := output.Print(result, c.String("output")); err != nil {
+							return err
+						}
 					}
 					return nil
 				},
@@ -163,23 +163,23 @@ Examples:
 					if err != nil {
 						return fmt.Errorf("invalid issue ID: %w", err)
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				issue, err := cl.GetIssue(ctx, id, c.String("include"))
-				if err != nil {
-					return err
-				}
-				if fields := c.String("fields"); fields != "" {
-					fieldList := strings.Split(fields, ",")
-					if err := output.Print(output.FilterFields(issue, fieldList), c.String("output")); err != nil {
+					cl, err := newClient(c)
+					if err != nil {
 						return err
 					}
-				} else {
-					if err := output.Print(issue, c.String("output")); err != nil {
+					issue, err := cl.GetIssue(ctx, id, c.String("include"))
+					if err != nil {
 						return err
 					}
+					if fields := c.String("fields"); fields != "" {
+						fieldList := strings.Split(fields, ",")
+						if err := output.Print(output.FilterFields(issue, fieldList), c.String("output")); err != nil {
+							return err
+						}
+					} else {
+						if err := output.Print(issue, c.String("output")); err != nil {
+							return err
+						}
 					}
 					return nil
 				},
@@ -219,19 +219,19 @@ Examples:
 						TrackerID:    c.Int("tracker-id"),
 						AssignedToID: c.Int("assigned-to-id"),
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				result, err := cl.GrepIssues(ctx, opts)
-				if err != nil {
-					return err
-				}
-				format := c.String("output")
-				if format == "json" {
-					if err := output.Print(result, "json"); err != nil {
+					cl, err := newClient(c)
+					if err != nil {
 						return err
 					}
+					result, err := cl.GrepIssues(ctx, opts)
+					if err != nil {
+						return err
+					}
+					format := c.String("output")
+					if format == "json" {
+						if err := output.Print(result, "json"); err != nil {
+							return err
+						}
 					} else {
 						for _, m := range result.Matches {
 							fmt.Printf("#%d | %s | %s | %s\n", m.IssueID, m.Subject, m.Where, m.Snippet)
@@ -287,9 +287,11 @@ Examples:
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					var req client.IssueCreateRequest
-					req.Issue.ProjectID = 0 // will be set below
+					zero := 0
+					req.Issue.ProjectID = &zero // will be set below
 					req.Issue.Subject = c.String("subject")
-					req.Issue.Description = c.String("description")
+					desc := c.String("description")
+					req.Issue.Description = &desc
 
 					if c.IsSet("parent-id") {
 						v := c.Int("parent-id")
@@ -316,14 +318,14 @@ Examples:
 						if err := client.ValidateDate(v); err != nil {
 							return err
 						}
-						req.Issue.StartDate = v
+						req.Issue.StartDate = &v
 					}
 					if c.IsSet("due-date") {
 						v := c.String("due-date")
 						if err := client.ValidateDate(v); err != nil {
 							return err
 						}
-						req.Issue.DueDate = v
+						req.Issue.DueDate = &v
 					}
 					if c.IsSet("estimated-hours") {
 						v := c.Float("estimated-hours")
@@ -345,7 +347,7 @@ Examples:
 						if err != nil {
 							return err
 						}
-						req.Issue.WatcherUserIDs = ids
+						req.Issue.WatcherUserIds = ids
 					}
 					if c.IsSet("custom-field") {
 						fields, err := parseCustomFields(c.StringSlice("custom-field"))
@@ -355,17 +357,17 @@ Examples:
 						req.Issue.CustomFields = client.MergeCustomFields(fields)
 					}
 
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				issue, err := cl.CreateIssue(ctx, req)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(issue, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					issue, err := cl.CreateIssue(ctx, req)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(issue, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -483,17 +485,17 @@ Examples:
 						req.Issue.CustomFields = client.MergeCustomFields(fields)
 					}
 					if notes := c.String("notes"); notes != "" {
-						req.Issue.Notes = notes
+						req.Issue.Notes = &notes
 					} else if c.IsSet("notes") {
 						return fmt.Errorf("--notes requires non-empty text")
 					}
 
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
 
-				if err := cl.UpdateIssue(ctx, id, req); err != nil {
+					if err := cl.UpdateIssue(ctx, id, req); err != nil {
 						return err
 					}
 
@@ -536,13 +538,13 @@ This action cannot be undone.`,
 					if err != nil {
 						return fmt.Errorf("invalid issue ID: %w", err)
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				if err := cl.DeleteIssue(ctx, id); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					if err := cl.DeleteIssue(ctx, id); err != nil {
+						return err
+					}
 					fmt.Fprintf(os.Stdout, "Issue %d deleted\n", id)
 					return nil
 				},
@@ -605,9 +607,9 @@ Examples:
 							}
 
 							var req client.RelationCreateRequest
-							req.Relation.IssueID = fromID
+							req.Relation.IssueID = &fromID
 							req.Relation.IssueToID = toID
-							req.Relation.RelationType = rt
+							req.Relation.RelationType = string(rt)
 							if c.IsSet("delay") {
 								v := c.Int("delay")
 								req.Relation.Delay = &v

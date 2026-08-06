@@ -31,19 +31,19 @@ By default, returns up to 25 results.`,
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				resp, err := cl.ListProjects(ctx,
-					client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
-				)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(resp, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					resp, err := cl.ListProjects(ctx,
+						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
+					)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(resp, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -60,17 +60,17 @@ If the exact identifier is not found, close matches are suggested.`,
 					if identifier == "" {
 						return fmt.Errorf("project identifier is required")
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				project, err := cl.ResolveProject(ctx, identifier)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(project, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					project, err := cl.ResolveProject(ctx, identifier)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(project, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -91,19 +91,20 @@ and is used as the URL slug for the project.`,
 					var req client.ProjectCreateRequest
 					req.Project.Name = c.String("name")
 					req.Project.Identifier = c.String("identifier")
-					req.Project.Description = c.String("description")
+					desc := c.String("description")
+					req.Project.Description = &desc
 
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				project, err := cl.CreateProject(ctx, req)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(project, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					project, err := cl.CreateProject(ctx, req)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(project, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -120,13 +121,13 @@ time entries, etc.). This action cannot be undone.`,
 					if identifier == "" {
 						return fmt.Errorf("project identifier is required")
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				if err := cl.DeleteProject(ctx, identifier); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					if err := cl.DeleteProject(ctx, identifier); err != nil {
+						return err
+					}
 					fmt.Fprintf(os.Stdout, "Project %s deleted\n", identifier)
 					return nil
 				},

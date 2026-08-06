@@ -13,4 +13,4 @@ builder = RedmineOpenapiGenerator::SpecBuilder.new(
 
 output_path = ENV.fetch('OUTPUT_PATH', '/output/openapi.yaml')
 File.write(output_path, builder.to_yaml)
-puts ">> #{introspector.routes.length} API routes, #{introspector.models.length} models"
+puts ">> #{introspector.routes.length} API routes, #{RedmineOpenapiGenerator::Contract.components.length} contract components"

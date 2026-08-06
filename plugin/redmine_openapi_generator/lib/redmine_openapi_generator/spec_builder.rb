@@ -1,26 +1,14 @@
 module RedmineOpenapiGenerator
-  class SpecBuilder
-    AR_TO_OPENAPI = {
-      'integer'  => 'integer',
-      'bigint'   => 'integer',
-      'smallint' => 'integer',
-      'float'    => 'number',
-      'decimal'  => 'number',
-      'boolean'  => 'boolean',
-      'datetime' => 'string',
-      'timestamp'=> 'string',
-      'time'     => 'string',
-      'date'     => 'string',
-      'text'     => 'string',
-      'string'   => 'string',
-      'binary'   => 'string',
-      'json'     => 'object',
-      'jsonb'    => 'object',
-    }.freeze
+  require 'json'
+  require 'yaml'
+  require_relative 'introspector'
+  require_relative 'contract'
 
+  class SpecBuilder
     def initialize(introspector, redmine_version: 'unknown')
       @introspector = introspector
       @redmine_version = redmine_version
+      @components = Contract.components
     end
 
     def to_h
@@ -72,6 +60,7 @@ module RedmineOpenapiGenerator
 
       @introspector.routes.each do |route|
         next unless @introspector.api_controllers.key?(route[:controller])
+        next unless contract_resource?(route)
 
         tag = controller_to_tag(route[:controller])
         unless seen[tag]
@@ -83,42 +72,111 @@ module RedmineOpenapiGenerator
       result.sort_by { |t| t['name'] }
     end
 
+    # Only emit routes backed by a contract resource (and thus by schemas).
+    # Routes for non-contract controllers (attachments, groups, roles, news,
+    # memberships, watchers, files, ...) are filtered out so every operation in
+    # the spec carries a schema'd response.
+    REST_ACTIONS = %w[index list show create update destroy delete].freeze
+
+    def contract_resource?(route)
+      return false unless REST_ACTIONS.include?(route[:action])
+
+      normalized = normalize_path(route[:path])
+      if %w[show update destroy delete].include?(route[:action])
+        return false unless normalized =~ /\{\w+\}/ || normalized.end_with?('/current')
+      end
+
+      model = model_name_for(route)
+      model && Contract::RESOURCES.key?(model)
+    end
+
     def paths
       grouped = {}
+      meta = []
 
       @introspector.routes.each do |route|
         next unless @introspector.api_controllers.key?(route[:controller])
+        next unless contract_resource?(route)
 
         method = route[:verb].upcase
-        next if method == 'HEAD' || method == 'OPTIONS'
+        next if %w[HEAD OPTIONS].include?(method)
 
         normalized = normalize_path(route[:path])
         grouped[normalized] ||= {}
         grouped[normalized][method] = route
+        meta << [normalized, method, route]
       end
 
-      grouped.each_with_object({}) do |(path, methods), result|
-        result[path] = methods.each_with_object({}) do |(method, route), ops|
-          ops[method.downcase] = build_operation(route, path)
+      counts = Hash.new(0)
+      meta.each { |path, method, route| counts[operation_id(route, path)] += 1 }
+
+      used_ids = {}
+      path_ops = grouped.each_with_object({}) do |(path, methods), result|
+        ops = {}
+        methods.each do |method, route|
+          base = operation_id(route, path)
+          id = base
+          if counts[base] > 1
+            refined = refined_operation_id(route, path)
+            id = refined if refined && !used_ids[refined]
+          end
+          id = disambiguate(id, used_ids) if used_ids[id]
+          used_ids[id] = true
+          ops[method.downcase] = build_operation(route, path, id)
         end
+        result[path] = ops
       end
+      path_ops
     end
 
-    def build_operation(route, path)
+    # A nicer operationId for colliding routes, when the path shape suggests one.
+    #   /projects/{id}/roadmap          -> getProjectRoadmap
+    #   /users/current                  -> getCurrentUser
+    # Returns nil when no clean name applies (caller falls back to a numeric suffix).
+    def refined_operation_id(route, path)
+      verb = verb_for(route[:action])
+      ctrl = route[:controller].split('/').last
+      segments = path.split('/').reject(&:empty?)
+      last = segments.last
+
+      if %w[index list].include?(route[:action]) && last && !last.start_with?('{') && last != 'index' && last != ctrl
+        scopes = parent_scopes(path, route)
+        return "#{verb}#{scopes.map(&:capitalize).join + capitalize(last)}"
+      end
+
+      if route[:action] == 'show' && last == 'current'
+        scopes = parent_scopes(path, route)
+        return "#{verb}#{scopes.map(&:capitalize).join + 'Current' + resource_noun(route)}"
+      end
+
+      nil
+    end
+
+    def disambiguate(id, used_ids)
+      candidate = id
+      n = 2
+      while used_ids[candidate]
+        candidate = "#{id}#{n}"
+        n += 1
+      end
+      candidate
+    end
+
+    def build_operation(route, path, op_id)
       tag = controller_to_tag(route[:controller])
-      model_name = Introspector::CONTROLLER_MODEL_MAP[route[:controller]]
+      model_name = model_name_for(route)
 
       op = {
         'tags' => [tag],
         'summary' => operation_summary(route),
-        'operationId' => operation_id(route)
+        'operationId' => op_id
       }
 
       params = build_parameters(path, route)
       op['parameters'] = params unless params.empty?
 
       if %w[POST PUT PATCH].include?(route[:verb].upcase) && model_name
-        op['requestBody'] = build_request_body(model_name)
+        op['requestBody'] = build_request_body(model_name) if @components.key?("#{model_name}Create")
       end
 
       op['responses'] = build_responses(route)
@@ -133,16 +191,29 @@ module RedmineOpenapiGenerator
           'name' => name,
           'in' => 'path',
           'required' => true,
-          'schema' => { 'type' => 'integer' }
+          'schema' => { 'type' => path_param_type(name, route) }
         }
       end
 
-      if route[:action] == 'index' || route[:action] == 'list'
-        params << { 'name' => 'offset', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
-        params << { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+      if %w[index list].include?(route[:action])
+        params << { 'name' => 'offset', 'in' => 'query', 'schema' => { 'type' => 'integer', 'minimum' => 0 } }
+        params << { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer', 'minimum' => 1 } }
       end
 
       params
+    end
+
+    # Path parameters address the resource by contract 'path_key'. Resources keyed
+    # by a string handle (projects by identifier, wiki pages by title) take string
+    # params. Id-style params (id, project_id, issue_id, ...) are integers; any
+    # other param (a type name, a version, a filename) is a string.
+    def path_param_type(name, route)
+      model = model_name_for(route)
+      key = model && Contract::RESOURCES[model]&.fetch('path_key', 'id')
+      return 'string' if %w[identifier title].include?(key)
+      return 'integer' if name =~ /(?:^|_)id$/
+
+      'string'
     end
 
     def build_request_body(model_name)
@@ -150,41 +221,81 @@ module RedmineOpenapiGenerator
         'required' => true,
         'content' => {
           'application/json' => {
-            'schema' => { '$ref' => "#/components/schemas/#{model_name}" }
+            'schema' => { '$ref' => "#/components/schemas/#{model_name}Create" }
           }
         }
       }
     end
 
     def build_responses(route)
+      model = model_name_for(route)
       status = case route[:verb].upcase
                when 'POST' then '201'
                when 'DELETE' then '204'
                else '200'
                end
 
-      {
-        status => { 'description' => 'Success' },
-        '401' => { '$ref' => '#/components/responses/Unauthorized' },
-        '403' => { '$ref' => '#/components/responses/Forbidden' },
-        '412' => { '$ref' => '#/components/responses/PreconditionFailed' }
-      }
+      response = { 'description' => success_description(route) }
+      schema_name = response_schema(model, route[:action])
+      if schema_name && @components.key?(schema_name)
+        response['content'] = {
+          'application/json' => { 'schema' => { '$ref' => "#/components/schemas/#{schema_name}" } }
+        }
+      end
+
+      result = { status => response }
+      result['401'] = { '$ref' => '#/components/responses/Unauthorized' }
+      result['403'] = { '$ref' => '#/components/responses/Forbidden' }
+      result['412'] = { '$ref' => '#/components/responses/PreconditionFailed' }
+      if %w[show update edit destroy delete].include?(route[:action])
+        result['404'] = { '$ref' => '#/components/responses/NotFound' }
+      end
+      if %w[create update edit].include?(route[:action])
+        result['422'] = { '$ref' => '#/components/responses/UnprocessableEntity' }
+      end
+      result
+    end
+
+    def success_description(route)
+      case route[:verb].upcase
+      when 'POST' then 'Created'
+      when 'DELETE' then 'Deleted'
+      else 'Success'
+      end
+    end
+
+    # The response schema for an action: a {Name}Single wrapper for object
+    # endpoints, a {Name}List wrapper for collection endpoints.
+    def response_schema(model, action)
+      case action
+      when 'index', 'list' then "#{model}List" if model
+      when 'show', 'create', 'update', 'edit' then "#{model}Single" if model
+      else nil
+      end
+    end
+
+    def model_name_for(route)
+      Introspector::CONTROLLER_MODEL_MAP[route[:controller]]
     end
 
     def schemas
-      @introspector.models.each_with_object({}) do |(model_name, columns), result|
-        props = columns.each_with_object({}) do |col, h|
-          next if col[:name] == 'id' || col[:name] == 'created_on' || col[:name] == 'updated_on' || col[:name] == 'type'
+      resolve_refs(@components)
+    end
 
-          prop = { 'type' => AR_TO_OPENAPI[col[:type]] || 'string' }
-          prop['default'] = col[:default] if col[:default] && !col[:default].empty?
-          h[col[:name]] = prop
+    def resolve_refs(value)
+      case value
+      when Hash
+        if value.key?('$ref') && value['$ref'].is_a?(String) && !value['$ref'].start_with?('#')
+          { '$ref' => "#/components/schemas/#{value['$ref']}" }
+        else
+          value.each_with_object({}) do |(k, v), h|
+            h[k] = resolve_refs(v)
+          end
         end
-
-        result[model_name] = {
-          'type' => 'object',
-          'properties' => props
-        }
+      when Array
+        value.map { |v| resolve_refs(v) }
+      else
+        value
       end
     end
 
@@ -192,15 +303,23 @@ module RedmineOpenapiGenerator
       {
         'Unauthorized' => {
           'description' => 'Authentication required',
-          'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } }
+          'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Error' } } }
         },
         'Forbidden' => {
           'description' => 'Forbidden',
-          'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } }
+          'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Error' } } }
         },
         'PreconditionFailed' => {
           'description' => 'Precondition Failed',
-          'content' => { 'application/json' => { 'schema' => { 'type' => 'object' } } }
+          'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Error' } } }
+        },
+        'NotFound' => {
+          'description' => 'Resource not found',
+          'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Error' } } }
+        },
+        'UnprocessableEntity' => {
+          'description' => 'Validation failed',
+          'content' => { 'application/json' => { 'schema' => { '$ref' => '#/components/schemas/Error' } } }
         }
       }
     end
@@ -239,11 +358,9 @@ module RedmineOpenapiGenerator
 
     def normalize_path(path)
       p = path.gsub(/\{(\w+):[^}]+\}/, '{\1}')
+      p = p.gsub(/\(\.?:?format\)/, '')
+      p = p.sub(/\.:?format$/, '')
       p = p.gsub(/:(\w+)/, '{\1}')
-      p = p.gsub('(:format)', '')
-      p = p.gsub('(.:format)', '')
-      p = p.gsub('.{format}', '')
-      p = p.gsub(/\(\.{format}\)/, '')
       p = p.squeeze('/')
       p = '/' if p.empty?
       p
@@ -253,18 +370,74 @@ module RedmineOpenapiGenerator
       controller.split('/').last.split('_').map(&:capitalize).join(' ')
     end
 
-    def operation_id(route)
-      ctrl = route[:controller].split('/').last
-      action = route[:action]
-      singular = singularize(ctrl)
+    # Deterministic operationId: verb + optional parent scopes + resource noun.
+    # Nested routes (e.g. /projects/{project_id}/issues) get a scope prefix
+    # ("getProjectIssues"); parent scopes that are already implied by the noun
+    # (e.g. "issue" + IssueRelation) are dropped. Collisions are de-duplicated
+    # with a numeric suffix in #paths.
+    def operation_id(route, path)
+      verb = verb_for(route[:action])
+      noun = resource_noun(route)
+      scopes = parent_scopes(path, route)
+      "#{verb}#{scopes.map(&:capitalize).join + noun}"
+    end
 
+    def verb_for(action)
       case action
-      when 'index', 'list' then "get#{capitalize(pluralize(ctrl))}"
-      when 'show' then "get#{capitalize(singular)}"
-      when 'create' then "create#{capitalize(singular)}"
-      when 'update', 'edit' then "update#{capitalize(singular)}"
-      when 'destroy', 'delete' then "delete#{capitalize(singular)}"
-      else "#{action}#{capitalize(singular)}"
+      when 'index', 'list' then 'get'
+      when 'show' then 'get'
+      when 'create' then 'create'
+      when 'update', 'edit' then 'update'
+      when 'destroy', 'delete' then 'delete'
+      else action
+      end
+    end
+
+    def resource_noun(route)
+      model = model_name_for(route)
+      if model
+        return pluralize_model(model) if %w[index list].include?(route[:action])
+
+        return model
+      end
+
+      ctrl = route[:controller].split('/').last
+      %w[index list].include?(route[:action]) ? pluralize(ctrl) : singularize(ctrl)
+    end
+
+    # Parent resource scopes derived from path parameters, e.g. /projects/{id}/issues
+    # yields ["project"]. The resource's own trailing parameter (show/update/delete)
+    # is excluded.
+    def parent_scopes(path, route)
+      segments = path.split('/').reject(&:empty?)
+      noun = resource_noun(route).downcase
+      scopes = []
+
+      segments.each_with_index do |seg, i|
+        next unless seg =~ /\A\{(\w+)\}\z/
+        next unless i.positive? && !segments[i - 1].start_with?('{')
+
+        scope = singularize(segments[i - 1]).downcase
+        next if noun.start_with?(scope)
+
+        scopes << scope
+      end
+
+      scopes.pop if %w[show update edit destroy delete].include?(route[:action]) && scopes.any?
+      scopes
+    end
+
+    def pluralize_model(model)
+      case model
+      when 'TimeEntry' then 'TimeEntries'
+      when 'IssueCategory' then 'IssueCategories'
+      when 'IssuePriority' then 'IssuePriorities'
+      when 'IssueRelation' then 'IssueRelations'
+      when 'IssueStatus' then 'IssueStatuses'
+      when 'WikiPage' then 'WikiPages'
+      when 'CustomField' then 'CustomFields'
+      when 'News' then 'News'
+      else "#{model}s"
       end
     end
 

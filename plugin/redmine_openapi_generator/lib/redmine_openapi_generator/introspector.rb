@@ -1,6 +1,6 @@
 module RedmineOpenapiGenerator
   class Introspector
-    attr_reader :routes, :api_controllers, :models
+    attr_reader :routes, :api_controllers
 
     CONTROLLER_MODEL_MAP = {
       'issues'            => 'Issue',
@@ -9,7 +9,7 @@ module RedmineOpenapiGenerator
       'members'           => 'Member',
       'versions'          => 'Version',
       'news'              => 'News',
-      'issue_relations'   => 'IssueRelation',
+      'issue_relations'   => 'Relation',
       'issue_statuses'    => 'IssueStatus',
       'trackers'          => 'Tracker',
       'issue_categories'  => 'IssueCategory',
@@ -25,13 +25,15 @@ module RedmineOpenapiGenerator
       'journals'          => 'Journal',
       'watchers'          => 'Watcher',
       'files'             => 'Attachment',
+      'wiki'              => 'WikiPage',
+      'timelog'           => 'TimeEntry',
+      'wiki_pages'        => 'WikiPage',
     }.freeze
 
     def initialize
       Rails.application.eager_load!
       @routes = collect_api_routes
       @api_controllers = collect_api_controllers
-      @models = collect_models
     end
 
     private
@@ -78,36 +80,6 @@ module RedmineOpenapiGenerator
       end
 
       controllers
-    end
-
-    def collect_models
-      models = {}
-
-      CONTROLLER_MODEL_MAP.each do |controller, model_name|
-        begin
-          klass = model_name.constantize
-          next unless klass < ActiveRecord::Base
-
-          # Skip if the table doesn't exist (graceful fallback)
-          next unless ActiveRecord::Base.connection.table_exists?(klass.table_name)
-
-          models[model_name] = klass.columns.map do |col|
-            {
-              name: col.name,
-              type: col.type.to_s,
-              null: col.null,
-              default: col.default&.to_s,
-              limit: col.limit,
-              precision: col.precision,
-              scale: col.scale
-            }
-          end
-        rescue NameError, ActiveRecord::StatementInvalid
-          next
-        end
-      end
-
-      models
     end
   end
 end

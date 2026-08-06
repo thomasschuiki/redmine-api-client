@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // Issue represents a Redmine issue.
@@ -79,55 +81,16 @@ type IssueListResponse struct {
 }
 
 // IssueCreateRequest is the request body for creating an issue.
-type IssueCreateRequest struct {
-	Issue struct {
-		PriorityID     *int               `json:"priority_id,omitempty"`
-		TrackerID      *int               `json:"tracker_id,omitempty"`
-		CategoryID     *int               `json:"category_id,omitempty"`
-		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
-		StatusID       *int               `json:"status_id,omitempty"`
-		EstimatedHours *float64           `json:"estimated_hours,omitempty"`
-		ParentID       *int               `json:"parent_id,omitempty"`
-		AssignedToID   *int               `json:"assigned_to_id,omitempty"`
-		Subject        string             `json:"subject"`
-		DueDate        string             `json:"due_date,omitempty"`
-		StartDate      string             `json:"start_date,omitempty"`
-		Description    string             `json:"description,omitempty"`
-		WatcherUserIDs []int              `json:"watcher_user_ids,omitempty"`
-		CustomFields   []CustomFieldValue `json:"custom_fields,omitempty"`
-		ProjectID      int                `json:"project_id"`
-	} `json:"issue"`
-}
+type IssueCreateRequest = models.IssueCreate
 
 // IssueUpdateRequest is the request body for updating an issue.
-type IssueUpdateRequest struct {
-	Issue struct {
-		Subject        *string            `json:"subject,omitempty"`
-		Description    *string            `json:"description,omitempty"`
-		StartDate      *string            `json:"start_date,omitempty"`
-		DueDate        *string            `json:"due_date,omitempty"`
-		EstimatedHours *float64           `json:"estimated_hours,omitempty"`
-		TrackerID      *int               `json:"tracker_id,omitempty"`
-		StatusID       *int               `json:"status_id,omitempty"`
-		PriorityID     *int               `json:"priority_id,omitempty"`
-		AssignedToID   *int               `json:"assigned_to_id,omitempty"`
-		DoneRatio      *int               `json:"done_ratio,omitempty"`
-		FixedVersionID *int               `json:"fixed_version_id,omitempty"`
-		CategoryID     *int               `json:"category_id,omitempty"`
-		Notes          string             `json:"notes,omitempty"`
-		CustomFields   []CustomFieldValue `json:"custom_fields,omitempty"`
-	} `json:"issue"`
-}
+type IssueUpdateRequest = models.IssueUpdateRequest
 
 // CustomFieldValue is a custom field to set.
 // For single-value fields, use Value.
 // For multi-value fields, use Values (the API receives both; Redmine ignores
 // the one that doesn't match the field configuration).
-type CustomFieldValue struct {
-	Value  string   `json:"value,omitempty"`
-	Values []string `json:"values,omitempty"`
-	ID     int      `json:"id"`
-}
+type CustomFieldValue = models.CustomFieldValue
 
 // ParseCustomField parses a "id=value" string into a CustomFieldValue.
 func ParseCustomField(s string) (CustomFieldValue, error) {
@@ -139,7 +102,7 @@ func ParseCustomField(s string) (CustomFieldValue, error) {
 	if err != nil {
 		return CustomFieldValue{}, fmt.Errorf("invalid custom field id %q: %w", idStr, err)
 	}
-	return CustomFieldValue{ID: id, Value: val, Values: []string{val}}, nil
+	return CustomFieldValue{ID: id, Value: &val, Values: []string{val}}, nil
 }
 
 // MergeCustomFields combines a slice of CustomFieldValue into the final form:
@@ -151,13 +114,18 @@ func MergeCustomFields(fields []CustomFieldValue) []CustomFieldValue {
 		if _, ok := groups[f.ID]; !ok {
 			order = append(order, f.ID)
 		}
-		groups[f.ID] = append(groups[f.ID], f.Value)
+		if f.Value != nil {
+			groups[f.ID] = append(groups[f.ID], *f.Value)
+		} else {
+			groups[f.ID] = append(groups[f.ID], f.Values...)
+		}
 	}
 	result := make([]CustomFieldValue, 0, len(order))
 	for _, id := range order {
 		vals := groups[id]
 		if len(vals) == 1 {
-			result = append(result, CustomFieldValue{ID: id, Value: vals[0]})
+			v := vals[0]
+			result = append(result, CustomFieldValue{ID: id, Value: &v})
 		} else {
 			result = append(result, CustomFieldValue{ID: id, Values: vals})
 		}

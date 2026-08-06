@@ -3,7 +3,7 @@ require_relative '../redmine_openapi_generator/spec_builder'
 
 namespace :redmine do
   namespace :openapi do
-    desc 'Generate OpenAPI spec from Redmine routes and models'
+    desc 'Generate OpenAPI spec from Redmine routes and the curated contract'
     task generate: :environment do
       output_dir = ENV.fetch('OUTPUT_DIR', 'public')
       format = ENV.fetch('FORMAT', 'yaml')
@@ -28,7 +28,7 @@ namespace :redmine do
       end
 
       puts ">> Wrote #{output_path}"
-      puts ">> #{introspector.routes.length} routes, #{introspector.models.length} models"
+      puts ">> #{introspector.routes.length} routes, #{RedmineOpenapiGenerator::Contract.components.length} contract components"
     end
   end
 end

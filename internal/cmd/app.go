@@ -27,8 +27,8 @@ func specCommand() *cli.Command {
 	defaultOut := "docs/openapi/openapi.yaml"
 
 	return &cli.Command{
-		Name:  "spec",
-		Usage: "OpenAPI spec operations",
+		Name:        "spec",
+		Usage:       "OpenAPI spec operations",
 		Description: `Validate and inspect the Redmine OpenAPI specification.`,
 		Commands: []*cli.Command{
 			{
@@ -65,6 +65,14 @@ if any structural issues are found.`,
 							fmt.Fprintf(os.Stderr, "  %v\n", e)
 						}
 						return fmt.Errorf("spec validation failed with %d error(s)", len(result.ParseErrors))
+					}
+
+					if len(result.ContentErrors) > 0 {
+						fmt.Fprintf(os.Stderr, "\nContent errors:\n")
+						for _, e := range result.ContentErrors {
+							fmt.Fprintf(os.Stderr, "  %s\n", e)
+						}
+						return fmt.Errorf("spec validation failed with %d content error(s)", len(result.ContentErrors))
 					}
 
 					fmt.Println("\nOK: spec is valid.")

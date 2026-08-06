@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+
+	"github.com/tom-redmine/go-redmine-cli/internal/models"
 )
 
 // Project represents a Redmine project.
@@ -29,14 +31,7 @@ type ProjectListResponse struct {
 }
 
 // ProjectCreateRequest is the request body for creating a project.
-type ProjectCreateRequest struct {
-	Project struct {
-		IsPublic    *bool  `json:"is_public,omitempty"`
-		Name        string `json:"name"`
-		Identifier  string `json:"identifier"`
-		Description string `json:"description,omitempty"`
-	} `json:"project"`
-}
+type ProjectCreateRequest = models.ProjectCreate
 
 // ListProjects returns all projects.
 func (c *Client) ListProjects(ctx context.Context, opts ListOpts) (*ProjectListResponse, error) {

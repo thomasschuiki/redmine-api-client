@@ -35,21 +35,21 @@ Supports pagination with --limit and --offset flags.`,
 					&cli.IntFlag{Name: "offset", Usage: "Result offset", Value: 0},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				resp, err := cl.ListTimeEntries(ctx,
-					c.String("project"),
-					c.Int("issue"),
-					client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
-				)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(resp, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					resp, err := cl.ListTimeEntries(ctx,
+						c.String("project"),
+						c.Int("issue"),
+						client.ListOpts{Offset: c.Int("offset"), Limit: c.Int("limit")},
+					)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(resp, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -71,7 +71,8 @@ project (--project). Optionally specify an activity type and comment.`,
 				Action: func(ctx context.Context, c *cli.Command) error {
 					var req client.TimeEntryCreateRequest
 					req.TimeEntry.Hours = c.Float64("hours")
-					req.TimeEntry.Comments = c.String("comment")
+					comment := c.String("comment")
+					req.TimeEntry.Comments = &comment
 
 					if c.IsSet("issue") {
 						v := c.Int("issue")
@@ -82,17 +83,17 @@ project (--project). Optionally specify an activity type and comment.`,
 						req.TimeEntry.ActivityID = &v
 					}
 
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				entry, err := cl.CreateTimeEntry(ctx, req)
-				if err != nil {
-					return err
-				}
-				if err := output.Print(entry, c.String("output")); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					entry, err := cl.CreateTimeEntry(ctx, req)
+					if err != nil {
+						return err
+					}
+					if err := output.Print(entry, c.String("output")); err != nil {
+						return err
+					}
 					return nil
 				},
 			},
@@ -107,13 +108,13 @@ This action cannot be undone.`,
 					if err != nil {
 						return fmt.Errorf("invalid time entry ID: %w", err)
 					}
-				cl, err := newClient(c)
-				if err != nil {
-					return err
-				}
-				if err := cl.DeleteTimeEntry(ctx, id); err != nil {
-					return err
-				}
+					cl, err := newClient(c)
+					if err != nil {
+						return err
+					}
+					if err := cl.DeleteTimeEntry(ctx, id); err != nil {
+						return err
+					}
 					fmt.Fprintf(os.Stdout, "Time entry %d deleted\n", id)
 					return nil
 				},
