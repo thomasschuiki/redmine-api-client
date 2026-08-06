@@ -41,6 +41,26 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: name
+        in: query
+        schema:
+          type: string
+        description: Search for users by name
+      - name: group_id
+        in: query
+        schema:
+          type: integer
+        description: Filter users by group
+      - name: status
+        in: query
+        schema:
+          type: integer
+        description: User status (1 active, 2 locked, 3 registered; admins only)
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (groups, memberships)
       responses:
         '200':
           description: Success
@@ -201,6 +221,83 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: status_id
+        in: query
+        schema:
+          type: string
+        description: Issue status (open, closed, *, or an id)
+      - name: tracker_id
+        in: query
+        schema:
+          type: integer
+      - name: priority_id
+        in: query
+        schema:
+          type: integer
+      - name: author_id
+        in: query
+        schema:
+          type: integer
+        description: Author id (or me)
+      - name: assigned_to_id
+        in: query
+        schema:
+          type: integer
+        description: Assignee id (or me)
+      - name: subproject_id
+        in: query
+        schema:
+          type: string
+        description: Subproject id or identifier
+      - name: category_id
+        in: query
+        schema:
+          type: integer
+      - name: fixed_version_id
+        in: query
+        schema:
+          type: integer
+      - name: subject
+        in: query
+        schema:
+          type: string
+        description: Search within the subject
+      - name: created_on
+        in: query
+        schema:
+          type: string
+        description: Creation date or comparison (e.g. >=2024-01-01)
+      - name: updated_on
+        in: query
+        schema:
+          type: string
+        description: Update date or comparison
+      - name: start_date
+        in: query
+        schema:
+          type: string
+        description: Start date or comparison
+      - name: due_date
+        in: query
+        schema:
+          type: string
+        description: Due date or comparison
+      - name: done_ratio
+        in: query
+        schema:
+          type: integer
+        description: Done ratio or comparison
+      - name: sort
+        in: query
+        schema:
+          type: string
+        description: Sort attributes (comma-separated, e.g. priority:desc)
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (journals, relations, attachments,
+          watchers)
       responses:
         '200':
           description: Success
@@ -294,6 +391,11 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: status
+        in: query
+        schema:
+          type: string
+        description: Version status (open, locked, closed)
       responses:
         '200':
           description: Success
@@ -329,6 +431,11 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: status
+        in: query
+        schema:
+          type: string
+        description: Version status (open, locked, closed)
       responses:
         '200':
           description: Success
@@ -364,6 +471,39 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: issue_id
+        in: query
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: from
+        in: query
+        schema:
+          type: string
+        description: Starting date (YYYY-MM-DD)
+      - name: to
+        in: query
+        schema:
+          type: string
+        description: Ending date (YYYY-MM-DD)
+      - name: spent_on
+        in: query
+        schema:
+          type: string
+        description: Date of the time entries (YYYY-MM-DD)
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (project, issue, user, activity)
+      - name: sort
+        in: query
+        schema:
+          type: string
+        description: Sort attributes (comma-separated)
       responses:
         '200':
           description: Success
@@ -597,6 +737,11 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (attachments)
       responses:
         '200':
           description: Success
@@ -816,6 +961,16 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: name
+        in: query
+        schema:
+          type: string
+        description: Filter by project name
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (subprojects)
       responses:
         '200':
           description: Success
@@ -1138,6 +1293,88 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: status_id
+        in: query
+        schema:
+          type: string
+        description: Issue status (open, closed, *, or an id)
+      - name: tracker_id
+        in: query
+        schema:
+          type: integer
+      - name: priority_id
+        in: query
+        schema:
+          type: integer
+      - name: author_id
+        in: query
+        schema:
+          type: integer
+        description: Author id (or me)
+      - name: assigned_to_id
+        in: query
+        schema:
+          type: integer
+        description: Assignee id (or me)
+      - name: project_id
+        in: query
+        schema:
+          type: string
+        description: Project id or identifier
+      - name: subproject_id
+        in: query
+        schema:
+          type: string
+        description: Subproject id or identifier
+      - name: category_id
+        in: query
+        schema:
+          type: integer
+      - name: fixed_version_id
+        in: query
+        schema:
+          type: integer
+      - name: subject
+        in: query
+        schema:
+          type: string
+        description: Search within the subject
+      - name: created_on
+        in: query
+        schema:
+          type: string
+        description: Creation date or comparison (e.g. >=2024-01-01)
+      - name: updated_on
+        in: query
+        schema:
+          type: string
+        description: Update date or comparison
+      - name: start_date
+        in: query
+        schema:
+          type: string
+        description: Start date or comparison
+      - name: due_date
+        in: query
+        schema:
+          type: string
+        description: Due date or comparison
+      - name: done_ratio
+        in: query
+        schema:
+          type: integer
+        description: Done ratio or comparison
+      - name: sort
+        in: query
+        schema:
+          type: string
+        description: Sort attributes (comma-separated, e.g. priority:desc)
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (journals, relations, attachments,
+          watchers)
       responses:
         '200':
           description: Success
@@ -1416,6 +1653,44 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - name: project_id
+        in: query
+        schema:
+          type: string
+        description: Project id or identifier
+      - name: issue_id
+        in: query
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        schema:
+          type: integer
+      - name: from
+        in: query
+        schema:
+          type: string
+        description: Starting date (YYYY-MM-DD)
+      - name: to
+        in: query
+        schema:
+          type: string
+        description: Ending date (YYYY-MM-DD)
+      - name: spent_on
+        in: query
+        schema:
+          type: string
+        description: Date of the time entries (YYYY-MM-DD)
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (project, issue, user, activity)
+      - name: sort
+        in: query
+        schema:
+          type: string
+        description: Sort attributes (comma-separated)
       responses:
         '200':
           description: Success

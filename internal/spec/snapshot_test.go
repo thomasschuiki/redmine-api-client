@@ -88,3 +88,94 @@ func TestSnapshotInfoMatchesVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestListOperationsCarryQueryFilters(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	wantByOp := map[string][]string{
+		"getIssues":           {"status_id", "author_id", "assigned_to_id", "project_id", "subproject_id", "sort", "include"},
+		"getProjects":         {"name", "include"},
+		"getUsers":            {"name", "group_id", "status", "include"},
+		"getTimeEntries":      {"project_id", "issue_id", "user_id", "from", "to", "spent_on", "sort", "include"},
+		"getProjectVersions":  {"status"},
+		"getProjectWikiPages": {"include"},
+	}
+	for opID, wants := range wantByOp {
+		got := queryParams(t, ops, opID)
+		for _, want := range wants {
+			if !containsString(got, want) {
+				t.Errorf("%s: missing query filter %q; have %v", opID, want, got)
+			}
+		}
+	}
+
+	// Nested routes must not repeat a parent scope as a query filter; it is
+	// already expressed as a path parameter.
+	for _, opID := range []string{"getProjectIssues", "getProjectTimeEntries"} {
+		if got := queryParams(t, ops, opID); containsString(got, "project_id") {
+			t.Errorf("%s: repeats project_id as a query filter; it is already a path parameter", opID)
+		}
+	}
+}
+
+func loadOperations(t *testing.T, path string) map[string]any {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read snapshot: %v", err)
+	}
+	var doc struct {
+		Paths map[string]any `yaml:"paths"`
+	}
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		t.Fatalf("parse snapshot: %v", err)
+	}
+	ops := map[string]any{}
+	for _, pathItem := range doc.Paths {
+		methods, ok := pathItem.(map[string]any)
+		if !ok {
+			continue
+		}
+		for _, rawOp := range methods {
+			op, ok := rawOp.(map[string]any)
+			if !ok {
+				continue
+			}
+			if id, ok := op["operationId"].(string); ok {
+				ops[id] = op
+			}
+		}
+	}
+	return ops
+}
+
+func queryParams(t *testing.T, ops map[string]any, opID string) []string {
+	t.Helper()
+	op, ok := ops[opID]
+	if !ok {
+		t.Fatalf("operation %s not found", opID)
+	}
+	var names []string
+	params, _ := op.(map[string]any)["parameters"].([]any)
+	for _, raw := range params {
+		p, ok := raw.(map[string]any)
+		if !ok || p["in"] != "query" {
+			continue
+		}
+		if name, ok := p["name"].(string); ok {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+func containsString(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}

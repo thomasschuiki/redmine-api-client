@@ -1,7 +1,7 @@
 # Plan: Rework `redmine_openapi_generator` to emit a consumable OpenAPI spec
 
-> **Status:** Phases 0–5 done. Phase 2 remaining per-resource query filters and
-> open decision 4 (split request/response models) are the only outstanding items.
+> **Status:** Phases 0–5 done. Open decision 4 (split request/response models)
+> is the only outstanding item.
 
 ## Why
 
@@ -83,7 +83,7 @@ Files: `introspector.rb`, `spec_builder.rb`, new `contract.rb`.
 - Acceptance: no `hashed_password`/`salt`/`lft`/`rgt`/`lock_version` anywhere in the
   spec; every resource has request + single + list schemas.
 
-### Phase 2 — Fix paths and operations — ✅ DONE (except per-resource query filters)
+### Phase 2 — Fix paths and operations — ✅ DONE
 
 File: `spec_builder.rb`.
 
@@ -94,8 +94,7 @@ File: `spec_builder.rb`.
 - Correct status codes and attach body schemas: 200 list/single, 201 create, 204
   delete; add 404 (not found) and 422 (validation) with `Error` schema.
 - Pagination query params on all list ops; add per-resource query filters
-  (status_id, sort, etc. for issues). — **REMAINING: per-resource filters are
-  not emitted yet**; only `offset`/`limit` pagination params exist.
+  (status_id, sort, etc. for issues).
 - Acceptance: `redmine-spec validate` reports correct op counts; no duplicate
   operationIds; every op has a schema'd response.
 
@@ -104,7 +103,11 @@ requirement for object ops (kills `/issues`, `/time_entries/destroy`, form
 routes); `normalize_path` strips `(.:format)`/`.:format`; `path_param_type`
 (integer `*_id`, string identifier/title/other); refined `operationId`s
 (`getCurrentUser`, `getProjectRoadmap`) + numeric-suffix dedupe; 200/201/204 by
-verb, 404/422 error responses with `Error` schema.
+verb, 404/422 error responses with `Error` schema. **Per-resource query
+filters** added via `QUERY_FILTERS` in `spec_builder.rb` (issues/projects/
+users/timelog/versions/wiki), emitted on index/list operations; a filter that
+duplicates a nested route's parent scope is dropped (no repeated `project_id`
+on `/projects/{id}/issues`). Pinned by `TestListOperationsCarryQueryFilters`.
 
 ### Phase 3 — Strengthen `redmine-spec` tooling — ✅ DONE
 

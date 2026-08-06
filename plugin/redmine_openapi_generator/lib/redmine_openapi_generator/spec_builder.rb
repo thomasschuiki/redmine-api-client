@@ -203,10 +203,79 @@ module RedmineOpenapiGenerator
       if %w[index list].include?(route[:action])
         params << { 'name' => 'offset', 'in' => 'query', 'schema' => { 'type' => 'integer', 'minimum' => 0 } }
         params << { 'name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer', 'minimum' => 1 } }
+
+        scopes = parent_scopes(path, route).map(&:downcase)
+        QUERY_FILTERS.fetch(route[:controller], []).each do |filter|
+          next if scopes.include?(filter['name'].sub(/_id\z/, ''))
+
+          params << query_param(filter)
+        end
       end
 
       params
     end
+
+    def query_param(filter)
+      param = {
+        'name' => filter['name'],
+        'in' => 'query',
+        'schema' => { 'type' => filter['type'] }
+      }
+      param['description'] = filter['description'] if filter['description']
+      param
+    end
+
+    # Per-resource query filters for index/list operations, following the
+    # Redmine REST API documentation. Filters are dropped when they duplicate a
+    # parent scope of a nested route (e.g. project_id is not repeated on
+    # /projects/{id}/issues). Controllers without an entry emit no filters.
+    QUERY_FILTERS = {
+      'issues' => [
+        { 'name' => 'status_id', 'type' => 'string', 'description' => 'Issue status (open, closed, *, or an id)' },
+        { 'name' => 'tracker_id', 'type' => 'integer' },
+        { 'name' => 'priority_id', 'type' => 'integer' },
+        { 'name' => 'author_id', 'type' => 'integer', 'description' => 'Author id (or me)' },
+        { 'name' => 'assigned_to_id', 'type' => 'integer', 'description' => 'Assignee id (or me)' },
+        { 'name' => 'project_id', 'type' => 'string', 'description' => 'Project id or identifier' },
+        { 'name' => 'subproject_id', 'type' => 'string', 'description' => 'Subproject id or identifier' },
+        { 'name' => 'category_id', 'type' => 'integer' },
+        { 'name' => 'fixed_version_id', 'type' => 'integer' },
+        { 'name' => 'subject', 'type' => 'string', 'description' => 'Search within the subject' },
+        { 'name' => 'created_on', 'type' => 'string', 'description' => 'Creation date or comparison (e.g. >=2024-01-01)' },
+        { 'name' => 'updated_on', 'type' => 'string', 'description' => 'Update date or comparison' },
+        { 'name' => 'start_date', 'type' => 'string', 'description' => 'Start date or comparison' },
+        { 'name' => 'due_date', 'type' => 'string', 'description' => 'Due date or comparison' },
+        { 'name' => 'done_ratio', 'type' => 'integer', 'description' => 'Done ratio or comparison' },
+        { 'name' => 'sort', 'type' => 'string', 'description' => 'Sort attributes (comma-separated, e.g. priority:desc)' },
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (journals, relations, attachments, watchers)' }
+      ],
+      'projects' => [
+        { 'name' => 'name', 'type' => 'string', 'description' => 'Filter by project name' },
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (subprojects)' }
+      ],
+      'users' => [
+        { 'name' => 'name', 'type' => 'string', 'description' => 'Search for users by name' },
+        { 'name' => 'group_id', 'type' => 'integer', 'description' => 'Filter users by group' },
+        { 'name' => 'status', 'type' => 'integer', 'description' => 'User status (1 active, 2 locked, 3 registered; admins only)' },
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (groups, memberships)' }
+      ],
+      'timelog' => [
+        { 'name' => 'project_id', 'type' => 'string', 'description' => 'Project id or identifier' },
+        { 'name' => 'issue_id', 'type' => 'integer' },
+        { 'name' => 'user_id', 'type' => 'integer' },
+        { 'name' => 'from', 'type' => 'string', 'description' => 'Starting date (YYYY-MM-DD)' },
+        { 'name' => 'to', 'type' => 'string', 'description' => 'Ending date (YYYY-MM-DD)' },
+        { 'name' => 'spent_on', 'type' => 'string', 'description' => 'Date of the time entries (YYYY-MM-DD)' },
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (project, issue, user, activity)' },
+        { 'name' => 'sort', 'type' => 'string', 'description' => 'Sort attributes (comma-separated)' }
+      ],
+      'versions' => [
+        { 'name' => 'status', 'type' => 'string', 'description' => 'Version status (open, locked, closed)' }
+      ],
+      'wiki' => [
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (attachments)' }
+      ]
+    }.freeze
 
     # Path parameters address the resource by contract 'path_key'. Resources keyed
     # by a string handle (projects by identifier, wiki pages by title) take string
