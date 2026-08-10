@@ -222,8 +222,10 @@ func (c *Client) decodeResponse(method, u string, resp *http.Response, target an
 	if target == nil {
 		return nil
 	}
-	// 204 No Content (and other empty bodies) leave nothing to decode.
-	if len(bytes.TrimSpace(raw)) == 0 {
+	// 204 No Content leaves nothing to decode. Any other 2xx with an empty
+	// body is an anomaly (e.g. a proxy quirk) and should surface as an error
+	// rather than be silently accepted.
+	if resp.StatusCode == http.StatusNoContent {
 		return nil
 	}
 	if err := json.Unmarshal(raw, target); err != nil {
