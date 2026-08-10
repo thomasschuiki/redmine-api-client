@@ -16,7 +16,7 @@ module RedmineOpenapiGenerator
       'enumerations'      => 'IssuePriority',
       'roles'             => 'Role',
       'groups'            => 'Group',
-      'custom_fields'     => 'CustomField',
+      'custom_fields'     => 'CustomFieldDefinition',
       'queries'           => 'Query',
       'attachments'       => 'Attachment',
       'time_entries'      => 'TimeEntry',

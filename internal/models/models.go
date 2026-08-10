@@ -474,3 +474,42 @@ type GroupUpdate struct {
 type GroupUpdateRequest struct {
 	Group GroupUpdate `json:"group"`
 }
+
+type Query struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	IsPublic  *bool  `json:"is_public,omitempty"`
+	ProjectID *int   `json:"project_id,omitempty"`
+}
+
+type QueryList struct {
+	Queries    []Query `json:"queries"`
+	TotalCount *int    `json:"total_count,omitempty"`
+	Offset     *int    `json:"offset,omitempty"`
+	Limit      *int    `json:"limit,omitempty"`
+}
+
+type CustomFieldDefinition struct {
+	ID             int      `json:"id"`
+	Name           string   `json:"name"`
+	Description    *string  `json:"description,omitempty"`
+	CustomizedType *string  `json:"customized_type,omitempty"`
+	FieldFormat    *string  `json:"field_format,omitempty"`
+	IsRequired     *bool    `json:"is_required,omitempty"`
+	IsFilter       *bool    `json:"is_filter,omitempty"`
+	Searchable     *bool    `json:"searchable,omitempty"`
+	Multiple       *bool    `json:"multiple,omitempty"`
+	Visible        *bool    `json:"visible,omitempty"`
+	Editable       *bool    `json:"editable,omitempty"`
+	DefaultValue   any      `json:"default_value,omitempty"`
+	PossibleValues []string `json:"possible_values,omitempty"`
+	Regexp         *string  `json:"regexp,omitempty"`
+	MinLength      *int     `json:"min_length,omitempty"`
+	MaxLength      *int     `json:"max_length,omitempty"`
+	Trackers       []IDName `json:"trackers,omitempty"`
+	Roles          []IDName `json:"roles,omitempty"`
+}
+
+type CustomFieldDefinitionList struct {
+	CustomFields []CustomFieldDefinition `json:"custom_fields"`
+}

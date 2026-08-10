@@ -38,6 +38,7 @@ Filter flags map to Redmine API query parameters:
   --category-id   → category_id
   --fixed-version-id → fixed_version_id
   --parent-id     → parent_id (filter children of a parent issue)
+  --query         → query_id (apply a saved query, e.g. 'redmine query list')
   --subject       → subject (substring match)
   --description   → description (substring match)
   --sort          → sort order (e.g. 'created_on:desc')
@@ -64,6 +65,7 @@ Output options:
 					&cli.IntFlag{Name: "category-id", Usage: "Category ID"},
 					&cli.IntFlag{Name: "fixed-version-id", Usage: "Fixed version ID"},
 					&cli.IntFlag{Name: "parent-id", Usage: "Parent issue ID"},
+					&cli.IntFlag{Name: "query", Usage: "Saved query ID (see redmine query list)"},
 					&cli.StringFlag{Name: "subject", Usage: "Filter by subject (substring)"},
 					&cli.StringFlag{Name: "description", Usage: "Filter by description (substring)"},
 					&cli.StringFlag{Name: "sort", Usage: "Sort order (e.g. 'created_on:desc')"},
@@ -82,6 +84,7 @@ Output options:
 						CategoryID:     c.Int("category-id"),
 						FixedVersionID: c.Int("fixed-version-id"),
 						ParentID:       c.Int("parent-id"),
+						QueryID:        c.Int("query"),
 						Subject:        c.String("subject"),
 						Description:    c.String("description"),
 						Sort:           c.String("sort"),

@@ -592,6 +592,67 @@ module RedmineOpenapiGenerator
           'properties' => { '__items__' => true }
         },
         'path_key' => 'id'
+      },
+      'Query' => {
+        'request' => nil,
+        'single' => {
+          'wrapper' => 'query',
+          'required' => %w[id name],
+          'properties' => {
+            'id' => { 'type' => 'integer' },
+            'name' => { 'type' => 'string' },
+            'is_public' => { 'type' => 'boolean' },
+            'project_id' => { 'type' => 'integer' }
+          }
+        },
+        'list' => {
+          'wrapper' => 'queries',
+          'envelope' => true,
+          'properties' => { '__items__' => true }
+        },
+        'path_key' => 'id'
+      },
+      'CustomFieldDefinition' => {
+        'request' => nil,
+        'single' => {
+          'wrapper' => 'custom_field',
+          'required' => %w[id name],
+          'properties' => {
+            'id' => { 'type' => 'integer' },
+            'name' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' },
+            'customized_type' => { 'type' => 'string' },
+            'field_format' => { 'type' => 'string' },
+            'is_required' => { 'type' => 'boolean' },
+            'is_filter' => { 'type' => 'boolean' },
+            'searchable' => { 'type' => 'boolean' },
+            'multiple' => { 'type' => 'boolean' },
+            'visible' => { 'type' => 'boolean' },
+            'editable' => { 'type' => 'boolean' },
+            'default_value' => {},
+            'possible_values' => {
+              'type' => 'array',
+              'items' => { 'type' => 'string' }
+            },
+            'regexp' => { 'type' => 'string' },
+            'min_length' => { 'type' => 'integer' },
+            'max_length' => { 'type' => 'integer' },
+            'trackers' => {
+              'type' => 'array',
+              'items' => { '$ref' => 'IDName' }
+            },
+            'roles' => {
+              'type' => 'array',
+              'items' => { '$ref' => 'IDName' }
+            }
+          }
+        },
+        'list' => {
+          'wrapper' => 'custom_fields',
+          'envelope' => false,
+          'properties' => { '__items__' => true }
+        },
+        'path_key' => 'id'
       }
     }.freeze
 

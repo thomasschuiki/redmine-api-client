@@ -605,6 +605,7 @@ module RedmineOpenapiGenerator
       when 'WikiPage' then 'WikiPages'
       when 'CustomField' then 'CustomFields'
       when 'News' then 'News'
+      when 'Query' then 'Queries'
       else "#{model}s"
       end
     end

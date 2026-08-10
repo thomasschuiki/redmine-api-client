@@ -160,7 +160,7 @@ Auth types: `api_key`, `basic`, `oauth2`.
 ```
 # Issues
 redmine issue list [--project PROJECT] [--limit N] [--offset N] [--sort FIELD]
-                   [--all] [--top N] [--fields FIELDS]
+                   [--all] [--top N] [--fields FIELDS] [--query QUERY_ID]
                    [--contains TEXT] [--regex PATTERN] [--case-insensitive]
                    [--include journals]
 redmine issue get <ID> [--include journals] [--fields FIELDS]
@@ -233,6 +233,12 @@ redmine group get <ID> [--include users,memberships]
 redmine group create --name NAME [--users 1,2]
 redmine group update <ID> [--name NAME] [--add-users 1,2] [--remove-users 3]
 redmine group delete <ID>
+
+# Queries
+redmine query list [--limit N]
+
+# Custom fields
+redmine custom-field list
 
 # Attachments
 redmine attachment get <ID> [--output-file FILE]

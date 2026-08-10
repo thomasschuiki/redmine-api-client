@@ -99,6 +99,7 @@ type IssueListOpts struct {
 	CategoryID     int
 	FixedVersionID int
 	ParentID       int
+	QueryID        int
 }
 
 // Params converts IssueListOpts to url.Values.
@@ -124,6 +125,9 @@ func (o IssueListOpts) Params() url.Values {
 	}
 	if o.ParentID > 0 {
 		v.Set("parent_id", fmt.Sprintf("%d", o.ParentID))
+	}
+	if o.QueryID > 0 {
+		v.Set("query_id", fmt.Sprintf("%d", o.QueryID))
 	}
 	if o.Subject != "" {
 		v.Set("subject", o.Subject)

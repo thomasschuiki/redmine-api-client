@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 35, 82, 72},
-	{"redmine-6.0.10.yaml", "6.0.10", 35, 82, 72},
-	{"redmine-6.1.3.yaml", "6.1.3", 35, 82, 72},
+	{"redmine-5.1.12.yaml", "5.1.12", 37, 84, 76},
+	{"redmine-6.0.10.yaml", "6.0.10", 37, 84, 76},
+	{"redmine-6.1.3.yaml", "6.1.3", 37, 84, 76},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -250,6 +250,30 @@ func TestGroupSurface(t *testing.T) {
 	}
 	if got := queryParams(t, ops, "getGroup"); !containsString(got, "include") {
 		t.Errorf("getGroup: missing include query param; have %v", got)
+	}
+}
+
+// TestQueryAndCustomFieldSurface pins the read-only queries and custom fields
+// contracts: the accept_api_auth filter restricts both controllers to their
+// index op, so no create/update/delete surface may leak.
+func TestQueryAndCustomFieldSurface(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{"getQueries", "getCustomFieldDefinitions"} {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing index operation %s", opID)
+		}
+	}
+
+	for _, opID := range []string{
+		"createQuery", "updateQuery", "updateQuery2", "deleteQuery",
+		"createCustomField", "updateCustomField", "updateCustomField2", "deleteCustomField",
+	} {
+		if _, ok := ops[opID]; ok {
+			t.Errorf("accept_api_auth filter leak: %s must not be emitted", opID)
+		}
 	}
 }
 

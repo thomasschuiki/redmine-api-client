@@ -74,6 +74,8 @@ See 'redmine help' for a list of available commands.`,
 			membershipCommand(),
 			newsCommand(),
 			groupCommand(),
+			queryCommand(),
+			customFieldCommand(),
 		},
 	}
 }

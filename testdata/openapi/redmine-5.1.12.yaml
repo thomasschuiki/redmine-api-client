@@ -13,6 +13,7 @@ security:
 - OAuth2: []
 tags:
 - name: Attachments
+- name: Custom Fields
 - name: Enumerations
 - name: Groups
 - name: Issue Categories
@@ -22,6 +23,7 @@ tags:
 - name: Members
 - name: News
 - name: Projects
+- name: Queries
 - name: Timelog
 - name: Trackers
 - name: Users
@@ -1786,6 +1788,36 @@ paths:
           "$ref": "#/components/responses/PreconditionFailed"
         '404':
           "$ref": "#/components/responses/NotFound"
+  "/queries":
+    get:
+      tags:
+      - Queries
+      summary: List query
+      operationId: getQueries
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/QueryList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
   "/news":
     get:
       tags:
@@ -2666,6 +2698,36 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/IssueStatusList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+  "/custom_fields":
+    get:
+      tags:
+      - Custom Fields
+      summary: List custom_field
+      operationId: getCustomFieldDefinitions
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CustomFieldDefinitionList"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -3707,6 +3769,91 @@ components:
       properties:
         group:
           "$ref": "#/components/schemas/GroupUpdate"
+    Query:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_public:
+          type: boolean
+        project_id:
+          type: integer
+    QueryList:
+      type: object
+      required:
+      - queries
+      properties:
+        queries:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Query"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    CustomFieldDefinition:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        customized_type:
+          type: string
+        field_format:
+          type: string
+        is_required:
+          type: boolean
+        is_filter:
+          type: boolean
+        searchable:
+          type: boolean
+        multiple:
+          type: boolean
+        visible:
+          type: boolean
+        editable:
+          type: boolean
+        default_value: {}
+        possible_values:
+          type: array
+          items:
+            type: string
+        regexp:
+          type: string
+        min_length:
+          type: integer
+        max_length:
+          type: integer
+        trackers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IDName"
+        roles:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IDName"
+    CustomFieldDefinitionList:
+      type: object
+      required:
+      - custom_fields
+      properties:
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomFieldDefinition"
   responses:
     Unauthorized:
       description: Authentication required
