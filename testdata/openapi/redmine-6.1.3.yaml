@@ -1877,105 +1877,6 @@ paths:
           "$ref": "#/components/responses/Forbidden"
         '412':
           "$ref": "#/components/responses/PreconditionFailed"
-    post:
-      tags:
-      - Trackers
-      summary: Create tracker
-      operationId: createTracker
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/TrackerSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-  "/trackers/{id}":
-    patch:
-      tags:
-      - Trackers
-      summary: Update tracker
-      operationId: updateTracker
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/TrackerSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    put:
-      tags:
-      - Trackers
-      summary: Update tracker
-      operationId: updateTracker2
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/TrackerSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    delete:
-      tags:
-      - Trackers
-      summary: Delete tracker
-      operationId: deleteTracker
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '204':
-          description: Deleted
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
   "/issue_statuses":
     get:
       tags:
@@ -2006,105 +1907,6 @@ paths:
           "$ref": "#/components/responses/Forbidden"
         '412':
           "$ref": "#/components/responses/PreconditionFailed"
-    post:
-      tags:
-      - Issue Statuses
-      summary: Create issue_statuse
-      operationId: createIssueStatus
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssueStatusSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-  "/issue_statuses/{id}":
-    patch:
-      tags:
-      - Issue Statuses
-      summary: Update issue_statuse
-      operationId: updateIssueStatus
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssueStatusSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    put:
-      tags:
-      - Issue Statuses
-      summary: Update issue_statuse
-      operationId: updateIssueStatus2
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssueStatusSingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    delete:
-      tags:
-      - Issue Statuses
-      summary: Delete issue_statuse
-      operationId: deleteIssueStatus
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '204':
-          description: Deleted
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
   "/enumerations":
     get:
       tags:
@@ -2135,105 +1937,6 @@ paths:
           "$ref": "#/components/responses/Forbidden"
         '412':
           "$ref": "#/components/responses/PreconditionFailed"
-    post:
-      tags:
-      - Enumerations
-      summary: Create enumeration
-      operationId: createIssuePriority
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssuePrioritySingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-  "/enumerations/{id}":
-    patch:
-      tags:
-      - Enumerations
-      summary: Update enumeration
-      operationId: updateIssuePriority
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssuePrioritySingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    put:
-      tags:
-      - Enumerations
-      summary: Update enumeration
-      operationId: updateIssuePriority2
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/IssuePrioritySingle"
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableEntity"
-    delete:
-      tags:
-      - Enumerations
-      summary: Delete enumeration
-      operationId: deleteIssuePriority
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '204':
-          description: Deleted
-        '401':
-          "$ref": "#/components/responses/Unauthorized"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
-        '412':
-          "$ref": "#/components/responses/PreconditionFailed"
-        '404':
-          "$ref": "#/components/responses/NotFound"
   "/enumerations/{type}":
     get:
       tags:
@@ -2826,13 +2529,6 @@ components:
           type: integer
         name:
           type: string
-    TrackerSingle:
-      type: object
-      required:
-      - tracker
-      properties:
-        tracker:
-          "$ref": "#/components/schemas/Tracker"
     TrackerList:
       type: object
       required:
@@ -2854,13 +2550,6 @@ components:
           type: string
         is_closed:
           type: boolean
-    IssueStatusSingle:
-      type: object
-      required:
-      - issue_status
-      properties:
-        issue_status:
-          "$ref": "#/components/schemas/IssueStatus"
     IssueStatusList:
       type: object
       required:
@@ -2884,13 +2573,6 @@ components:
           type: boolean
         active:
           type: boolean
-    IssuePrioritySingle:
-      type: object
-      required:
-      - issue_priority
-      properties:
-        issue_priority:
-          "$ref": "#/components/schemas/IssuePriority"
     IssuePriorityList:
       type: object
       required:

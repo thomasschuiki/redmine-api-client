@@ -1,6 +1,7 @@
 module RedmineOpenapiGenerator
   require 'json'
   require 'yaml'
+  require 'set'
   require_relative 'introspector'
   require_relative 'contract'
 
@@ -80,6 +81,7 @@ module RedmineOpenapiGenerator
 
     def contract_resource?(route)
       return false unless REST_ACTIONS.include?(route[:action])
+      return false unless @introspector.api_controllers[route[:controller]]&.include?(route[:action])
 
       normalized = normalize_path(route[:path])
       if %w[show update destroy delete].include?(route[:action])
@@ -353,7 +355,79 @@ module RedmineOpenapiGenerator
     end
 
     def schemas
-      resolve_refs(@components)
+      resolve_refs(reachable_components)
+    end
+
+    # Only contract components reachable from the emitted operations (plus the
+    # shared Error schema used by the common responses) are emitted. A resource
+    # filtered out by contract_resource? (e.g. an accept_api_auth index-only
+    # controller) must not leak an unused {Name}Single, which strict validation
+    # rejects as a dead component.
+    def reachable_components
+      reachable = Set.new
+      queue = []
+
+      seed = proc do |name|
+        next if name.nil? || reachable.include?(name)
+
+        reachable << name
+        queue << name
+      end
+
+      @introspector.routes.each do |route|
+        next unless @introspector.api_controllers.key?(route[:controller])
+        next unless contract_resource?(route)
+
+        model = model_name_for(route)
+        next unless model
+
+        seed.call(response_schema(model, route[:action]))
+
+        if %w[POST PUT PATCH].include?(route[:verb].upcase)
+          if %w[PUT PATCH].include?(route[:verb].upcase) && @components.key?("#{model}UpdateRequest")
+            seed.call("#{model}UpdateRequest")
+          elsif @components.key?("#{model}Create")
+            seed.call("#{model}Create")
+          end
+        end
+      end
+
+      # Error is referenced by the shared response components, not by operations.
+      seed.call('Error')
+
+      until queue.empty?
+        name = queue.shift
+        next unless @components.key?(name)
+
+        component_refs(name).each { |ref| seed.call(ref) }
+      end
+
+      # Preserve the contract definition order (SHARED then RESOURCES) so the
+      # emitted schema order — and the generated Go models — stay stable.
+      result = {}
+      @components.each do |name, value|
+        result[name] = value if reachable.include?(name)
+      end
+      result
+    end
+
+    # Bare component names referenced by a schema definition (resolve_refs turns
+    # them into "#/components/schemas/..." in the emitted document).
+    def component_refs(schema_name)
+      refs = []
+      walk = lambda do |value|
+        case value
+        when Hash
+          if value.key?('$ref') && value['$ref'].is_a?(String) && !value['$ref'].start_with?('#')
+            refs << value['$ref']
+          end
+          value.each_value { |child| walk.call(child) }
+        when Array
+          value.each { |child| walk.call(child) }
+        end
+      end
+      walk.call(@components[schema_name])
+      refs
     end
 
     def resolve_refs(value)

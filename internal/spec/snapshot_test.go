@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 29, 69, 50},
-	{"redmine-6.0.10.yaml", "6.0.10", 29, 69, 50},
-	{"redmine-6.1.3.yaml", "6.1.3", 29, 69, 50},
+	{"redmine-5.1.12.yaml", "5.1.12", 26, 57, 47},
+	{"redmine-6.0.10.yaml", "6.0.10", 26, 57, 47},
+	{"redmine-6.1.3.yaml", "6.1.3", 26, 57, 47},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -116,6 +116,32 @@ func TestListOperationsCarryQueryFilters(t *testing.T) {
 	for _, opID := range []string{"getProjectIssues", "getProjectTimeEntries"} {
 		if got := queryParams(t, ops, opID); containsString(got, "project_id") {
 			t.Errorf("%s: repeats project_id as a query filter; it is already a path parameter", opID)
+		}
+	}
+}
+
+// TestIndexOnlyResourcesAreTrulyReadOnly pins the accept_api_auth filter: the
+// trackers/issue_statuses/enumerations controllers expose only :index via the
+// API, so their spec surface must be a single list operation.
+func TestIndexOnlyResourcesAreTrulyReadOnly(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	want := []string{"getTrackers", "getIssueStatuses", "getIssuePriorities", "getEnumerationIssuePriorities"}
+	for _, opID := range want {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing index operation %s", opID)
+		}
+	}
+
+	for _, opID := range []string{
+		"createTracker", "updateTracker", "updateTracker2", "deleteTracker",
+		"createIssueStatus", "updateIssueStatus", "updateIssueStatus2", "deleteIssueStatus",
+		"createIssuePriority", "updateIssuePriority", "updateIssuePriority2", "deleteIssuePriority",
+	} {
+		if _, ok := ops[opID]; ok {
+			t.Errorf("accept_api_auth filter leak: %s must not be emitted", opID)
 		}
 	}
 }

@@ -36,9 +36,9 @@ var requiredSchemas = []string{
 	"TimeEntry", "TimeEntrySingle", "TimeEntryList", "TimeEntryRequest", "TimeEntryCreate",
 	"WikiPage", "WikiPageSingle", "WikiPageList",
 	"Version", "VersionSingle", "VersionList",
-	"Tracker", "TrackerSingle", "TrackerList",
-	"IssueStatus", "IssueStatusSingle", "IssueStatusList",
-	"IssuePriority", "IssuePrioritySingle", "IssuePriorityList",
+	"Tracker", "TrackerList",
+	"IssueStatus", "IssueStatusList",
+	"IssuePriority", "IssuePriorityList",
 	"IssueCategory", "IssueCategorySingle", "IssueCategoryList",
 	"Relation", "RelationSingle", "RelationList", "RelationRequest", "RelationCreate",
 }

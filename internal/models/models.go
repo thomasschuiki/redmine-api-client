@@ -268,10 +268,6 @@ type Tracker struct {
 	Name string `json:"name"`
 }
 
-type TrackerSingle struct {
-	Tracker Tracker `json:"tracker"`
-}
-
 type TrackerList struct {
 	Trackers []Tracker `json:"trackers"`
 }
@@ -280,10 +276,6 @@ type IssueStatus struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	IsClosed *bool  `json:"is_closed,omitempty"`
-}
-
-type IssueStatusSingle struct {
-	IssueStatus IssueStatus `json:"issue_status"`
 }
 
 type IssueStatusList struct {
@@ -295,10 +287,6 @@ type IssuePriority struct {
 	Name      string `json:"name"`
 	IsDefault *bool  `json:"is_default,omitempty"`
 	Active    *bool  `json:"active,omitempty"`
-}
-
-type IssuePrioritySingle struct {
-	IssuePriority IssuePriority `json:"issue_priority"`
 }
 
 type IssuePriorityList struct {
