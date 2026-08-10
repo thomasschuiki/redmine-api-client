@@ -227,6 +227,13 @@ redmine news get <ID> [--include attachments,comments]
 redmine news create --title TITLE [--project PROJECT]
                     [--summary SUMMARY] [--description DESC]
 
+# Groups
+redmine group list [--builtin] [--limit N]
+redmine group get <ID> [--include users,memberships]
+redmine group create --name NAME [--users 1,2]
+redmine group update <ID> [--name NAME] [--add-users 1,2] [--remove-users 3]
+redmine group delete <ID>
+
 # Attachments
 redmine attachment get <ID> [--output-file FILE]
 redmine attachment update <ID> [--description DESC] [--filename NAME]

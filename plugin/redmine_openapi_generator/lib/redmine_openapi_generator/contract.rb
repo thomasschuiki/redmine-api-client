@@ -542,6 +542,56 @@ module RedmineOpenapiGenerator
           'properties' => { '__items__' => true }
         },
         'path_key' => 'id'
+      },
+      'Group' => {
+        'request' => {
+          'wrapper' => 'group',
+          'required' => %w[name],
+          'properties' => {
+            'name' => { 'type' => 'string' },
+            'user_ids' => {
+              'type' => 'array',
+              'items' => { 'type' => 'integer' }
+            }
+          }
+        },
+        'update' => {
+          'wrapper' => 'group',
+          'properties' => {
+            'name' => { 'type' => 'string' },
+            'user_ids' => {
+              'type' => 'array',
+              'items' => { 'type' => 'integer' }
+            }
+          }
+        },
+        'single' => {
+          'wrapper' => 'group',
+          'required' => %w[id name],
+          'properties' => {
+            'id' => { 'type' => 'integer' },
+            'name' => { 'type' => 'string' },
+            'builtin' => { 'type' => 'boolean' },
+            'custom_fields' => {
+              'type' => 'array',
+              'items' => { '$ref' => 'CustomField' }
+            },
+            'users' => {
+              'type' => 'array',
+              'items' => { '$ref' => 'IDName' }
+            },
+            'memberships' => {
+              'type' => 'array',
+              'items' => { '$ref' => 'Membership' }
+            }
+          }
+        },
+        'list' => {
+          'wrapper' => 'groups',
+          'envelope' => false,
+          'properties' => { '__items__' => true }
+        },
+        'path_key' => 'id'
       }
     }.freeze
 

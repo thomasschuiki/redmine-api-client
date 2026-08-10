@@ -14,6 +14,7 @@ security:
 tags:
 - name: Attachments
 - name: Enumerations
+- name: Groups
 - name: Issue Categories
 - name: Issue Relations
 - name: Issue Statuses
@@ -2428,6 +2429,189 @@ paths:
           "$ref": "#/components/responses/PreconditionFailed"
         '404':
           "$ref": "#/components/responses/NotFound"
+  "/groups":
+    get:
+      tags:
+      - Groups
+      summary: List group
+      operationId: getGroups
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: builtin
+        in: query
+        schema:
+          type: integer
+        description: Include built-in groups
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GroupList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Groups
+      summary: Create group
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/GroupCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GroupSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/groups/{id}":
+    get:
+      tags:
+      - Groups
+      summary: Get group
+      operationId: getGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (users, memberships)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GroupSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Groups
+      summary: Update group
+      operationId: updateGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/GroupUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GroupSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Groups
+      summary: Update group
+      operationId: updateGroup2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/GroupUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/GroupSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Groups
+      summary: Delete group
+      operationId: deleteGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
   "/trackers":
     get:
       tags:
@@ -3449,6 +3633,80 @@ components:
       properties:
         news:
           "$ref": "#/components/schemas/NewsUpdate"
+    Group:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        builtin:
+          type: boolean
+        custom_fields:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CustomField"
+        users:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IDName"
+        memberships:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Membership"
+    GroupSingle:
+      type: object
+      required:
+      - group
+      properties:
+        group:
+          "$ref": "#/components/schemas/Group"
+    GroupList:
+      type: object
+      required:
+      - groups
+      properties:
+        groups:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Group"
+    GroupRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        user_ids:
+          type: array
+          items:
+            type: integer
+    GroupCreate:
+      type: object
+      required:
+      - group
+      properties:
+        group:
+          "$ref": "#/components/schemas/GroupRequest"
+    GroupUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        user_ids:
+          type: array
+          items:
+            type: integer
+    GroupUpdateRequest:
+      type: object
+      required:
+      - group
+      properties:
+        group:
+          "$ref": "#/components/schemas/GroupUpdate"
   responses:
     Unauthorized:
       description: Authentication required

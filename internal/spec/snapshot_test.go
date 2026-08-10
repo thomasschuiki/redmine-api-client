@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 33, 76, 65},
-	{"redmine-6.0.10.yaml", "6.0.10", 33, 76, 65},
-	{"redmine-6.1.3.yaml", "6.1.3", 33, 76, 65},
+	{"redmine-5.1.12.yaml", "5.1.12", 35, 82, 72},
+	{"redmine-6.0.10.yaml", "6.0.10", 35, 82, 72},
+	{"redmine-6.1.3.yaml", "6.1.3", 35, 82, 72},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -229,6 +229,27 @@ func TestNewsSurface(t *testing.T) {
 	// The show op (getNews2) must carry the include expansion.
 	if got := queryParams(t, ops, "getNews2"); !containsString(got, "include") {
 		t.Errorf("getNews2: missing include query param; have %v", got)
+	}
+}
+
+// TestGroupSurface pins the groups contract: all six operations plus the
+// builtin index param and include show param.
+func TestGroupSurface(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{"getGroups", "createGroup", "getGroup", "updateGroup", "updateGroup2", "deleteGroup"} {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing group operation %s", opID)
+		}
+	}
+
+	if got := queryParams(t, ops, "getGroups"); !containsString(got, "builtin") {
+		t.Errorf("getGroups: missing builtin query param; have %v", got)
+	}
+	if got := queryParams(t, ops, "getGroup"); !containsString(got, "include") {
+		t.Errorf("getGroup: missing include query param; have %v", got)
 	}
 }
 

@@ -439,3 +439,38 @@ type NewsUpdate struct {
 type NewsUpdateRequest struct {
 	News NewsUpdate `json:"news"`
 }
+
+type Group struct {
+	ID           int           `json:"id"`
+	Name         string        `json:"name"`
+	Builtin      *bool         `json:"builtin,omitempty"`
+	CustomFields []CustomField `json:"custom_fields,omitempty"`
+	Users        []IDName      `json:"users,omitempty"`
+	Memberships  []Membership  `json:"memberships,omitempty"`
+}
+
+type GroupSingle struct {
+	Group Group `json:"group"`
+}
+
+type GroupList struct {
+	Groups []Group `json:"groups"`
+}
+
+type GroupRequest struct {
+	Name    string `json:"name"`
+	UserIds []int  `json:"user_ids,omitempty"`
+}
+
+type GroupCreate struct {
+	Group GroupRequest `json:"group"`
+}
+
+type GroupUpdate struct {
+	Name    *string `json:"name,omitempty"`
+	UserIds []int   `json:"user_ids,omitempty"`
+}
+
+type GroupUpdateRequest struct {
+	Group GroupUpdate `json:"group"`
+}
