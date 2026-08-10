@@ -214,6 +214,12 @@ module RedmineOpenapiGenerator
         end
       end
 
+      if route[:action] == 'show'
+        SHOW_QUERY_PARAMS.fetch(route[:controller], []).each do |param|
+          params << query_param(param)
+        end
+      end
+
       params
     end
 
@@ -276,6 +282,20 @@ module RedmineOpenapiGenerator
       ],
       'wiki' => [
         { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (attachments)' }
+      ],
+      'groups' => [
+        { 'name' => 'builtin', 'type' => 'integer', 'description' => 'Include built-in groups' }
+      ]
+    }.freeze
+
+    # Query parameters on show operations. Mostly include= expansions that only
+    # make sense on single-resource reads (news attachments/comments, group users).
+    SHOW_QUERY_PARAMS = {
+      'news' => [
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (attachments, comments)' }
+      ],
+      'groups' => [
+        { 'name' => 'include', 'type' => 'string', 'description' => 'Associated data to include (users, memberships)' }
       ]
     }.freeze
 

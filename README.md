@@ -221,6 +221,12 @@ redmine membership list --project PROJECT [--limit N]
 redmine membership add --project PROJECT --user U --roles 1,2
 redmine membership remove <ID>
 
+# News
+redmine news list [--project PROJECT] [--limit N]
+redmine news get <ID> [--include attachments,comments]
+redmine news create --title TITLE [--project PROJECT]
+                    [--summary SUMMARY] [--description DESC]
+
 # Attachments
 redmine attachment get <ID> [--output-file FILE]
 redmine attachment update <ID> [--description DESC] [--filename NAME]

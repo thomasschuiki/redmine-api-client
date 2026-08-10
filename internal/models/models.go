@@ -397,3 +397,45 @@ type MembershipUpdate struct {
 type MembershipUpdateRequest struct {
 	Membership MembershipUpdate `json:"membership"`
 }
+
+type News struct {
+	ID          int        `json:"id"`
+	Title       string     `json:"title"`
+	Summary     *string    `json:"summary,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Project     *IDName    `json:"project,omitempty"`
+	Author      *IDName    `json:"author,omitempty"`
+	CreatedOn   *time.Time `json:"created_on,omitempty"`
+}
+
+type NewsSingle struct {
+	News News `json:"news"`
+}
+
+type NewsList struct {
+	News       []News `json:"news"`
+	TotalCount *int   `json:"total_count,omitempty"`
+	Offset     *int   `json:"offset,omitempty"`
+	Limit      *int   `json:"limit,omitempty"`
+}
+
+type NewsRequest struct {
+	Title       string  `json:"title"`
+	Summary     *string `json:"summary,omitempty"`
+	Description *string `json:"description,omitempty"`
+	ProjectID   *int    `json:"project_id,omitempty"`
+}
+
+type NewsCreate struct {
+	News NewsRequest `json:"news"`
+}
+
+type NewsUpdate struct {
+	Title       *string `json:"title,omitempty"`
+	Summary     *string `json:"summary,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type NewsUpdateRequest struct {
+	News NewsUpdate `json:"news"`
+}

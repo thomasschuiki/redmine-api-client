@@ -503,6 +503,45 @@ module RedmineOpenapiGenerator
           'properties' => { '__items__' => true }
         },
         'path_key' => 'id'
+      },
+      'News' => {
+        'request' => {
+          'wrapper' => 'news',
+          'required' => %w[title],
+          'properties' => {
+            'title' => { 'type' => 'string' },
+            'summary' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' },
+            'project_id' => { 'type' => 'integer' }
+          }
+        },
+        'update' => {
+          'wrapper' => 'news',
+          'properties' => {
+            'title' => { 'type' => 'string' },
+            'summary' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' }
+          }
+        },
+        'single' => {
+          'wrapper' => 'news',
+          'required' => %w[id title],
+          'properties' => {
+            'id' => { 'type' => 'integer' },
+            'title' => { 'type' => 'string' },
+            'summary' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' },
+            'project' => { '$ref' => 'IDName' },
+            'author' => { '$ref' => 'IDName' },
+            'created_on' => { 'type' => 'string', 'format' => 'date-time' }
+          }
+        },
+        'list' => {
+          'wrapper' => 'news',
+          'envelope' => true,
+          'properties' => { '__items__' => true }
+        },
+        'path_key' => 'id'
       }
     }.freeze
 

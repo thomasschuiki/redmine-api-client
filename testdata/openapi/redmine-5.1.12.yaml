@@ -19,6 +19,7 @@ tags:
 - name: Issue Statuses
 - name: Issues
 - name: Members
+- name: News
 - name: Projects
 - name: Timelog
 - name: Trackers
@@ -635,6 +636,73 @@ paths:
           "$ref": "#/components/responses/Forbidden"
         '412':
           "$ref": "#/components/responses/PreconditionFailed"
+  "/projects/{project_id}/news":
+    get:
+      tags:
+      - News
+      summary: List new
+      operationId: getProjectNews
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - News
+      summary: Create new
+      operationId: createProjectNews
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewsCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
   "/projects/{project_id}/time_entries":
     get:
       tags:
@@ -1700,6 +1768,184 @@ paths:
       - Issues
       summary: Delete issue
       operationId: deleteIssue
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/news":
+    get:
+      tags:
+      - News
+      summary: List new
+      operationId: getNews
+      parameters:
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - News
+      summary: Create new
+      operationId: createNews
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewsCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/news/{id}":
+    get:
+      tags:
+      - News
+      summary: Get new
+      operationId: getNews2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: include
+        in: query
+        schema:
+          type: string
+        description: Associated data to include (attachments, comments)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - News
+      summary: Update new
+      operationId: updateNews
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewsUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - News
+      summary: Update new
+      operationId: updateNews2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewsUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NewsSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - News
+      summary: Delete new
+      operationId: deleteNews
       parameters:
       - name: id
         in: path
@@ -3124,6 +3370,85 @@ components:
       properties:
         membership:
           "$ref": "#/components/schemas/MembershipUpdate"
+    News:
+      type: object
+      required:
+      - id
+      - title
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        project:
+          "$ref": "#/components/schemas/IDName"
+        author:
+          "$ref": "#/components/schemas/IDName"
+        created_on:
+          type: string
+          format: date-time
+    NewsSingle:
+      type: object
+      required:
+      - news
+      properties:
+        news:
+          "$ref": "#/components/schemas/News"
+    NewsList:
+      type: object
+      required:
+      - news
+      properties:
+        news:
+          type: array
+          items:
+            "$ref": "#/components/schemas/News"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    NewsRequest:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        project_id:
+          type: integer
+    NewsCreate:
+      type: object
+      required:
+      - news
+      properties:
+        news:
+          "$ref": "#/components/schemas/NewsRequest"
+    NewsUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+    NewsUpdateRequest:
+      type: object
+      required:
+      - news
+      properties:
+        news:
+          "$ref": "#/components/schemas/NewsUpdate"
   responses:
     Unauthorized:
       description: Authentication required

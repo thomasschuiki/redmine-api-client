@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 30, 68, 58},
-	{"redmine-6.0.10.yaml", "6.0.10", 30, 68, 58},
-	{"redmine-6.1.3.yaml", "6.1.3", 30, 68, 58},
+	{"redmine-5.1.12.yaml", "5.1.12", 33, 76, 65},
+	{"redmine-6.0.10.yaml", "6.0.10", 33, 76, 65},
+	{"redmine-6.1.3.yaml", "6.1.3", 33, 76, 65},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -207,6 +207,28 @@ func TestMembershipSurface(t *testing.T) {
 	}
 	if got := pathParams("getMembership"); !containsString(got, "id") {
 		t.Errorf("getMembership path params = %v, want id", got)
+	}
+}
+
+// TestNewsSurface pins the news contract: index, nested index, create,
+// auto-disambiguated show (getNews2), update pair, and delete are all emitted.
+func TestNewsSurface(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{
+		"getNews", "getNews2", "createNews", "getProjectNews", "createProjectNews",
+		"updateNews", "updateNews2", "deleteNews",
+	} {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing news operation %s", opID)
+		}
+	}
+
+	// The show op (getNews2) must carry the include expansion.
+	if got := queryParams(t, ops, "getNews2"); !containsString(got, "include") {
+		t.Errorf("getNews2: missing include query param; have %v", got)
 	}
 }
 
