@@ -6,7 +6,7 @@ module RedmineOpenapiGenerator
       'issues'            => 'Issue',
       'projects'          => 'Project',
       'users'             => 'User',
-      'members'           => 'Member',
+      'members'           => 'Membership',
       'versions'          => 'Version',
       'news'              => 'News',
       'issue_relations'   => 'Relation',

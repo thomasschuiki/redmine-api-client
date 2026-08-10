@@ -71,6 +71,7 @@ See 'redmine help' for a list of available commands.`,
 			categoryCommand(),
 			attachmentCommand(),
 			uploadCommand(),
+			membershipCommand(),
 		},
 	}
 }

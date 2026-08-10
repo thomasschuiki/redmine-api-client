@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 28, 62, 51},
-	{"redmine-6.0.10.yaml", "6.0.10", 28, 62, 51},
-	{"redmine-6.1.3.yaml", "6.1.3", 28, 62, 51},
+	{"redmine-5.1.12.yaml", "5.1.12", 30, 68, 58},
+	{"redmine-6.0.10.yaml", "6.0.10", 30, 68, 58},
+	{"redmine-6.1.3.yaml", "6.1.3", 30, 68, 58},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -167,6 +167,46 @@ func TestAttachmentSurface(t *testing.T) {
 		if _, ok := ops[opID]; ok {
 			t.Errorf("attachment surface leak: %s must not be emitted", opID)
 		}
+	}
+}
+
+// TestMembershipSurface pins the memberships contract: all six operations are
+// emitted, keyed to the members controller (renamed Membership).
+func TestMembershipSurface(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{
+		"getProjectMemberships", "createProjectMembership",
+		"getMembership", "updateMembership", "updateMembership2", "deleteMembership",
+	} {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing membership operation %s", opID)
+		}
+	}
+
+	// Nested routes bind the project scope as a path parameter; the un-nested
+	// show binds the membership id.
+	pathParams := func(opID string) []string {
+		var names []string
+		params, _ := ops[opID].(map[string]any)["parameters"].([]any)
+		for _, raw := range params {
+			p, ok := raw.(map[string]any)
+			if !ok || p["in"] != "path" {
+				continue
+			}
+			if name, ok := p["name"].(string); ok {
+				names = append(names, name)
+			}
+		}
+		return names
+	}
+	if got := pathParams("getProjectMemberships"); !containsString(got, "project_id") || containsString(got, "id") {
+		t.Errorf("getProjectMemberships path params = %v, want project_id only", got)
+	}
+	if got := pathParams("getMembership"); !containsString(got, "id") {
+		t.Errorf("getMembership path params = %v, want id", got)
 	}
 }
 

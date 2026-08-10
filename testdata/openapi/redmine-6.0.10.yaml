@@ -18,6 +18,7 @@ tags:
 - name: Issue Relations
 - name: Issue Statuses
 - name: Issues
+- name: Members
 - name: Projects
 - name: Timelog
 - name: Trackers
@@ -183,6 +184,190 @@ paths:
       - Users
       summary: Delete user
       operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/projects/{project_id}/memberships":
+    get:
+      tags:
+      - Members
+      summary: List member
+      operationId: getProjectMemberships
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MembershipList"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+    post:
+      tags:
+      - Members
+      summary: Create member
+      operationId: createProjectMembership
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/MembershipCreate"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MembershipSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+  "/memberships/{id}":
+    get:
+      tags:
+      - Members
+      summary: Get member
+      operationId: getMembership
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MembershipSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Members
+      summary: Update member
+      operationId: updateMembership
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/MembershipUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MembershipSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Members
+      summary: Update member
+      operationId: updateMembership2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/MembershipUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MembershipSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Members
+      summary: Delete member
+      operationId: deleteMembership
       parameters:
       - name: id
         in: path
@@ -2862,6 +3047,83 @@ components:
       properties:
         attachment:
           "$ref": "#/components/schemas/AttachmentUpdate"
+    Membership:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+        project:
+          "$ref": "#/components/schemas/IDName"
+        roles:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IDName"
+        user:
+          "$ref": "#/components/schemas/IDName"
+        group:
+          "$ref": "#/components/schemas/IDName"
+    MembershipSingle:
+      type: object
+      required:
+      - membership
+      properties:
+        membership:
+          "$ref": "#/components/schemas/Membership"
+    MembershipList:
+      type: object
+      required:
+      - memberships
+      properties:
+        memberships:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Membership"
+        total_count:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    MembershipRequest:
+      type: object
+      required:
+      - role_ids
+      properties:
+        user_id:
+          type: integer
+        user_ids:
+          type: array
+          items:
+            type: integer
+        group_id:
+          type: integer
+        role_ids:
+          type: array
+          items:
+            type: integer
+    MembershipCreate:
+      type: object
+      required:
+      - membership
+      properties:
+        membership:
+          "$ref": "#/components/schemas/MembershipRequest"
+    MembershipUpdate:
+      type: object
+      properties:
+        role_ids:
+          type: array
+          items:
+            type: integer
+    MembershipUpdateRequest:
+      type: object
+      required:
+      - membership
+      properties:
+        membership:
+          "$ref": "#/components/schemas/MembershipUpdate"
   responses:
     Unauthorized:
       description: Authentication required

@@ -359,3 +359,41 @@ type AttachmentUpdate struct {
 type AttachmentUpdateRequest struct {
 	Attachment AttachmentUpdate `json:"attachment"`
 }
+
+type Membership struct {
+	ID      int      `json:"id"`
+	Project *IDName  `json:"project,omitempty"`
+	Roles   []IDName `json:"roles,omitempty"`
+	User    *IDName  `json:"user,omitempty"`
+	Group   *IDName  `json:"group,omitempty"`
+}
+
+type MembershipSingle struct {
+	Membership Membership `json:"membership"`
+}
+
+type MembershipList struct {
+	Memberships []Membership `json:"memberships"`
+	TotalCount  *int         `json:"total_count,omitempty"`
+	Offset      *int         `json:"offset,omitempty"`
+	Limit       *int         `json:"limit,omitempty"`
+}
+
+type MembershipRequest struct {
+	UserID  *int  `json:"user_id,omitempty"`
+	UserIds []int `json:"user_ids,omitempty"`
+	GroupID *int  `json:"group_id,omitempty"`
+	RoleIds []int `json:"role_ids"`
+}
+
+type MembershipCreate struct {
+	Membership MembershipRequest `json:"membership"`
+}
+
+type MembershipUpdate struct {
+	RoleIds []int `json:"role_ids,omitempty"`
+}
+
+type MembershipUpdateRequest struct {
+	Membership MembershipUpdate `json:"membership"`
+}

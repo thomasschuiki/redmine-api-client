@@ -216,6 +216,11 @@ redmine wiki get --project PROJECT --page TITLE
 # Versions
 redmine version list --project PROJECT
 
+# Memberships
+redmine membership list --project PROJECT [--limit N]
+redmine membership add --project PROJECT --user U --roles 1,2
+redmine membership remove <ID>
+
 # Attachments
 redmine attachment get <ID> [--output-file FILE]
 redmine attachment update <ID> [--description DESC] [--filename NAME]
