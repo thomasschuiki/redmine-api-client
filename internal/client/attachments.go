@@ -94,6 +94,9 @@ func (c *Client) UploadAttachment(ctx context.Context, path, filename string) (*
 	defer f.Close()
 
 	resp, err := c.doWithRetry(ctx, func() (*http.Request, error) {
+		if _, err := f.Seek(0, io.SeekStart); err != nil {
+			return nil, fmt.Errorf("rewinding %s for request: %w", path, err)
+		}
 		req, err := http.NewRequest("POST", u, f)
 		if err != nil {
 			return nil, err
