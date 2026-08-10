@@ -92,7 +92,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: test-plugin
     steps:
+      # Tag checkouts are detached HEADs where `git push` fails, so check out
+      # main explicitly and sync regenerated artifacts back to it.
       - uses: actions/checkout@v5
+        with:
+          ref: main
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -116,7 +120,7 @@ jobs:
             echo "No generated artifacts changed."
           else
             git commit -m "chore(plugin): regenerate OpenAPI spec for ${{ github.ref_name }}"
-            git push
+            git push origin main
           fi
 
   release:
