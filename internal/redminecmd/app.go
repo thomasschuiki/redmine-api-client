@@ -69,6 +69,8 @@ See 'redmine help' for a list of available commands.`,
 			statusCommand(),
 			priorityCommand(),
 			categoryCommand(),
+			attachmentCommand(),
+			uploadCommand(),
 		},
 	}
 }

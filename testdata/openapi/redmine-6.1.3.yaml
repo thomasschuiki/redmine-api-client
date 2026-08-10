@@ -12,6 +12,7 @@ security:
 - ApiKeyInQuery: []
 - OAuth2: []
 tags:
+- name: Attachments
 - name: Enumerations
 - name: Issue Categories
 - name: Issue Relations
@@ -1847,6 +1848,155 @@ paths:
           "$ref": "#/components/responses/PreconditionFailed"
         '404':
           "$ref": "#/components/responses/NotFound"
+  "/attachments/{id}/{filename}":
+    get:
+      tags:
+      - Attachments
+      summary: Get attachment
+      operationId: getAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AttachmentSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+  "/attachments/{id}":
+    get:
+      tags:
+      - Attachments
+      summary: Get attachment
+      operationId: getAttachment2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AttachmentSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+    patch:
+      tags:
+      - Attachments
+      summary: Update attachment
+      operationId: updateAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AttachmentUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AttachmentSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    put:
+      tags:
+      - Attachments
+      summary: Update attachment
+      operationId: updateAttachment2
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AttachmentUpdateRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AttachmentSingle"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '422':
+          "$ref": "#/components/responses/UnprocessableEntity"
+    delete:
+      tags:
+      - Attachments
+      summary: Delete attachment
+      operationId: deleteAttachment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '412':
+          "$ref": "#/components/responses/PreconditionFailed"
+        '404':
+          "$ref": "#/components/responses/NotFound"
   "/trackers":
     get:
       tags:
@@ -2667,6 +2817,51 @@ components:
       properties:
         relation:
           "$ref": "#/components/schemas/RelationRequest"
+    Attachment:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        filesize:
+          type: integer
+        content_type:
+          type: string
+        description:
+          type: string
+        content_url:
+          type: string
+        thumbnail_url:
+          type: string
+        author:
+          "$ref": "#/components/schemas/IDName"
+        created_on:
+          type: string
+          format: date-time
+    AttachmentSingle:
+      type: object
+      required:
+      - attachment
+      properties:
+        attachment:
+          "$ref": "#/components/schemas/Attachment"
+    AttachmentUpdate:
+      type: object
+      properties:
+        filename:
+          type: string
+        description:
+          type: string
+    AttachmentUpdateRequest:
+      type: object
+      required:
+      - attachment
+      properties:
+        attachment:
+          "$ref": "#/components/schemas/AttachmentUpdate"
   responses:
     Unauthorized:
       description: Authentication required

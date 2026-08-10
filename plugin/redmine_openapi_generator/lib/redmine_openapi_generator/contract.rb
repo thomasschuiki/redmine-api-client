@@ -426,6 +426,36 @@ module RedmineOpenapiGenerator
           'properties' => { '__items__' => true }
         },
         'path_key' => 'id'
+      },
+      'Attachment' => {
+        'update' => {
+          'wrapper' => 'attachment',
+          'properties' => {
+            'filename' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' }
+          }
+        },
+        'single' => {
+          'wrapper' => 'attachment',
+          'required' => %w[id],
+          'properties' => {
+            'id' => { 'type' => 'integer' },
+            'filename' => { 'type' => 'string' },
+            'filesize' => { 'type' => 'integer' },
+            'content_type' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' },
+            'content_url' => { 'type' => 'string' },
+            'thumbnail_url' => { 'type' => 'string' },
+            'author' => { '$ref' => 'IDName' },
+            'created_on' => { 'type' => 'string', 'format' => 'date-time' }
+          }
+        },
+        'list' => {
+          'wrapper' => 'attachments',
+          'envelope' => false,
+          'properties' => { '__items__' => true }
+        },
+        'path_key' => 'id'
       }
     }.freeze
 

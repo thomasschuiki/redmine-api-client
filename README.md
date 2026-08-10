@@ -215,6 +215,12 @@ redmine wiki get --project PROJECT --page TITLE
 
 # Versions
 redmine version list --project PROJECT
+
+# Attachments
+redmine attachment get <ID> [--output-file FILE]
+redmine attachment update <ID> [--description DESC] [--filename NAME]
+redmine attachment delete <ID>
+redmine upload --file PATH [--filename NAME]
 ```
 
 ---

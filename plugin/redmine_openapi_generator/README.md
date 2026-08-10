@@ -200,6 +200,18 @@ go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out
   contract; there is no automatic schema discovery.
 - **Contract surface** — only resources the contract covers appear in the spec.
   Redmine endpoints without a contract entry are omitted.
+- **Excluded endpoints** — the following API-exposed actions are intentionally **not** in
+  the spec:
+  - `POST /uploads` (attachment upload) — raw `application/octet-stream` body; no JSON
+    schema. Clients must post the file directly and read `{ upload: { id, token } }` from
+    the 201 response.
+  - `GET /attachments/download/...` and `GET /attachments/thumbnail/...` — file streaming
+    actions, not REST resources; download is served via the `content_url` field of
+    `GET /attachments/{id}`.
+  - `POST /groups/{id}/users` / `DELETE /groups/{id}/users/{user_id}` (group member
+    add/remove) — non-REST actions, deferred.
+  - Journal write actions — `journals` is not a REST resource; journal data is covered via
+    `include=journals` on issues.
 - **Version metadata only** — the contract surface is identical across
   supported Redmine versions (5.1/6.0/6.1); snapshots differ only in the
   `info.version` string.

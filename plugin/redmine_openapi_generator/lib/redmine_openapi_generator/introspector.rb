@@ -24,7 +24,6 @@ module RedmineOpenapiGenerator
       'documents'         => 'Document',
       'journals'          => 'Journal',
       'watchers'          => 'Watcher',
-      'files'             => 'Attachment',
       'wiki'              => 'WikiPage',
       'timelog'           => 'TimeEntry',
       'wiki_pages'        => 'WikiPage',

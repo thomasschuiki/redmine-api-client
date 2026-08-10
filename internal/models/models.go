@@ -334,3 +334,28 @@ type RelationRequest struct {
 type RelationCreate struct {
 	Relation RelationRequest `json:"relation"`
 }
+
+type Attachment struct {
+	ID           int        `json:"id"`
+	Filename     *string    `json:"filename,omitempty"`
+	Filesize     *int       `json:"filesize,omitempty"`
+	ContentType  *string    `json:"content_type,omitempty"`
+	Description  *string    `json:"description,omitempty"`
+	ContentURL   *string    `json:"content_url,omitempty"`
+	ThumbnailURL *string    `json:"thumbnail_url,omitempty"`
+	Author       *IDName    `json:"author,omitempty"`
+	CreatedOn    *time.Time `json:"created_on,omitempty"`
+}
+
+type AttachmentSingle struct {
+	Attachment Attachment `json:"attachment"`
+}
+
+type AttachmentUpdate struct {
+	Filename    *string `json:"filename,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type AttachmentUpdateRequest struct {
+	Attachment AttachmentUpdate `json:"attachment"`
+}

@@ -21,9 +21,9 @@ var snapshotExpectations = []struct {
 	ops     int
 	schemas int
 }{
-	{"redmine-5.1.12.yaml", "5.1.12", 26, 57, 47},
-	{"redmine-6.0.10.yaml", "6.0.10", 26, 57, 47},
-	{"redmine-6.1.3.yaml", "6.1.3", 26, 57, 47},
+	{"redmine-5.1.12.yaml", "5.1.12", 28, 62, 51},
+	{"redmine-6.0.10.yaml", "6.0.10", 28, 62, 51},
+	{"redmine-6.1.3.yaml", "6.1.3", 28, 62, 51},
 }
 
 // repoRoot resolves the module root from the test source location so the
@@ -142,6 +142,30 @@ func TestIndexOnlyResourcesAreTrulyReadOnly(t *testing.T) {
 	} {
 		if _, ok := ops[opID]; ok {
 			t.Errorf("accept_api_auth filter leak: %s must not be emitted", opID)
+		}
+	}
+}
+
+// TestAttachmentSurface pins the attachments contract: the five REST ops are
+// emitted, while the non-REST binary surface (upload, download, thumbnail) and
+// the project files controller stay out of the spec.
+func TestAttachmentSurface(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{"getAttachment", "getAttachment2", "updateAttachment", "updateAttachment2", "deleteAttachment"} {
+		if _, ok := ops[opID]; !ok {
+			t.Errorf("missing attachment operation %s", opID)
+		}
+	}
+
+	for _, opID := range []string{
+		"getProjectAttachments", "createProjectAttachment",
+		"uploadAttachment", "downloadAttachment", "thumbnailAttachment",
+	} {
+		if _, ok := ops[opID]; ok {
+			t.Errorf("attachment surface leak: %s must not be emitted", opID)
 		}
 	}
 }
