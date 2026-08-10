@@ -1,7 +1,9 @@
 # Plan: Rework `redmine_openapi_generator` to emit a consumable OpenAPI spec
 
-> **Status:** Phases 0–5 done. Open decision 4 (split request/response models)
-> is the only outstanding item.
+> **Status:** Phases 0–5 done. All open decisions resolved (4 included).
+> Follow-up work adding six more contract resources landed as incremental
+> commits on top (attachments, memberships, news, groups, queries, custom
+> fields) — see `plan-next.md`.
 
 ## Why
 
@@ -246,4 +248,8 @@ PUT/PATCH → `{Name}UpdateRequest`, snapshot workflow).
    nil-safe derefs). Verified in the live smoke test.
 4. **Split request vs response models** — consider two generated files (request/
    response) so the client imports only what it needs.
-   — **Open.**
+   — ✅ **Resolved:** not needed. Per-resource client files (`internal/client/*.go`)
+   alias exactly the generated types they consume (e.g. `internal/client/membership.go`
+   aliases `models.Membership*`), so the client only links what it imports; the single
+   `internal/models/models.go` remains the source of truth for `redmine-spec
+   generate-models`.

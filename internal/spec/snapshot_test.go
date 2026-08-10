@@ -277,6 +277,54 @@ func TestQueryAndCustomFieldSurface(t *testing.T) {
 	}
 }
 
+// TestRenderOkWritesPinEmptyResponses pins the render_api_ok contract: news
+// create/update, membership update, group update, and attachment update reply
+// 204 No Content with no response body.
+func TestRenderOkWritesPinEmptyResponses(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	ops := loadOperations(t, path)
+
+	for _, opID := range []string{
+		"createNews", "createProjectNews",
+		"updateNews", "updateNews2",
+		"updateMembership",
+		"updateGroup",
+		"updateAttachment",
+	} {
+		op, ok := ops[opID].(map[string]any)
+		if !ok {
+			t.Fatalf("operation %s not found", opID)
+		}
+		responses, ok := op["responses"].(map[string]any)
+		if !ok {
+			t.Fatalf("operation %s has no responses", opID)
+		}
+		resp204, ok := responses["204"].(map[string]any)
+		if !ok {
+			t.Errorf("%s: missing 204 response; have %v", opID, keysOf(responses))
+			continue
+		}
+		if _, ok := resp204["content"]; ok {
+			t.Errorf("%s: 204 must not carry a response body", opID)
+		}
+	}
+
+	// GetNews2 (show) is a normal 200 with a body.
+	show := ops["getNews2"].(map[string]any)["responses"].(map[string]any)
+	if _, ok := show["200"]; !ok {
+		t.Errorf("getNews2: missing 200 response")
+	}
+}
+
+func keysOf(m map[string]any) []string {
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 func loadOperations(t *testing.T, path string) map[string]any {
 	t.Helper()
 	data, err := os.ReadFile(path)

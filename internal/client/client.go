@@ -222,6 +222,10 @@ func (c *Client) decodeResponse(method, u string, resp *http.Response, target an
 	if target == nil {
 		return nil
 	}
+	// 204 No Content (and other empty bodies) leave nothing to decode.
+	if len(bytes.TrimSpace(raw)) == 0 {
+		return nil
+	}
 	if err := json.Unmarshal(raw, target); err != nil {
 		return &DecodeError{
 			Method:      method,

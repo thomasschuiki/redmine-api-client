@@ -161,13 +161,10 @@ full member list; --add-users and --remove-users adjust it incrementally
 						}
 						req.Group.UserIds = diffUserIDs(group.Users, addIDs, removeIDs)
 					}
-					group, err := cl.UpdateGroup(ctx, id, req)
-					if err != nil {
+					if err := cl.UpdateGroup(ctx, id, req); err != nil {
 						return err
 					}
-					if err := output.Print(group, c.String("output")); err != nil {
-						return err
-					}
+					fmt.Fprintf(os.Stdout, "Group %d updated\n", id)
 					return nil
 				},
 			},

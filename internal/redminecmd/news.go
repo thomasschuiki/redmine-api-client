@@ -3,6 +3,7 @@ package redminecmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/tom-redmine/go-redmine-cli/internal/client"
@@ -82,11 +83,12 @@ Use --include to expand associated data (attachments, comments).`,
 				ArgsUsage: " ",
 				Description: `Create a news item in a project.
 
---title is required. Pass the project with --project (identifier or ID);
-the news is created in the default project when omitted.`,
+--title and --project are required. Redmine's news endpoint only accepts
+the project via the top-level project_id parameter, so a project must be
+given even though the wrapper carries it.`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "title", Usage: "News title", Required: true},
-					&cli.StringFlag{Name: "project", Usage: "Project identifier"},
+					&cli.StringFlag{Name: "project", Usage: "Project identifier", Required: true},
 					&cli.StringFlag{Name: "summary", Usage: "News summary"},
 					&cli.StringFlag{Name: "description", Usage: "News description"},
 				},
@@ -111,15 +113,12 @@ the news is created in the default project when omitted.`,
 						if err != nil {
 							return err
 						}
-						req.News.ProjectID = &project.ID
+						req.ProjectID = &project.ID
 					}
-					news, err := cl.CreateNews(ctx, req)
-					if err != nil {
+					if err := cl.CreateNews(ctx, req); err != nil {
 						return err
 					}
-					if err := output.Print(news, c.String("output")); err != nil {
-						return err
-					}
+					fmt.Fprintf(os.Stdout, "News created\n")
 					return nil
 				},
 			},

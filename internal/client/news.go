@@ -50,25 +50,14 @@ func (c *Client) GetNews(ctx context.Context, id int, include string) (*News, er
 	return &result.News, nil
 }
 
-// CreateNews creates a news item.
-func (c *Client) CreateNews(ctx context.Context, req NewsCreateRequest) (*News, error) {
-	var result struct {
-		News News `json:"news"`
-	}
-	if err := c.post(ctx, "/news.json", req, &result); err != nil {
-		return nil, err
-	}
-	return &result.News, nil
+// CreateNews creates a news item. News#create render_api_ok: the response is
+// 204 No Content.
+func (c *Client) CreateNews(ctx context.Context, req NewsCreateRequest) error {
+	return c.post(ctx, "/news.json", req, nil)
 }
 
-// UpdateNews updates a news item.
-func (c *Client) UpdateNews(ctx context.Context, id int, req NewsUpdateRequest) (*News, error) {
+// UpdateNews updates a news item. News#update render_api_ok: 204 No Content.
+func (c *Client) UpdateNews(ctx context.Context, id int, req NewsUpdateRequest) error {
 	path := fmt.Sprintf("/news/%d.json", id)
-	var result struct {
-		News News `json:"news"`
-	}
-	if err := c.put(ctx, path, req, &result); err != nil {
-		return nil, err
-	}
-	return &result.News, nil
+	return c.put(ctx, path, req, nil)
 }

@@ -67,16 +67,11 @@ func (c *Client) CreateGroup(ctx context.Context, req GroupCreateRequest) (*Grou
 	return &result.Group, nil
 }
 
-// UpdateGroup updates a group.
-func (c *Client) UpdateGroup(ctx context.Context, id int, req GroupUpdateRequest) (*Group, error) {
+// UpdateGroup updates a group. GroupsController#update render_api_ok: the
+// response is 204 No Content.
+func (c *Client) UpdateGroup(ctx context.Context, id int, req GroupUpdateRequest) error {
 	path := fmt.Sprintf("/groups/%d.json", id)
-	var result struct {
-		Group Group `json:"group"`
-	}
-	if err := c.put(ctx, path, req, &result); err != nil {
-		return nil, err
-	}
-	return &result.Group, nil
+	return c.put(ctx, path, req, nil)
 }
 
 // DeleteGroup deletes a group.

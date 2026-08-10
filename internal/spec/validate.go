@@ -41,6 +41,12 @@ var requiredSchemas = []string{
 	"IssuePriority", "IssuePriorityList",
 	"IssueCategory", "IssueCategorySingle", "IssueCategoryList",
 	"Relation", "RelationSingle", "RelationList", "RelationRequest", "RelationCreate",
+	"Attachment", "AttachmentSingle", "AttachmentUpdate", "AttachmentUpdateRequest",
+	"Membership", "MembershipSingle", "MembershipList", "MembershipRequest", "MembershipCreate", "MembershipUpdate", "MembershipUpdateRequest",
+	"News", "NewsSingle", "NewsList", "NewsRequest", "NewsCreate", "NewsUpdate", "NewsUpdateRequest",
+	"Group", "GroupSingle", "GroupList", "GroupRequest", "GroupCreate", "GroupUpdate", "GroupUpdateRequest",
+	"Query", "QueryList",
+	"CustomFieldDefinition", "CustomFieldDefinitionList",
 }
 
 // Validate reads a bundled OpenAPI spec and checks for structural errors:

@@ -423,11 +423,11 @@ type NewsRequest struct {
 	Title       string  `json:"title"`
 	Summary     *string `json:"summary,omitempty"`
 	Description *string `json:"description,omitempty"`
-	ProjectID   *int    `json:"project_id,omitempty"`
 }
 
 type NewsCreate struct {
-	News NewsRequest `json:"news"`
+	News      NewsRequest `json:"news"`
+	ProjectID *int        `json:"project_id,omitempty"`
 }
 
 type NewsUpdate struct {

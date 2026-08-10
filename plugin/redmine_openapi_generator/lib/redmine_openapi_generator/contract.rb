@@ -435,6 +435,8 @@ module RedmineOpenapiGenerator
             'description' => { 'type' => 'string' }
           }
         },
+        # AttachmentsController#update render_api_ok: 204 No Content.
+        'render_ok' => %w[update],
         'single' => {
           'wrapper' => 'attachment',
           'required' => %w[id],
@@ -483,6 +485,8 @@ module RedmineOpenapiGenerator
             }
           }
         },
+        # MembershipsController#update render_api_ok: 204 No Content.
+        'render_ok' => %w[update],
         'single' => {
           'wrapper' => 'membership',
           'required' => %w[id],
@@ -511,10 +515,17 @@ module RedmineOpenapiGenerator
           'properties' => {
             'title' => { 'type' => 'string' },
             'summary' => { 'type' => 'string' },
-            'description' => { 'type' => 'string' },
+            'description' => { 'type' => 'string' }
+          },
+          # Redmine's NewsController#create runs find_project_by_project_id,
+          # which reads params[:project_id] at the TOP level — a project_id
+          # nested under the news wrapper is invisible and 404s POST /news.
+          'top_level' => {
             'project_id' => { 'type' => 'integer' }
           }
         },
+        # News#create/update render_api_ok: 204 No Content, empty body.
+        'render_ok' => %w[create update],
         'update' => {
           'wrapper' => 'news',
           'properties' => {
@@ -565,6 +576,8 @@ module RedmineOpenapiGenerator
             }
           }
         },
+        # GroupsController#update render_api_ok: 204 No Content.
+        'render_ok' => %w[update],
         'single' => {
           'wrapper' => 'group',
           'required' => %w[id name],
@@ -679,7 +692,11 @@ module RedmineOpenapiGenerator
         req = res['request']
         if req
           result["#{name}Request"] = flat_schema(req)
-          result["#{name}Create"] = wrapper_schema(req['wrapper'], "#{name}Request")
+          create = wrapper_schema(req['wrapper'], "#{name}Request")
+          if (top = req['top_level'])
+            create['properties'].merge!(top)
+          end
+          result["#{name}Create"] = create
         end
 
         upd = res['update']

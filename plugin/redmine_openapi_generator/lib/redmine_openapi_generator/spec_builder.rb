@@ -325,18 +325,25 @@ module RedmineOpenapiGenerator
 
     def build_responses(route)
       model = model_name_for(route)
-      status = case route[:verb].upcase
-               when 'POST' then '201'
-               when 'DELETE' then '204'
-               else '200'
+      no_body = route[:verb].upcase == 'DELETE' || render_ok_actions(model).include?(route[:action])
+
+      status = if no_body
+                 '204'
+               else
+                 case route[:verb].upcase
+                 when 'POST' then '201'
+                 else '200'
+                 end
                end
 
       response = { 'description' => success_description(route) }
-      schema_name = response_schema(model, route[:action])
-      if schema_name && @components.key?(schema_name)
-        response['content'] = {
-          'application/json' => { 'schema' => { '$ref' => "#/components/schemas/#{schema_name}" } }
-        }
+      unless no_body
+        schema_name = response_schema(model, route[:action])
+        if schema_name && @components.key?(schema_name)
+          response['content'] = {
+            'application/json' => { 'schema' => { '$ref' => "#/components/schemas/#{schema_name}" } }
+          }
+        end
       end
 
       result = { status => response }
@@ -352,6 +359,15 @@ module RedmineOpenapiGenerator
       result
     end
 
+    # Actions that render_api_ok: reply 204 No Content with an empty body
+    # (measured against a live Redmine; declared per resource in the contract).
+    def render_ok_actions(model)
+      return [] unless model
+
+      res = Contract::RESOURCES[model]
+      res ? (res['render_ok'] || []) : []
+    end
+
     def success_description(route)
       case route[:verb].upcase
       when 'POST' then 'Created'
@@ -361,8 +377,11 @@ module RedmineOpenapiGenerator
     end
 
     # The response schema for an action: a {Name}Single wrapper for object
-    # endpoints, a {Name}List wrapper for collection endpoints.
+    # endpoints, a {Name}List wrapper for collection endpoints. Actions that
+    # render_api_ok carry no response body and return nil here.
     def response_schema(model, action)
+      return nil if model && render_ok_actions(model).include?(action)
+
       case action
       when 'index', 'list' then "#{model}List" if model
       when 'show', 'create', 'update', 'edit' then "#{model}Single" if model

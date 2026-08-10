@@ -55,16 +55,11 @@ func (c *Client) CreateMembership(ctx context.Context, projectID string, req Mem
 	return &result.Membership, nil
 }
 
-// UpdateMembership updates the roles of a membership.
-func (c *Client) UpdateMembership(ctx context.Context, id int, req MembershipUpdateRequest) (*Membership, error) {
+// UpdateMembership updates the roles of a membership. MembershipsController
+// #update render_api_ok: the response is 204 No Content.
+func (c *Client) UpdateMembership(ctx context.Context, id int, req MembershipUpdateRequest) error {
 	path := fmt.Sprintf("/memberships/%d.json", id)
-	var result struct {
-		Membership Membership `json:"membership"`
-	}
-	if err := c.put(ctx, path, req, &result); err != nil {
-		return nil, err
-	}
-	return &result.Membership, nil
+	return c.put(ctx, path, req, nil)
 }
 
 // DeleteMembership removes a membership by ID.

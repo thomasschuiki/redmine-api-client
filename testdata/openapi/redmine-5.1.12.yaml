@@ -317,12 +317,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/MembershipUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/MembershipSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -351,12 +347,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/MembershipUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/MembershipSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -692,12 +684,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/NewsCreate"
       responses:
-        '201':
+        '204':
           description: Created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/NewsSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -1860,12 +1848,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/NewsCreate"
       responses:
-        '201':
+        '204':
           description: Created
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/NewsSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -1924,12 +1908,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/NewsUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/NewsSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -1958,12 +1938,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/NewsUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/NewsSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -2389,12 +2365,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/AttachmentUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AttachmentSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -2423,12 +2395,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/AttachmentUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/AttachmentSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -2572,12 +2540,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/GroupUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/GroupSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -2606,12 +2570,8 @@ paths:
             schema:
               "$ref": "#/components/schemas/GroupUpdateRequest"
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/GroupSingle"
         '401':
           "$ref": "#/components/responses/Unauthorized"
         '403':
@@ -3670,8 +3630,6 @@ components:
           type: string
         description:
           type: string
-        project_id:
-          type: integer
     NewsCreate:
       type: object
       required:
@@ -3679,6 +3637,8 @@ components:
       properties:
         news:
           "$ref": "#/components/schemas/NewsRequest"
+        project_id:
+          type: integer
     NewsUpdate:
       type: object
       properties:
