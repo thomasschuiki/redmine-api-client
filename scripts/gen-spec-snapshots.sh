@@ -5,12 +5,12 @@
 #
 # Usage:
 #   ./scripts/gen-spec-snapshots.sh
-#   VERSIONS="6.1.3" ./scripts/gen-spec-snapshots.sh   # subset
+#   VERSIONS="7.0.2" ./scripts/gen-spec-snapshots.sh   # subset
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SNAP_DIR="${SCRIPT_DIR}/../testdata/openapi"
-VERSIONS="${VERSIONS:-5.1.12 6.0.10 6.1.3}"
+VERSIONS="${VERSIONS:-5.1.12 6.0.10 6.1.3 7.0.2}"
 
 mkdir -p "${SNAP_DIR}"
 

@@ -24,7 +24,10 @@ var snapshotExpectations = []struct {
 	{"redmine-5.1.12.yaml", "5.1.12", 37, 84, 76},
 	{"redmine-6.0.10.yaml", "6.0.10", 37, 84, 76},
 	{"redmine-6.1.3.yaml", "6.1.3", 37, 84, 76},
+	{"redmine-7.0.2.yaml", "7.0.2", 37, 84, 76},
 }
+
+const currentSnapshot = "redmine-7.0.2.yaml"
 
 // repoRoot resolves the module root from the test source location so the
 // versioned snapshots under the repo-level testdata/ can be read regardless
@@ -91,7 +94,7 @@ func TestSnapshotInfoMatchesVersion(t *testing.T) {
 
 func TestListOperationsCarryQueryFilters(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	wantByOp := map[string][]string{
@@ -125,7 +128,7 @@ func TestListOperationsCarryQueryFilters(t *testing.T) {
 // API, so their spec surface must be a single list operation.
 func TestIndexOnlyResourcesAreTrulyReadOnly(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	want := []string{"getTrackers", "getIssueStatuses", "getIssuePriorities", "getEnumerationIssuePriorities"}
@@ -151,7 +154,7 @@ func TestIndexOnlyResourcesAreTrulyReadOnly(t *testing.T) {
 // the project files controller stay out of the spec.
 func TestAttachmentSurface(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{"getAttachment", "getAttachment2", "updateAttachment", "updateAttachment2", "deleteAttachment"} {
@@ -174,7 +177,7 @@ func TestAttachmentSurface(t *testing.T) {
 // emitted, keyed to the members controller (renamed Membership).
 func TestMembershipSurface(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{
@@ -214,7 +217,7 @@ func TestMembershipSurface(t *testing.T) {
 // auto-disambiguated show (getNews2), update pair, and delete are all emitted.
 func TestNewsSurface(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{
@@ -236,7 +239,7 @@ func TestNewsSurface(t *testing.T) {
 // builtin index param and include show param.
 func TestGroupSurface(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{"getGroups", "createGroup", "getGroup", "updateGroup", "updateGroup2", "deleteGroup"} {
@@ -258,7 +261,7 @@ func TestGroupSurface(t *testing.T) {
 // index op, so no create/update/delete surface may leak.
 func TestQueryAndCustomFieldSurface(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{"getQueries", "getCustomFieldDefinitions"} {
@@ -282,7 +285,7 @@ func TestQueryAndCustomFieldSurface(t *testing.T) {
 // 204 No Content with no response body.
 func TestRenderOkWritesPinEmptyResponses(t *testing.T) {
 	root := repoRoot(t)
-	path := filepath.Join(root, "testdata", "openapi", "redmine-6.1.3.yaml")
+	path := filepath.Join(root, "testdata", "openapi", currentSnapshot)
 	ops := loadOperations(t, path)
 
 	for _, opID := range []string{

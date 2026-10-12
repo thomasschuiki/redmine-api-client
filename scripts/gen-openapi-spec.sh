@@ -7,7 +7,7 @@
 #
 # Examples:
 #   ./scripts/gen-openapi-spec.sh latest
-#   ./scripts/gen-openapi-spec.sh 7.0 docs/openapi/openapi.yaml
+#   ./scripts/gen-openapi-spec.sh 7.0.2 docs/openapi/openapi.yaml
 set -euo pipefail
 
 REDMINE_VERSION="${1:-latest}"

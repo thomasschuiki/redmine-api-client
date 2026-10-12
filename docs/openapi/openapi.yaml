@@ -2,8 +2,8 @@
 openapi: 3.0.3
 info:
   title: Redmine API
-  description: Auto-generated OpenAPI specification for Redmine 6.1.3.stable.
-  version: 1.0.0+redmine.6.1.3.stable
+  description: Auto-generated OpenAPI specification for Redmine 7.0.2.stable.
+  version: 1.0.0+redmine.7.0.2.stable
 servers:
 - url: "/"
 security:

@@ -82,7 +82,7 @@ with payload shapes from a curated contract. See
 ./scripts/gen-openapi-spec.sh latest
 
 # Regenerate for a specific version
-./scripts/gen-openapi-spec.sh 6.1.3 docs/openapi/openapi.yaml
+./scripts/gen-openapi-spec.sh 7.0.2 docs/openapi/openapi.yaml
 ```
 
 Versioned snapshots are committed under `testdata/openapi/` and pinned by the
@@ -283,6 +283,8 @@ go-redmine-cli/
     redmine-5.1.12.yaml           Committed contract snapshot
     redmine-6.0.10.yaml           Committed contract snapshot
     redmine-6.1.3.yaml            Committed contract snapshot
+    redmine-7.0.2.yaml            Committed contract snapshot
+  docs/archive/                   Historical project plans
   docs/openapi/
     openapi.yaml                  Auto-generated spec
 ```

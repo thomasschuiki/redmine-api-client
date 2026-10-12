@@ -71,7 +71,7 @@ introspector, and copies the output out.
 ./scripts/gen-openapi-spec.sh latest
 
 # Generate for a specific version
-./scripts/gen-openapi-spec.sh 6.1.3 /tmp/redmine-api.yaml
+./scripts/gen-openapi-spec.sh 7.0.2 /tmp/redmine-api.yaml
 ```
 
 Generate one snapshot per supported version into `testdata/openapi/`:
@@ -79,7 +79,7 @@ Generate one snapshot per supported version into `testdata/openapi/`:
 ```bash
 ./scripts/gen-spec-snapshots.sh
 # or a subset:
-VERSIONS="6.1.3" ./scripts/gen-spec-snapshots.sh
+VERSIONS="7.0.2" ./scripts/gen-spec-snapshots.sh
 ```
 
 Commit the regenerated snapshots. The Go snapshot tests
@@ -181,7 +181,7 @@ shared pieces under `SHARED`), then run strict validation to make sure nothing
 is left unreferenced:
 
 ```bash
-./scripts/gen-openapi-spec.sh 6.1.3 /tmp/openapi.yaml
+./scripts/gen-openapi-spec.sh 7.0.2 /tmp/openapi.yaml
 go run ./cmd/redmine-spec spec validate --strict --spec /tmp/openapi.yaml
 ```
 
@@ -189,7 +189,7 @@ Then regenerate and commit snapshots, models, and the bundled spec:
 
 ```bash
 ./scripts/gen-spec-snapshots.sh
-cp testdata/openapi/redmine-6.1.3.yaml docs/openapi/openapi.yaml
+cp testdata/openapi/redmine-7.0.2.yaml docs/openapi/openapi.yaml
 go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out internal/models
 ```
 
@@ -213,8 +213,8 @@ go run ./cmd/redmine-spec generate-models --spec docs/openapi/openapi.yaml --out
   - Journal write actions — `journals` is not a REST resource; journal data is covered via
     `include=journals` on issues.
 - **Version metadata only** — the contract surface is identical across
-  supported Redmine versions (5.1/6.0/6.1); snapshots differ only in the
-  `info.version` string.
+  supported Redmine versions (5.1/6.0/6.1/7.0); snapshots differ only in the
+  Redmine version metadata in `info.description` and `info.version`.
 - **Path parameter types** — all `{id}` parameters are typed as `integer`. Some
   Redmine resources use string identifiers.
 - **Plugin controller excluded** — `openapi_spec` is filtered out to avoid
