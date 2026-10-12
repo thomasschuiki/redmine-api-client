@@ -4,9 +4,11 @@ module RedmineOpenapiGenerator
   # schemas. It is the source of truth for SpecBuilder's schema emission and
   # replaces the previous DB-column introspection.
   #
-  # The shapes here are derived from the working hand-written types in
-  # internal/client/*.go (themselves validated against a live Redmine instance)
-  # plus well-known Redmine REST API conventions.
+  # The initial shapes were derived from the hand-written request/response types
+  # in internal/client/*.go and validated against a live Redmine instance, plus
+  # well-known Redmine REST API conventions. The generated Go models in
+  # internal/models/models.go are downstream artifacts generated from this
+  # contract's OpenAPI output.
   #
   # Schema fragments are OpenAPI 3.0 schema objects. A $ref is written as the bare
   # component name (e.g. "IDName"); SpecBuilder resolves it to

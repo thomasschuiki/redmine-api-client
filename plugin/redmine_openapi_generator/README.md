@@ -34,6 +34,13 @@ parameters, operation summaries and IDs, request bodies referencing component
 schemas, response schemas, common error responses (401/403/412), and security
 schemes (Basic, API key header, API key query, OAuth2).
 
+The dependency direction is intentionally one-way: `contract.rb` produces the
+OpenAPI schemas, `redmine-spec` uses `libopenapi` to generate
+`internal/models/models.go`, and the hand-written methods in `internal/client/`
+use those generated types. The plugin does not consume the Go models; they are
+downstream artifacts. Change API shapes in the contract first, then regenerate
+the spec and models.
+
 ## Plugin Structure
 
 ```
