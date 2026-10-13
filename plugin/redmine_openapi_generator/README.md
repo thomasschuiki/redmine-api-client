@@ -114,13 +114,12 @@ Output goes to `public/openapi.yaml` (or `openapi.json`).
 
 ### Via HTTP endpoint
 
-When installed, the plugin exposes `GET /openapi/spec` which returns the spec as
-JSON or YAML. The endpoint requires the `view_openapi_spec` permission (grants
-to administrators by default).
+When installed, the plugin exposes `GET /openapi/spec.json`, which returns the
+spec as JSON. The endpoint requires authentication and the `view_openapi_spec`
+permission (granted to administrators by default).
 
 ```
 GET /openapi/spec.json
-GET /openapi/spec.yaml
 ```
 
 ### Standalone script

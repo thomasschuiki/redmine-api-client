@@ -305,6 +305,7 @@ go-redmine-cli/
   scripts/
     gen-openapi-spec.sh           Docker-based spec generation
     gen-spec-snapshots.sh         Per-version snapshot generation
+    test-openapi-endpoint.rb      Authenticated endpoint smoke test
   testdata/openapi/
     redmine-5.1.12.yaml           Committed contract snapshot
     redmine-6.0.10.yaml           Committed contract snapshot

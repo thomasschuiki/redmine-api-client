@@ -65,12 +65,15 @@ jobs:
           set +e
           docker run --rm --network redmine-test --name test-redmine \
             -v "${PWD}/plugin/redmine_openapi_generator:/usr/src/redmine/plugins/redmine_openapi_generator:ro" \
+            -v "${PWD}/scripts/test-openapi-endpoint.rb:/tmp/test-openapi-endpoint.rb:ro" \
             -v "${TMPOUT}:/output" \
             "redmine:${{ matrix.redmine }}" /bin/bash -exc '
               cp /usr/src/redmine/plugins/redmine_openapi_generator/config/database_ci.yml /usr/src/redmine/config/database.yml
               cd /usr/src/redmine
               RAILS_ENV=test bundle exec rake db:migrate 2>&1
+              RAILS_ENV=test REDMINE_LANG=en bundle exec rake redmine:load_default_data 2>&1
               RAILS_ENV=test OUTPUT_PATH=/output/openapi.yaml bundle exec ruby plugins/redmine_openapi_generator/generate_spec.rb
+              RAILS_ENV=test bundle exec ruby /tmp/test-openapi-endpoint.rb
             '
           EXITCODE=$?
           set -e
